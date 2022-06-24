@@ -2,14 +2,19 @@
   <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
     <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
       <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
+        <template #left>
+          <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
+            @click="nextTop(item.Id)" />
+        </template>
         <van-row @click="onNoteDetail(item.Id)">
           <van-col span="24">
             <p class="van-ellipsis">{{ item.Title }}</p>
-            <p>{{ item.CreateTime }}</p>
+            <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort>1">置顶</span></p>
           </van-col>
         </van-row>
         <template #right>
-          <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id)" type="danger" class="delete-button" />
+          <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id)" type="danger"
+            class="delete-button" />
         </template>
       </van-swipe-cell>
     </van-list>
@@ -50,15 +55,69 @@ export default {
     };
 
     let willDelItemId = 0;
+    //删除
     const preDelItem = (Id) => {
       willDelItemId = Id;
       console.log(willDelItemId);
+    };
+    //置顶
+    let willTopItemId = 0;
+    const nextTop = (Id) => {
+      willTopItemId = Id;
+      console.log(willTopItemId);
+    };
+
+    const topItem = (item) => {
+      if (item.Sort > 1) {
+        //取消置顶
+        store.dispatch('updateNoteSort', {
+          Id: item.Id,
+          Sort: 1
+        }).then((resolve) => {
+          if (resolve.rowsAffected > 0) {
+            initPageIndex = 1;
+            list.value = [];
+            getNoteListByPage(initPageIndex, 20);
+            setTimeout(function () {
+              Toast('已取消置顶');
+            }, 300);
+          }
+        }).catch((reject) => {
+          Toast.fail('取消置顶失败：' + reject);
+        });
+      } else {
+        //置顶
+        store.dispatch('updateNoteSort', {
+          Id: item.Id,
+          Sort: Date.now()
+        }).then((resolve) => {
+          if (resolve.rowsAffected > 0) {
+            initPageIndex = 1;
+            list.value = [];
+            getNoteListByPage(initPageIndex, 20);
+            setTimeout(function () {
+              Toast('已置顶');
+            }, 300);
+          }
+        }).catch((reject) => {
+          Toast.fail('置顶失败：' + reject);
+        });
+      }
     };
 
     // position 为关闭时点击的位置
     const beforeClose = ({ position }) => {
       switch (position) {
         case 'left':
+          return new Promise(() => {
+            for (let index = 0; index < list.value.length; index++) {
+              const item = list.value[index];
+              if (item.Id == willTopItemId) {
+                topItem(item);
+                break;
+              }
+            }
+          });
         case 'cell':
         case 'outside':
           return true;
@@ -67,20 +126,20 @@ export default {
             Dialog.confirm({
               title: '确定删除吗？',
             }).then(() => {
-               store.dispatch('delNote',willDelItemId).then((resolve,reject)=>{
-                  if(resolve.rowsAffected>0){
-                    for (let index = 0; index < list.value.length; index++) {
-                      const item = list.value[index];
-                      if(item.Id == willDelItemId){
-                        list.value.splice(index,1);
-                        break;
-                      }
+              store.dispatch('delNote', willDelItemId).then((resolve, reject) => {
+                if (resolve.rowsAffected > 0) {
+                  for (let index = 0; index < list.value.length; index++) {
+                    const item = list.value[index];
+                    if (item.Id == willDelItemId) {
+                      list.value.splice(index, 1);
+                      break;
                     }
-                    Notify({ type: 'success', message: '已删除',position:'bottom' });
-                  }else{
-                    Toast.fail('删除失败：'+reject);
                   }
-               });
+                  Notify({ type: 'success', message: '已删除', position: 'bottom' });
+                } else {
+                  Toast.fail('删除失败：' + reject);
+                }
+              });
             }).catch(() => {
               // on cancel
             });
@@ -90,6 +149,7 @@ export default {
 
     onActivated(() => {
       const RefreshListState = store.state.RefreshListState;
+      console.log('store.state.RefreshListState:'+store.state.RefreshListState);
       if (RefreshListState) {
         list.value = [];
         initPageIndex = 1;
@@ -125,7 +185,7 @@ export default {
     };
 
     const { height } = useWindowSize();
-    const vheight = ref(height.value+'px');
+    const vheight = ref(height.value + 'px');
 
     return {
       Refresh,
@@ -137,7 +197,8 @@ export default {
       onNoteDetail,
       preDelItem,
       beforeClose,
-      vheight
+      vheight,
+      nextTop
     };
   },
 }
@@ -146,8 +207,9 @@ export default {
 <style lang="less">
 .van-pull-refresh {
   background-color: #f9f9f9;
+  padding-bottom: 40px;
 
-  .van-list{
+  .van-list {
     height: v-bind("vheight");
   }
 
@@ -174,6 +236,15 @@ export default {
         color: #666;
       }
     }
+  }
+  .top-tag{
+    font-size: 12px;
+    display:inline-block;
+    padding: 2px 3px;
+    background-color: blue;
+    color: #fff;
+    border-radius: 3px;
+    margin-left: 9px;
   }
 }
 </style>

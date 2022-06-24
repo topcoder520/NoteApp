@@ -133,6 +133,29 @@ export function updateNote(context,{
     });
 }
 
+export function updateNoteSort(context,{
+    Id,Sort
+}){
+    return new Promise((resolve, reject) => {
+        context.state.database.transaction(function (tx) {
+            var query = "update note set Sort=? where Id = ?";
+            tx.executeSql(query, [Sort,Id], function (tx, res) {
+                    //console.log("insertId: " + res.insertId + " -- probably 1");
+                    //console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
+                    resolve({rowsAffected:res.rowsAffected});
+                },
+                function (tx, error) {
+                    console.log('UPDATE  error: ' + error.message);
+                    reject('UPDATE  error: ' + error.message);
+                });
+        }, function (error) {
+            console.log('transaction error: ' + error.message);
+        }, function () {
+            console.log('transaction ok');
+        });
+    });
+}
+
 export function delNote(context,id){
     return new Promise((resolve, reject) =>{
         context.state.database.transaction(function (tx) {
