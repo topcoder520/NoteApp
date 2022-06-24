@@ -101,7 +101,7 @@ export default {
                     if (resolve.rowsAffected > 0) {
                         Toast('添加成功');
                         store.commit('setRefreshListState', true);
-                        history.back();
+                        //history.back();
                     }
                 }).catch((reject) => {
                     Toast.fail('添加失败：' + reject);
