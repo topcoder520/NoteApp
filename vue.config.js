@@ -12,7 +12,7 @@ module.exports = defineConfig({
   //项目部署的地址
   publicPath:isProd?'./':'/', 
   // 打包输出
-  outputDir: "../www",
+  outputDir: "./www",
   // 放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录
   assetsDir: 'assets',
   // eslint-loader 是否在保存的时候检查
