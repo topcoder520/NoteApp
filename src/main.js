@@ -30,6 +30,8 @@ app.use(Calendar);
 app.use(SwipeCell);
 app.use(Button);
 app.use(Notify);
-
 app.mount('#app');
+// document.addEventListener('deviceready',function(){
+//     app.mount('#app');
+// },false)
 

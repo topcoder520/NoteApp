@@ -19,7 +19,7 @@
   },
   "installed_plugins": {
     "cordova-sqlite-storage": {
-      "PACKAGE_NAME": "com.github.topcoder520"
+      "PACKAGE_NAME": "com.github.topcoder520_debug"
     }
   },
   "dependent_plugins": {},

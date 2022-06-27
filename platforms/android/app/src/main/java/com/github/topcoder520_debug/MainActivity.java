@@ -17,7 +17,7 @@
        under the License.
  */
 
-package com.github.topcoder520;
+package com.github.topcoder520_debug;
 
 import android.os.Bundle;
 import org.apache.cordova.*;

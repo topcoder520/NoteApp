@@ -5,6 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "clean": "vue-cli-service clean",
+    "develop": "vue-cli-service develop",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -33,8 +35,8 @@
   },
   "cordova": {
     "platforms": [
-      "android",
-      "browser"
+      "browser",
+      "android"
     ],
     "plugins": {
       "cordova-sqlite-storage": {}

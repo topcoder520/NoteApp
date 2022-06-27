@@ -44,7 +44,7 @@ export default {
             caleListData[`${Year}-${Month}`] = YearMonthData1;
             caleListData[`${preData.Year}-${preData.Month}`] = YearMonthData2;
             caleListData[`${nextData.Year}-${nextData.Month}`] = YearMonthData3;
-            console.log('caleListData=>' + JSON.stringify(caleListData));
+            //console.log('caleListData=>' + JSON.stringify(caleListData));
         };
         getCaleListData(new Date().getFullYear(), new Date().getMonth() + 1);
 
@@ -52,7 +52,7 @@ export default {
         onMounted(() => {
             vheight.value = height.value - 80 + 'px';
         })
-        const nowDate = new Date();
+
         const formatter = computed(() => {
             return (day) => {
                 const _time = new Date(day.date);
@@ -123,6 +123,7 @@ export default {
             }
         };
 
+        const nowDate = new Date();
         return {
             vheight,
             minDate: new Date(nowDate.getFullYear() - 3, 0, 1),
