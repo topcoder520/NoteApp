@@ -17,7 +17,8 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
-import { mapGetters, useStore } from 'vuex';
+import { mapGetters, useStore } from 'vuex'
+import { FingerprintVerification } from '@/plugin/fingerprint';
 
 export default {
   setup() {
@@ -29,14 +30,22 @@ export default {
     //页面挂载后执行
     onMounted(() => {
       store.dispatch('startupDatabase').then(() => {
-        router.push({
-          path: '/'
-        })
+        //指纹验证 验证成功之后这里不做其他的操作
+        FingerprintVerification().then((resolve) => {
+          //console.log('FingerprintVerification' + JSON.stringify(resolve));
+          //Toast('FingerprintVerification' + JSON.stringify(resolve));
+          router.push({
+            path: '/'
+          })
+        }).catch(err => {
+          //Toast('FingerprintVerification' + JSON.stringify(err));
+          navigator.app.exitApp(); //退出app
+        });
+
       }).catch((reject) => {
         console.log('startupDatabase-err=>' + reject);
       });
-
-    })
+    });
 
     return {
       active

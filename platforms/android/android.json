@@ -11,6 +11,26 @@
             {
               "xml": "<feature name=\"SQLitePlugin\"><param name=\"android-package\" value=\"io.sqlc.SQLitePlugin\" /></feature>",
               "count": 1
+            },
+            {
+              "xml": "<feature name=\"FingerprintAuth\"><param name=\"android-package\" value=\"com.cordova.plugin.android.fingerprintauth.FingerprintAuth\" /></feature>",
+              "count": 1
+            }
+          ]
+        }
+      },
+      "config.xml": {
+        "parents": {
+          "/*": []
+        }
+      },
+      "AndroidManifest.xml": {
+        "parents": {
+          "/manifest": [],
+          "/*": [
+            {
+              "xml": "<uses-permission android:name=\"android.permission.USE_FINGERPRINT\" />",
+              "count": 1
             }
           ]
         }
@@ -19,6 +39,9 @@
   },
   "installed_plugins": {
     "cordova-sqlite-storage": {
+      "PACKAGE_NAME": "com.github.topcoder520_debug"
+    },
+    "cordova-plugin-android-fingerprint-auth": {
       "PACKAGE_NAME": "com.github.topcoder520_debug"
     }
   },
@@ -31,9 +54,18 @@
       "clobbers": [
         "SQLitePlugin"
       ]
+    },
+    {
+      "id": "cordova-plugin-android-fingerprint-auth.FingerprintAuth",
+      "file": "plugins/cordova-plugin-android-fingerprint-auth/www/FingerprintAuth.js",
+      "pluginId": "cordova-plugin-android-fingerprint-auth",
+      "clobbers": [
+        "FingerprintAuth"
+      ]
     }
   ],
   "plugin_metadata": {
-    "cordova-sqlite-storage": "6.0.0"
+    "cordova-sqlite-storage": "6.0.0",
+    "cordova-plugin-android-fingerprint-auth": "1.5.0"
   }
 }

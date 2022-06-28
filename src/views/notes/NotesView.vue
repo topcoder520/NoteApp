@@ -9,7 +9,7 @@
         <van-row @click="onNoteDetail(item.Id)">
           <van-col span="24">
             <p class="van-ellipsis">{{ item.Title }}</p>
-            <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort>1">置顶</span></p>
+            <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
           </van-col>
         </van-row>
         <template #right>
@@ -26,6 +26,7 @@ import { Dialog, Notify, Toast } from 'vant';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useWindowSize } from '@vant/use';
+
 export default {
   name: 'NotesView',
   setup() {
@@ -149,7 +150,7 @@ export default {
 
     onActivated(() => {
       const RefreshListState = store.state.RefreshListState;
-      console.log('store.state.RefreshListState:'+store.state.RefreshListState);
+      console.log('store.state.RefreshListState:' + store.state.RefreshListState);
       if (RefreshListState) {
         list.value = [];
         initPageIndex = 1;
@@ -237,9 +238,10 @@ export default {
       }
     }
   }
-  .top-tag{
+
+  .top-tag {
     font-size: 12px;
-    display:inline-block;
+    display: inline-block;
     padding: 2px 3px;
     background-color: blue;
     color: #fff;
