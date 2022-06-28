@@ -32,13 +32,13 @@ export default {
       store.dispatch('startupDatabase').then(() => {
         //指纹验证 验证成功之后这里不做其他的操作
         FingerprintVerification().then((resolve) => {
-          //console.log('FingerprintVerification' + JSON.stringify(resolve));
+          console.log('FingerprintVerification' + JSON.stringify(resolve));
           //Toast('FingerprintVerification' + JSON.stringify(resolve));
           router.push({
             path: '/'
           })
         }).catch(err => {
-          //Toast('FingerprintVerification' + JSON.stringify(err));
+          Toast('FingerprintVerification' + JSON.stringify(err));
           navigator.app.exitApp(); //退出app
         });
 
