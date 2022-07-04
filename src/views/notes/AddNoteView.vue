@@ -66,9 +66,9 @@ export default {
                     title.value = cutTitle(content.value);
                 }
             }
-            if (Id > 0) {
+            if (Id.value > 0) {
                 store.dispatch('updateNote', {
-                    Id: Id,
+                    Id: Id.value,
                     Title: title.value,
                     Category: categoryName.value,
                     Content: content.value
@@ -88,7 +88,7 @@ export default {
                 const d = nowdate.getDate();
 
                 store.dispatch('addNote', {
-                    Id: Id,
+                    Id: Id.value,
                     Title: title.value,
                     Category: categoryName.value,
                     Content: content.value,
@@ -98,8 +98,10 @@ export default {
                     Day: d,
                     timestamp:Date.now()
                 }).then((resolve) => {
+                    console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
                         Toast('添加成功');
+                        Id.value = resolve.insertId;
                         store.commit('setRefreshListState', true);
                         //history.back();
                     }
@@ -128,16 +130,16 @@ export default {
         });
 
         //内容
-        const Id = route.query.Id ?? 0;
+        const Id = ref(route.query.Id ?? 0);
         const title = ref('');
         const categoryName = ref('未分类');
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('添加笔记');
 
-        if (Id) {
+        if (Id.value) {
             PageTitle.value = '编辑笔记';
-            store.dispatch('getNoteById', Id).then((resolve) => {
+            store.dispatch('getNoteById', Id.value).then((resolve) => {
                 const data = resolve;
                 title.value = data.Title;
                 categoryName.value = data.Category;
@@ -161,7 +163,8 @@ export default {
             showPopover,
             onSelect,
             root,
-            vheight
+            vheight,
+            Id
         };
     }
 }

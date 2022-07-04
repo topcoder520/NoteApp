@@ -90,7 +90,7 @@ export function addNote(context,{
             tx.executeSql(query, [Title,Category,Content,CreateTime,Year,Month,Day,1,1,timestamp], function (tx, res) {
                     //console.log("insertId: " + res.insertId + " -- probably 1");
                     //console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
-                    resolve({Id:res.insertId,rowsAffected:res.rowsAffected});
+                    resolve(res);
                 },
                 function (tx, error) {
                     console.log('INSERT error: ' + error.message);
