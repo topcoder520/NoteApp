@@ -1,1 +1,1 @@
-cmd /c "cordova run browser"
+cmd /c "npm run build && cordova run browser"

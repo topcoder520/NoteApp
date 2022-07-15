@@ -46,8 +46,8 @@ export default {
         const cutTitle = (content) => {
             content = content ?? '';
             if (content.length > 0) {
-                if (content.length > 18) {
-                    content = content.substring(0, 18);
+                if (content.length > 50) {
+                    content = content.substring(0, 50);
                 }
             }
             return content;

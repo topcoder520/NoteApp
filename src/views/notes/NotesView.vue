@@ -8,7 +8,7 @@
         </template>
         <van-row @click="onNoteDetail(item.Id)">
           <van-col span="24">
-            <p class="van-ellipsis">{{ item.Title }}</p>
+            <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
             <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
           </van-col>
         </van-row>
@@ -208,10 +208,11 @@ export default {
 <style lang="less">
 .van-pull-refresh {
   background-color: #f9f9f9;
-  padding-bottom: 40px;
+  //margin-bottom: 120px;
 
   .van-list {
-    height: v-bind("vheight");
+    //height: v-bind("vheight");
+    min-height: v-bind("vheight");
   }
 
   .van-row {
