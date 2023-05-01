@@ -24,7 +24,7 @@ export function FingerprintVerification() {
                     reject(err);
                 });
             } else {
-                reject(err);
+                reject("指纹解锁不可用");
             }
         }, resultError => {
             reject(resultError);
