@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import NotesView from '../views/notes/NotesView.vue'
 import AddNoteView from '../views/notes/AddNoteView.vue'
 import CalendarView from '../views/calendar/CalendarView.vue'
+import SettingView from '../views/setting/SettingView.vue'
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/Calendar',
     name: 'CalendarView',
     component: CalendarView
+  },
+  {
+    path: '/Setting',
+    name: 'SettingView',
+    component: SettingView
   },
 ]
 

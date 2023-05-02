@@ -12,7 +12,7 @@
 </template>
 <script>
 import { useWindowSize } from '@vant/use';
-import { ref, onMounted, computed, reactive, watch, onUnmounted, onActivated, onDeactivated } from 'vue';
+import { ref, onMounted, computed, reactive, onActivated, onDeactivated } from 'vue';
 import { useStore } from 'vuex';
 import { calendar } from '@/plugin/calendar';
 import { getPreMonths, getNextMonths } from '@/util/date';
@@ -121,7 +121,7 @@ export default {
         };
 
         //监听返回按钮---------START---------
-        function pushHistory() {
+        const pushHistory = ()=>{
             const state = { title: "title", url: "/Calendar" };
             window.history.pushState(state, state.title, state.url)
         };

@@ -1,4 +1,5 @@
 <template>
+  <van-nav-bar title="笔记" />
   <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
     <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
       <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">

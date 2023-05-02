@@ -185,6 +185,7 @@ export function delNote(context,id){
     });
 }
 
+
 export function startupDatabase(context) {
     return new Promise((resolve) => {
         document.addEventListener('deviceready', () => {

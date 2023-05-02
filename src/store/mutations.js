@@ -14,3 +14,8 @@ export function setDatabase(state,db){
 export function setRefreshListState(state,isRefresh){
     state.RefreshListState = isRefresh;
 }
+
+//本地存储
+export function setLocalItem(state,keyval){
+    localStorage.setItem(keyval.key,keyval.val);
+}
