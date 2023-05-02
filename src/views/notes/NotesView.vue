@@ -21,7 +21,7 @@
   </van-pull-refresh>
 </template>
 <script>
-import { onActivated, ref } from 'vue';
+import { onActivated, ref, watch } from 'vue';
 import { Dialog, Notify, Toast } from 'vant';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -29,7 +29,17 @@ import { useWindowSize } from '@vant/use';
 
 export default {
   name: 'NotesView',
-  setup() {
+  props: {
+    Date: {
+      type: Object,
+      default: () => ({ Year: 0, Month: 0, Day: 0 })
+    },
+    IsAll: Boolean
+  },
+  emits:{
+    'openNotedetail':null,
+  },
+  setup(props,context) {
 
     const router = useRouter();
     const store = useStore();
@@ -158,10 +168,18 @@ export default {
       }
     });
 
+    //监听传入的日期是否变化
+    watch(() => props.Date, (newVal, oldVal) => {
+      console.log(JSON.stringify(newVal),JSON.stringify(oldVal));
+      list.value = [];
+      initPageIndex = 1;
+      getNoteListByPage(initPageIndex, 20);
+    }, { deep: true });
+
     const getNoteListByPage = (pageIndex, pageSize) => {
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize }).then((resolve) => {
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1) }).then((resolve) => {
         var listData = resolve;
-        console.log(pageIndex + ', ' + pageSize);
+        console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day);
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
           list.value.push(listData[i]);
@@ -179,6 +197,7 @@ export default {
     //查看详情
     const onNoteDetail = (Id) => {
       console.log(Id);
+      context.emit('openNotedetail',{Id:Id});
       router.push({
         path: '/AddNote',
         query: { Id: Id }

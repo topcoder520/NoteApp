@@ -39,8 +39,11 @@ export default {
             path: '/'
           })
         }).catch(err => {
-          Toast('FingerprintVerification' + JSON.stringify(err));
-          navigator.app.exitApp(); //退出app
+          //Toast('FingerprintVerification' + JSON.stringify(err));
+          //navigator.app.exitApp(); //退出app
+          router.push({
+            path: '/'
+          })
         });
 
       }).catch((reject) => {

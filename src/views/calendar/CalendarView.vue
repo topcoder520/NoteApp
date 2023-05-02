@@ -1,21 +1,33 @@
 <template>
-    <van-calendar title="日历" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false"
-        :show-confirm="false" :formatter="formatter" @select="SelectDate" @month-show="monthShow">
+    <van-calendar title="日历" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false" :show-confirm="false"
+        :formatter="formatter" @select="SelectDate" @month-show="monthShow">
         <template v-slot:top-info="day">
             <van-icon v-show="day.topInfo > 0" class="tips" color="red" name="bell" />
         </template>
     </van-calendar>
+    <van-popup v-model:show="showPopup" @click-overlay="cancelPop" @click-close-icon="cancelPop" closeable position="bottom"
+        :style="{ height: '80%' }">
+        <notes-view :Date="DateObj" :IsAll="true" @openNotedetail="openNotedetail"></notes-view>
+    </van-popup>
 </template>
 <script>
 import { useWindowSize } from '@vant/use';
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch, onUnmounted, onActivated, onDeactivated } from 'vue';
 import { useStore } from 'vuex';
-import { calendar } from '@/plugin/calendar'
-import { getPreMonths, getNextMonths } from '@/util/date'
+import { calendar } from '@/plugin/calendar';
+import { getPreMonths, getNextMonths } from '@/util/date';
+import { useRouter } from 'vue-router';
+
+import NotesView from '../notes/NotesView.vue';
 
 export default {
     name: 'CalendarView',
+    components: {
+        NotesView,
+    },
     setup() {
+
+        const router = useRouter();
 
         const store = useStore();
 
@@ -91,6 +103,8 @@ export default {
         });
 
         //选择日期
+        const showPopup = ref(false);
+        const DateObj = reactive({ Year: 0, Month: 0, Day: 0 });
         const SelectDate = (value) => {
             const _time = new Date(value);
             const y = _time.getFullYear();
@@ -98,8 +112,57 @@ export default {
             const d = _time.getDate();
             // const w = _time.getDay();
             console.log([y, m, d].join('-'));
-
+            DateObj.Year = y;
+            DateObj.Month = m;
+            DateObj.Day = d;
+            console.log(JSON.stringify(DateObj));
+            showPopup.value = true;
+            pushHistory();
         };
+
+        //监听返回按钮---------START---------
+        function pushHistory() {
+            const state = { title: "title", url: "/Calendar" };
+            window.history.pushState(state, state.title, state.url)
+        };
+        window.addEventListener('popstate', () => {
+            console.log('popstate');
+            if (isActived.value && showPopup.value) {
+                showPopup.value = false;
+            }
+        }, false);
+        //取消弹窗pop
+
+        const cancelPop = () => {
+            console.log('cancelPop');
+            if (showPopup.value) {
+                router.back();
+            }
+        }
+        const isActived = ref(false);
+        onActivated(() => {
+            console.log("actived");
+            isActived.value = true;
+            console.log('historyNote', historyNote.value.length);
+            if (historyNote.value.length > 0) {
+                console.log('showPop', showPopup.value);
+                historyNote.value = [];
+                setTimeout(() => {
+                    showPopup.value = true;
+                }, 100);
+            }
+        });
+        onDeactivated(() => {
+            console.log("deactived");
+            isActived.value = false;
+        });
+        const historyNote = ref([]);
+        const openNotedetail = (data) => {
+            console.log('openNotedetail', JSON.stringify(data));
+            historyNote.value.push(data.Id);
+        };
+        //-----------------END---------------
+
         const monthShow = (data) => {
             console.log('monthShow');
             console.log(JSON.stringify(data));
@@ -131,6 +194,10 @@ export default {
             formatter,
             SelectDate,
             monthShow,
+            showPopup,
+            DateObj,
+            cancelPop,
+            openNotedetail,
         };
     }
 }

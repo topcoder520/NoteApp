@@ -61,9 +61,11 @@ function createTable(db, tableObject) {
     return new Promise((resolve, reject) => {
         //创建数据表
         db.transaction(function (tx) {
-            tx.executeSql(`CREATE TABLE IF NOT EXISTS "` + tableName + `" ( 
-                        `+ fieldList.join(' ') + ` 
-                    )`, [], (tx, res) => {
+            const sql = `CREATE TABLE IF NOT EXISTS "` + tableName + `" ( 
+                `+ fieldList.join(' ') + ` 
+            )`;
+            console.log('SQL===> '+sql);
+            tx.executeSql(sql, [], (tx, res) => {
                 resolve(res);
                 if (res.rowsAffected > 0) {
                     console.log('fileinfo 创建成功');
@@ -131,6 +133,7 @@ function delRecord(db, tableObject, whereObject, setObject) {
             } else {
                 query = "update " + tableName + " set " + setStr + " WHERE " + whereStr;
             }
+            console.log('SQL===> '+query);
             tx.executeSql(query, [], function (tx, res) {
                 //console.log("removeId: " + res.insertId);
                 //console.log("rowsAffected: " + res.rowsAffected);
@@ -188,6 +191,7 @@ function updateRecord(db, tableObject, whereObject, setObject) {
     return new Promise((resolve, reject) => {
         db.transaction(function (tx) {
             var query = "update " + tableName + " set " + setStr + " WHERE " + whereStr;
+            console.log('SQL===> '+query);
             tx.executeSql(query, [], function (tx, res) {
                 //console.log("removeId: " + res.insertId);
                 //console.log("rowsAffected: " + res.rowsAffected);
@@ -226,6 +230,7 @@ function addRecord(db, tableObject, dataObject) {
     return new Promise((resolve, reject) => {
         db.transaction(function (tx) {
             var query = "INSERT INTO " + tableName + " (" + keyStr + ") VALUES (" + valStr + ")";
+            console.log('SQL===> '+query);
             tx.executeSql(query, valArr, function (tx, res) {
                 //console.log("insertId: " + res.insertId + " -- probably 1");
                 //console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
@@ -283,7 +288,9 @@ function getRecord(db, tableObject, whereObject, childField,orderby) {
     }
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
-            tx.executeSql("select " + fieldStr + " from " + tableName + " where " + whereStr+' '+orderby, [], (tx, res) => {
+            const sql = "select " + fieldStr + " from " + tableName + " where " + whereStr+' '+orderby;
+            console.log('SQL===> '+sql);
+            tx.executeSql(sql, [], (tx, res) => {
                 var rowData = {};
                 for (var x = 0; x < res.rows.length; x++) {
                     rowData = res.rows.item(x);
@@ -350,7 +357,9 @@ function getRecordList(db, tableObject, whereObject, childField, orderby, page) 
     }
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
-            tx.executeSql("select " + fieldStr + " from " + tableName + " where " + whereStr + " " + orderby + " " + pageStr, [], (tx, res) => {
+            const sql = "select " + fieldStr + " from " + tableName + " where " + whereStr + " " + orderby + " " + pageStr;
+            console.log('SQL===> '+sql);
+            tx.executeSql(sql, [], (tx, res) => {
                 var rowData = [];
                 for (var x = 0; x < res.rows.length; x++) {
                     rowData.push(res.rows.item(x));

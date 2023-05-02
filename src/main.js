@@ -5,7 +5,9 @@ import store from './store'
 import {
     Tabbar,
     TabbarItem,
-    Col, Row, PullRefresh, List, Cell, CellGroup, NavBar, Field, Icon, Popover, Calendar,SwipeCell,Button,Notify
+    Col, Row, PullRefresh, List, Cell, CellGroup, NavBar, Field, 
+    Icon, Popover, Calendar,SwipeCell,Button,Notify
+    ,Popup
 } from 'vant';
 import 'vant/lib/index.css';
 
@@ -30,6 +32,7 @@ app.use(Calendar);
 app.use(SwipeCell);
 app.use(Button);
 app.use(Notify);
+app.use(Popup);
 app.mount('#app');
 // document.addEventListener('deviceready',function(){
 //     app.mount('#app');

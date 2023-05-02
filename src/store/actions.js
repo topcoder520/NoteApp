@@ -66,13 +66,28 @@ export function hasNoteOnYearMonthDate(context,{Year,Month,Date}) {
     });
 }
 
-export function getNoteListByPage(context,{pageIndex=1,pageSize=20}){
+export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=0,Day=0,State = 0}){
     return new Promise((resolve,reject)=>{
         if(pageIndex<1){
             pageIndex = 1;
         }
         pageIndex = (pageIndex - 1)*pageSize;
-        getRecordList(context.state.database, note  , {State:1},"","Sort desc,Timestamp desc",{pageIndex:pageIndex,pageSize:pageSize}).then((res) => {
+        var page = {pageIndex:pageIndex,pageSize:pageSize};
+
+        var whereObject = {};
+        if(State>0){
+            whereObject.State = State;
+        }
+        if(Year>0){
+            whereObject.Year = Year;
+        }
+        if(Month>0){
+            whereObject.Month = Month;
+        }
+        if(Day>0){
+            whereObject.Day = Day;
+        }
+        getRecordList(context.state.database, note  , whereObject,"","Sort desc,Timestamp desc",page).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
