@@ -21,13 +21,13 @@ export function FingerprintVerification() {
                 FingerprintAuth.encrypt(config, rs => {
                     resolve(rs);
                 }, err => {
-                    reject(err);
+                    reject({code:3,msg:"指纹解锁授权失败"});
                 });
             } else {
-                reject("指纹解锁不可用");
+                reject({code:2,msg:"指纹解锁不可用"});
             }
         }, resultError => {
-            reject(resultError);
+            reject({code:1,msg:resultError});
         });
     });
 }

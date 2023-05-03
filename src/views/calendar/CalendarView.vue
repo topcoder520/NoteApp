@@ -60,6 +60,16 @@ export default {
         };
         getCaleListData(new Date().getFullYear(), new Date().getMonth() + 1);
 
+        onActivated(()=>{
+            if(DateObj.Year == 0){
+                const date = new Date();
+                DateObj.Year = date.getFullYear();
+                DateObj.Month = date.getMonth()+1;
+                DateObj.Day = date.getDate();
+            }
+            getCaleListData(DateObj.Year, DateObj.Month);
+        })
+
 
         onMounted(() => {
             vheight.value = height.value - 80 + 'px';

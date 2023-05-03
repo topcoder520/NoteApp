@@ -230,7 +230,7 @@ function addRecord(db, tableObject, dataObject) {
     return new Promise((resolve, reject) => {
         db.transaction(function (tx) {
             var query = "INSERT INTO " + tableName + " (" + keyStr + ") VALUES (" + valStr + ")";
-            console.log('SQL===> '+query);
+            console.log('SQL===> '+query+'   data:('+valArr.join(',')+')');
             tx.executeSql(query, valArr, function (tx, res) {
                 //console.log("insertId: " + res.insertId + " -- probably 1");
                 //console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");

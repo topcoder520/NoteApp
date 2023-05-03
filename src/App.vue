@@ -41,9 +41,13 @@ export default {
               router.push({
                 path: '/'
               })
-            }).catch(err => {
-              //Toast('FingerprintVerification' + JSON.stringify(err));
-              navigator.app.exitApp(); //退出app
+            }).catch(rs => {
+              console.log('FingerprintVerification',JSON.stringify(rs));
+              if(rs.code == 3){
+                navigator.app.exitApp(); //退出app
+              }else{
+                Toast(rs.msg);
+              }
             });
           } else {
             console.log('不不不开启指纹解锁');
