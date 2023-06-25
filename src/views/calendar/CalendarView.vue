@@ -1,8 +1,13 @@
 <template>
-    <van-calendar title="日历" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false" :show-confirm="false"
-        :formatter="formatter" @select="SelectDate" @month-show="monthShow">
+    <van-nav-bar title="日历" @click-right="clickRightEvent">
+        <template #right>
+            <router-link to="/Search"> <van-icon name="search" size="18" /></router-link>
+        </template>
+    </van-nav-bar>
+    <van-calendar :show-title="false" :show-subtitle="false" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false"
+        :show-confirm="false" :formatter="formatter" @select="SelectDate" @month-show="monthShow">
         <template v-slot:top-info="day">
-            <van-icon v-show="day.topInfo > 0" class="tips" color="red" name="bell" />
+            <van-icon v-show="day.topInfo > 0" class="tips" color="red" name="bookmark" />
         </template>
     </van-calendar>
     <van-popup v-model:show="showPopup" @click-overlay="cancelPop" @click-close-icon="cancelPop" closeable position="bottom"
@@ -59,18 +64,6 @@ export default {
             //console.log('caleListData=>' + JSON.stringify(caleListData));
         };
         getCaleListData(new Date().getFullYear(), new Date().getMonth() + 1);
-
-        onActivated(()=>{
-            if(DateObj.Year == 0){
-                const date = new Date();
-                DateObj.Year = date.getFullYear();
-                DateObj.Month = date.getMonth()+1;
-                DateObj.Day = date.getDate();
-            }
-            getCaleListData(DateObj.Year, DateObj.Month);
-        })
-
-
         onMounted(() => {
             vheight.value = height.value - 80 + 'px';
         })
@@ -131,7 +124,7 @@ export default {
         };
 
         //监听返回按钮---------START---------
-        const pushHistory = ()=>{
+        const pushHistory = () => {
             const state = { title: "title", url: "/Calendar" };
             window.history.pushState(state, state.title, state.url)
         };
@@ -151,8 +144,19 @@ export default {
         }
         const isActived = ref(false);
         onActivated(() => {
-            console.log("actived");
+            console.log("Cale actived");
+
             isActived.value = true;
+            store.commit('SelectTabBar', -1);
+            store.commit('SelectTabBar', -1);
+            if (DateObj.Year == 0) {
+                const date = new Date();
+                DateObj.Year = date.getFullYear();
+                DateObj.Month = date.getMonth() + 1;
+                DateObj.Day = date.getDate();
+            }
+            getCaleListData(DateObj.Year, DateObj.Month);
+
             console.log('historyNote', historyNote.value.length);
             if (historyNote.value.length > 0) {
                 console.log('showPop', showPopup.value);
@@ -197,6 +201,12 @@ export default {
         };
 
         const nowDate = new Date();
+
+        //点击标题右侧按钮事件
+        const clickRightEvent = ()=>{
+            console.log('click right');
+
+        }
         return {
             vheight,
             minDate: new Date(nowDate.getFullYear() - 3, 0, 1),
@@ -208,6 +218,7 @@ export default {
             DateObj,
             cancelPop,
             openNotedetail,
+            clickRightEvent,
         };
     }
 }

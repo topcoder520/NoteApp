@@ -3,6 +3,7 @@ import NotesView from '../views/notes/NotesView.vue'
 import AddNoteView from '../views/notes/AddNoteView.vue'
 import CalendarView from '../views/calendar/CalendarView.vue'
 import SettingView from '../views/setting/SettingView.vue'
+import SearchView from '../views/search/SearchView.vue'
 
 const routes = [
   {
@@ -21,6 +22,13 @@ const routes = [
     path: '/Calendar',
     name: 'CalendarView',
     component: CalendarView
+  },
+  {
+    path: '/Search',
+    name: 'SearchView',
+    components: {
+      SearchNote:SearchView
+    }
   },
   {
     path: '/Setting',

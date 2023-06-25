@@ -15,19 +15,27 @@
                 </van-popover>
             </template>
         </van-cell>
-        <textarea class="note-content" v-model="content"></textarea>
+        <!-- <textarea class="note-content " v-model="content"></textarea> -->
+        <div  class="note-content">
+            <rich-text @getValue="getValue" :value="tmepContent"></rich-text>
+        </div>
     </div>
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
 import { Toast } from 'vant';
-import { onUnmounted, ref, onMounted} from 'vue';
+import { onUnmounted, ref, onMounted, onActivated } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
-import { getNowDateString } from '@/util/date'
+import { getNowDateString } from '@/util/date';
+
+import RichText from '../common/RichTextView.vue';
 
 export default {
     name: 'AddNoteView',
+    components: {
+        RichText,
+    },
     setup() {
         const store = useStore()
         const route = useRoute();
@@ -40,6 +48,9 @@ export default {
         onUnmounted(() => {
             store.commit('SelectTabBar', -1);
             console.log('卸载');
+        });
+        onActivated(() => {
+            console.log('addNote onActivated');
         });
 
         //
@@ -63,7 +74,7 @@ export default {
                     Toast.fail('请输入内容');
                     return;
                 } else {
-                    title.value = cutTitle(content.value);
+                    title.value = cutTitle(temTitle.value);
                 }
             }
             if (Id.value > 0) {
@@ -96,7 +107,7 @@ export default {
                     Year: y,
                     Month: m,
                     Day: d,
-                    timestamp:Date.now()
+                    timestamp: Date.now()
                 }).then((resolve) => {
                     console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
@@ -126,7 +137,7 @@ export default {
         const vheight = ref(height + 'px');
         onMounted(() => {
             const rect = useRect(root);
-            vheight.value = (height.value - rect.height) + 'px';
+            vheight.value = (height.value - rect.height - 50) + 'px';
         });
 
         //内容
@@ -137,6 +148,7 @@ export default {
         const createTime = ref(getNowDateString());
         const PageTitle = ref('添加笔记');
 
+        const tmepContent = ref('');//进入页面赋值的时候使用一次
         if (Id.value) {
             PageTitle.value = '编辑笔记';
             store.dispatch('getNoteById', Id.value).then((resolve) => {
@@ -144,6 +156,7 @@ export default {
                 title.value = data.Title;
                 categoryName.value = data.Category;
                 content.value = data.Content;
+                tmepContent.value = data.Content;
                 createTime.value = data.CreateTime;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
@@ -151,13 +164,24 @@ export default {
             });
         }
 
+        //测试编辑div
+        const temTitle = ref('');
+        const getValue = (valObj) => {
+            console.log(valObj.text,valObj.html);
+            content.value = valObj.html;
+            temTitle.value = valObj.text;
+        }
+
         return {
+            getValue,
+
             onClickLeft,
             onClickRight,
             PageTitle,
             title,
             categoryName,
             content,
+            tmepContent,
             createTime,
             actions,
             showPopover,
@@ -171,15 +195,13 @@ export default {
 </script>
 <style lang="less">
 #app {
-
     .content {
         padding: 16px 20px;
 
         .title {
             width: 100%;
-            height: 40px;
-            font-size: 36px;
-            line-height: 36px;
+            font-size: 20px;
+            line-height: 20px;
             border: none;
         }
 
@@ -203,7 +225,7 @@ export default {
         .note-content {
             width: 100%;
             border: none;
-            min-height: v-bind("vheight");
+            height: v-bind("vheight");
         }
     }
 }

@@ -6,7 +6,13 @@
       <component :is="Component" />
     </keep-alive>
   </router-view>
-  <router-view name="NewNote"></router-view>
+  <router-view name="NewNote">
+  </router-view>
+  <router-view name="SearchNote" v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
   <van-tabbar route v-show="IsShowTabBar">
     <van-tabbar-item icon="notes-o" to="/">笔记</van-tabbar-item>
     <van-tabbar-item icon="plus" to="/AddNote">添加</van-tabbar-item>
@@ -19,6 +25,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import { mapGetters, useStore } from 'vuex'
 import { FingerprintVerification } from '@/plugin/fingerprint';
+import { Toast } from 'vant';
 
 export default {
   setup() {

@@ -176,7 +176,6 @@ function updateRecord(db, tableObject, whereObject, setObject) {
     }
     var setStr = "";
     if (typeof setObject == "object") {
-        delete setObject.State;
         for (let key in setObject) {
             if (!checkNumber(fields[key])) {
                 setStr += key + " = '" + setObject[key] + "' , "
@@ -339,6 +338,9 @@ function getRecordList(db, tableObject, whereObject, childField, orderby, page) 
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
     } else if (typeof whereObject == "string") {
         whereStr = whereObject;
+    }
+    if((whereStr.trim()).length == 0){
+        whereStr = " 1 = 1 ";
     }
     if (!orderby) {
         orderby = " order by Id asc "

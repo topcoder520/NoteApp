@@ -66,12 +66,8 @@ export function hasNoteOnYearMonthDate(context,{Year,Month,Date}) {
     });
 }
 
-export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=0,Day=0,State = 0}){
+export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=0,Day=0,State = 0,kw=''}){
     return new Promise((resolve,reject)=>{
-        if(pageIndex<1){
-            pageIndex = 1;
-        }
-        pageIndex = (pageIndex - 1)*pageSize;
         var page = {pageIndex:pageIndex,pageSize:pageSize};
 
         var whereObject = {};
@@ -87,12 +83,35 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
         if(Day>0){
             whereObject.Day = Day;
         }
-        getRecordList(context.state.database, note  , whereObject,"","Sort desc,Timestamp desc",page).then((res) => {
+        var whereStr = '';
+        for (let key in whereObject) {
+            if (!checkNumber(note.fields[key])) {
+                whereStr += key + " = '" + whereObject[key] + "' and ";
+            } else {
+                whereStr += key + " = " + whereObject[key] + " and ";
+            }
+        }
+        console.log('kw:',kw,typeof kw,kw !== undefined && kw.trim().length>0);
+        if(kw !== undefined && kw.trim().length>0){
+            whereStr += " ( Title like '%"+kw+"%' " + " OR Content like '%"+kw+"%' " + " ) and ";
+        }
+        whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
+        getRecordList(context.state.database, note  , whereStr,"","Sort desc,Timestamp desc",page).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
         });
     });
+}
+
+function checkNumber(type) {
+    if (!type) {
+        return false;
+    }
+    if (type.toLowerCase() == "text" || type.toLowerCase() == "blob") {
+        return false;
+    }
+    return true;
 }
 
 export function getNoteListNearMonth(context,{Year,Month}){
@@ -136,21 +155,13 @@ export function updateNote(context,{
     Id,Title,Category,Content
 }){
     return new Promise((resolve, reject)=>{
-        const CreateTime = getNowDateString();
-        const now = new Date();
-        const Year = now.getFullYear();
-        const Month = now.getMonth()+1;
-        const Day = now.getDate();
         const timestamp = getNowTimestamp();
         updateRecord(context.state.database, note, { Id: Id }, {
             Title:Title,
             Category:Category,
             Content:Content,
-            CreateTime:CreateTime,
-            Year:Year,
-            Month:Month,
-            Day:Day,
-            Timestamp:timestamp
+            Timestamp:timestamp,
+            State:1
         }).then((res) =>{
             resolve(res);
         }).catch((reject1) => {
@@ -165,6 +176,7 @@ export function updateNoteSort(context,{
     return new Promise((resolve, reject)=>{
         updateRecord(context.state.database, note, { Id: Id }, {
             Sort: Sort,
+            State:1,
         }).then((res) =>{
             resolve(res);
         }).catch((reject1) => {

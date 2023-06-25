@@ -1,9 +1,9 @@
 <template>
-  <van-nav-bar title="笔记" />
+  <van-nav-bar title="笔记" v-show="showNavbar"/>
   <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
     <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
       <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
-        <template #left>
+        <template #left >
           <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
             @click="nextTop(item.Id)" />
         </template>
@@ -13,8 +13,8 @@
             <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
           </van-col>
         </van-row>
-        <template #right>
-          <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id)" type="danger"
+        <template #right v-if="showSwitchBtn">
+          <van-button square style="height: 100% !important" text="隐藏" @click="preDelItem(item.Id)" type="danger"
             class="delete-button" />
         </template>
       </van-swipe-cell>
@@ -35,7 +35,12 @@ export default {
       type: Object,
       default: () => ({ Year: 0, Month: 0, Day: 0 })
     },
-    IsAll: Boolean
+    IsAll: Boolean,
+    Keywords:String,
+    ShowNavBar:{
+      type:Boolean,
+      default:()=>true
+    }, //是否展示
   },
   emits:{
     'openNotedetail':null,
@@ -55,6 +60,7 @@ export default {
         Toast('刷新成功');
         initPageIndex = 1;
         list.value = [];
+        console.log('getNoteListByPage5');
         getNoteListByPage(initPageIndex, 20);
         Refresh.value = false;
       }, 1000);
@@ -63,6 +69,7 @@ export default {
     const onLoad = () => {
       // 异步更新数据
       initPageIndex = initPageIndex + 1;
+      console.log('getNoteListByPage6');
       getNoteListByPage(initPageIndex, 20);
     };
 
@@ -89,6 +96,7 @@ export default {
           if (resolve.rowsAffected > 0) {
             initPageIndex = 1;
             list.value = [];
+            console.log('getNoteListByPage7');
             getNoteListByPage(initPageIndex, 20);
             setTimeout(function () {
               Toast('已取消置顶');
@@ -106,6 +114,7 @@ export default {
           if (resolve.rowsAffected > 0) {
             initPageIndex = 1;
             list.value = [];
+            console.log('getNoteListByPage1');
             getNoteListByPage(initPageIndex, 20);
             setTimeout(function () {
               Toast('已置顶');
@@ -160,11 +169,13 @@ export default {
     };
 
     onActivated(() => {
+
       const RefreshListState = store.state.RefreshListState;
       console.log('store.state.RefreshListState:' + store.state.RefreshListState);
       if (RefreshListState) {
         list.value = [];
         initPageIndex = 1;
+        console.log('getNoteListByPage2');
         getNoteListByPage(initPageIndex, 20);
       }
     });
@@ -174,13 +185,23 @@ export default {
       console.log(JSON.stringify(newVal),JSON.stringify(oldVal));
       list.value = [];
       initPageIndex = 1;
+      console.log('getNoteListByPage3');
+      getNoteListByPage(initPageIndex, 20);
+    }, { deep: true });
+    //监听关键字
+    watch(() => props.Keywords, (newVal, oldVal) => {
+      console.log(JSON.stringify(newVal),JSON.stringify(oldVal));
+      list.value = [];
+      initPageIndex = 1;
+      console.log('getNoteListByPage4');
       getNoteListByPage(initPageIndex, 20);
     }, { deep: true });
 
     const getNoteListByPage = (pageIndex, pageSize) => {
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1) }).then((resolve) => {
+      finished.value = false;
+      console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day+', '+props.Keywords);
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1),kw:props.Keywords }).then((resolve) => {
         var listData = resolve;
-        console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day);
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
           list.value.push(listData[i]);
@@ -205,6 +226,9 @@ export default {
       });
     };
 
+    //是否展示navbar
+    const showNavbar = ref(props.ShowNavBar);
+
     const { height } = useWindowSize();
     const vheight = ref(height.value + 'px');
 
@@ -219,7 +243,9 @@ export default {
       preDelItem,
       beforeClose,
       vheight,
-      nextTop
+      nextTop,
+      showNavbar,
+      showSwitchBtn:!props.IsAll
     };
   },
 }
