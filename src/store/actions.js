@@ -96,7 +96,7 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
             whereStr += " ( Title like '%"+kw+"%' " + " OR Content like '%"+kw+"%' " + " ) and ";
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
-        getRecordList(context.state.database, note  , whereStr,"","Sort desc,Timestamp desc",page).then((res) => {
+        getRecordList(context.state.database, note  , whereStr,"","Sort desc,Timestamp desc",page,['Content']).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -118,7 +118,7 @@ export function getNoteListNearMonth(context,{Year,Month}){
     return new Promise((resolve,reject)=>{
         const preData = getPreMonths(Year,Month);
         const nextData = getNextMonths(Year,Month);
-        getRecordList(context.state.database, note  , `(Year = ${preData.Year} and Month=${preData.Month} or Year = ${Year} and Month=${Month} or Year = ${nextData.Year} and Month=${nextData.Month})`,"","Year desc,Month desc").then((res) => {
+        getRecordList(context.state.database, note  , `(Year = ${preData.Year} and Month=${preData.Month} or Year = ${Year} and Month=${Month} or Year = ${nextData.Year} and Month=${nextData.Month})`,"","Year desc,Month desc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);

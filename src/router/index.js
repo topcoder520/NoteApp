@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import NotesView from '../views/notes/NotesView.vue'
 import AddNoteView from '../views/notes/AddNoteView.vue'
+import ViewNoteView from '../views/notes/ViewNoteView.vue'
 import CalendarView from '../views/calendar/CalendarView.vue'
 import SettingView from '../views/setting/SettingView.vue'
 import SearchView from '../views/search/SearchView.vue'
@@ -16,6 +17,13 @@ const routes = [
     name: 'AddNoteView',
     components: {
       NewNote:AddNoteView
+    }
+  },
+  {
+    path: '/ViewNote',
+    name: 'ViewNoteView',
+    components: {
+      NewNote:ViewNoteView
     }
   },
   {

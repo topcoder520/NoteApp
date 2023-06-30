@@ -1,14 +1,14 @@
 <template>
     <van-nav-bar :title="PageTitle" left-text="返回" right-text="保存" left-arrow @click-left="onClickLeft"
         @click-right="onClickRight" />
-    <div class="content" ref="root">
+    <div class="addcontent" ref="root">
         <input type="text" class="title" placeholder="标题" v-model="title" />
         <van-cell class="date-info" v-model:title="createTime" icon="calendar-o">
             <!-- 使用 right-icon 插槽来自定义右侧图标 -->
             <template #right-icon>
                 <van-popover placement="left-start" v-model:show="showPopover" :actions="actions" @select="onSelect">
                     <template #reference>
-                        <van-icon size="22px" name="label-o" />
+                        <van-icon size="20px" style="position: relative;top: 2px" name="label-o" />
                         <label class="category-name">{{ categoryName }}</label>
                         <van-icon class="arrow-down" size="20px" name="arrow-down" />
                     </template>
@@ -16,7 +16,7 @@
             </template>
         </van-cell>
         <!-- <textarea class="note-content " v-model="content"></textarea> -->
-        <div  class="note-content">
+        <div class="note-content">
             <rich-text @getValue="getValue" :value="tmepContent"></rich-text>
         </div>
     </div>
@@ -24,7 +24,7 @@
 <script>
 import { useRect, useWindowSize } from '@vant/use';
 import { Toast } from 'vant';
-import { onUnmounted, ref, onMounted, onActivated } from 'vue';
+import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
@@ -69,8 +69,9 @@ export default {
             history.back();
         };
         const onClickRight = () => {
-            if (title.value.length == 0) {
-                if (content.value.length == 0) {
+            tmepContent.type = '1';
+            if (title.value.trim().length == 0) {
+                if (content.value.trim().length == 0) {
                     Toast.fail('请输入内容');
                     return;
                 } else {
@@ -138,6 +139,7 @@ export default {
         onMounted(() => {
             const rect = useRect(root);
             vheight.value = (height.value - rect.height - 50) + 'px';
+            console.log('vheight', vheight.value);
         });
 
         //内容
@@ -148,7 +150,7 @@ export default {
         const createTime = ref(getNowDateString());
         const PageTitle = ref('添加笔记');
 
-        const tmepContent = ref('');//进入页面赋值的时候使用一次
+        const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
         if (Id.value) {
             PageTitle.value = '编辑笔记';
             store.dispatch('getNoteById', Id.value).then((resolve) => {
@@ -156,7 +158,7 @@ export default {
                 title.value = data.Title;
                 categoryName.value = data.Category;
                 content.value = data.Content;
-                tmepContent.value = data.Content;
+                tmepContent.val = data.Content;
                 createTime.value = data.CreateTime;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
@@ -164,14 +166,13 @@ export default {
             });
         }
 
-        //测试编辑div
+        //获取富文本值
         const temTitle = ref('');
         const getValue = (valObj) => {
-            console.log(valObj.text,valObj.html);
+            console.log(valObj.text, valObj.html);
             content.value = valObj.html;
             temTitle.value = valObj.text;
         }
-
         return {
             getValue,
 
@@ -194,39 +195,37 @@ export default {
 }
 </script>
 <style lang="less">
-#app {
-    .content {
-        padding: 16px 20px;
+.addcontent {
+    padding: 16px 20px;
 
-        .title {
-            width: 100%;
-            font-size: 20px;
-            line-height: 20px;
-            border: none;
+    .title {
+        width: 100%;
+        font-size: 20px;
+        line-height: 20px;
+        border: none;
+    }
+
+    .title::placeholder {
+        font-size: x-large;
+        font-weight: 600;
+        color: #666;
+    }
+
+    .date-info {
+        text-align: left;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+
+        .category-name,
+        .arrow-down {
+            color: deepskyblue;
         }
+    }
 
-        .title::placeholder {
-            font-size: x-large;
-            font-weight: 600;
-            color: #666;
-        }
-
-        .date-info {
-            text-align: left;
-            padding-left: 0px !important;
-            padding-right: 0px !important;
-
-            .category-name,
-            .arrow-down {
-                color: deepskyblue;
-            }
-        }
-
-        .note-content {
-            width: 100%;
-            border: none;
-            height: v-bind("vheight");
-        }
+    .note-content {
+        width: 100%;
+        border: none;
+        height: v-bind("vheight");
     }
 }
 </style>

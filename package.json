@@ -28,6 +28,8 @@
     "cordova-android": "^10.1.2",
     "cordova-browser": "^6.0.0",
     "cordova-plugin-android-fingerprint-auth": "^1.5.0",
+    "cordova-plugin-camera": "^6.0.0",
+    "cordova-plugin-file": "^7.0.0",
     "cordova-sqlite-storage": "^6.0.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
@@ -41,7 +43,13 @@
     ],
     "plugins": {
       "cordova-sqlite-storage": {},
-      "cordova-plugin-android-fingerprint-auth": {}
+      "cordova-plugin-android-fingerprint-auth": {},
+      "cordova-plugin-camera": {
+        "ANDROIDX_CORE_VERSION": "1.6.+"
+      },
+      "cordova-plugin-file": {
+        "ANDROIDX_WEBKIT_VERSION": "1.4.0"
+      }
     }
   }
 }

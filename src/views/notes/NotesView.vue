@@ -221,7 +221,7 @@ export default {
       console.log(Id);
       context.emit('openNotedetail',{Id:Id});
       router.push({
-        path: '/AddNote',
+        path: '/ViewNote',
         query: { Id: Id }
       });
     };

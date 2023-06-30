@@ -311,11 +311,15 @@ function getRecord(db, tableObject, whereObject, childField,orderby) {
 //      childField:其他的字段
 //      orderby: 排序，例如: "Id DESC,Name ASC"
 //      page: 分页，{pageIndex:1,pageSize:20}
-function getRecordList(db, tableObject, whereObject, childField, orderby, page) {
+//      ignore: 忽略查询的字段,['Id','State']
+function getRecordList(db, tableObject, whereObject, childField, orderby, page,ignore) {
     var tableName = tableObject.tableName;
     var fields = tableObject.fields;
     var fieldStr = "";
     for (let key in fields) {
+        if(ignore && ignore.indexOf(key) != -1){
+            continue;
+        }
         fieldStr += key + ",";
     }
     if (childField) {

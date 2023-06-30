@@ -159,13 +159,17 @@ public class SystemWebViewEngine implements CordovaWebViewEngine {
         // @todo remove when Cordova drop API level 26 support
         settings.setSaveFormData(false);
 
-        if (preferences.getBoolean("AndroidInsecureFileModeEnabled", false)) {
-            //These settings are deprecated and loading content via file:// URLs is generally discouraged,
-            //but we allow this for compatibility reasons
-            LOG.d(TAG, "Enabled insecure file access");
-            settings.setAllowFileAccess(true);
-            settings.setAllowUniversalAccessFromFileURLs(true);
-        }
+
+        // if (preferences.getBoolean("AndroidInsecureFileModeEnabled", false)) {
+        //     //These settings are deprecated and loading content via file:// URLs is generally discouraged,
+        //     //but we allow this for compatibility reasons
+        //     LOG.d(TAG, "Enabled insecure file access");
+        //     settings.setAllowFileAccess(true);
+        //     settings.setAllowUniversalAccessFromFileURLs(true);
+        // }
+        LOG.d(TAG, "Enabled insecure file access");
+        settings.setAllowFileAccess(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
 
         settings.setMediaPlaybackRequiresUserGesture(false);
 

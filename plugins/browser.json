@@ -12,6 +12,12 @@
     },
     "cordova-plugin-android-fingerprint-auth": {
       "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "com.github.topcoder520"
     }
   },
   "dependent_plugins": {}
