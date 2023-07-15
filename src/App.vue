@@ -25,7 +25,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
 import { mapGetters, useStore } from 'vuex'
 import { FingerprintVerification } from '@/plugin/fingerprint';
-import { Toast } from 'vant';
+import { Toast } from '@vant/compat';
 
 export default {
   setup() {

@@ -23,7 +23,7 @@
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
-import { Toast } from 'vant';
+import { Toast } from '@vant/compat';
 import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
@@ -79,7 +79,6 @@ export default {
                 }
             }
             if (Id.value > 0) {
-                //content.value = content.value.replaceAll("'","\"");
                 store.dispatch('updateNote', {
                     Id: Id.value,
                     Title: title.value,

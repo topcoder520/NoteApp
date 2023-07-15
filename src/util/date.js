@@ -1,13 +1,20 @@
-export function getNowDateString(){
+export function getNowDateString(typ) {
     const nowdate = new Date();
-    const y = nowdate.getFullYear();
-    const m = nowdate.getMonth()+1;
-    const d = nowdate.getDate();
-    const h = nowdate.getHours();
-    const mn = nowdate.getMinutes();
-    return [y,'年',m,'月',d,'日 ',h,':',mn].join('');
+    let y = nowdate.getFullYear();
+    let m = nowdate.getMonth() + 1;
+    let d = nowdate.getDate();
+    let h = nowdate.getHours();
+    let mn = nowdate.getMinutes();
+    m = m < 10 ? ('0' + m) : m;
+    d = d < 10 ? ('0' + d) : d;
+    h = h < 10 ? ('0' + h) : h;
+    mn = mn < 10 ? ('0' + mn) : mn;
+    if(typ && typ === 1){
+        return [y, '-', m, '-', d, ' ', h, ':', mn].join('');
+    }
+    return [y, '年', m, '月', d, '日 ', h, ':', mn].join('');
 }
-export function getNowTimestamp(){
+export function getNowTimestamp() {
     return Date.now();
 }
 //date 格式为yyyy-mm-dd的日期，如：2022-03-25
@@ -60,40 +67,40 @@ export function getNextDate(date) {
     return t2;
 }
 
-export function getPreMonths(Year,Month){
-    if(Month>12){
+export function getPreMonths(Year, Month) {
+    if (Month > 12) {
         Month = 12;
     }
-    if(Month<0){
+    if (Month < 0) {
         Month = 1;
     }
-    if(Month == 1){
+    if (Month == 1) {
         Year = Year - 1;
         Month = 12;
-    }else{
+    } else {
         Month = Month - 1;
     }
     return {
-        Year:Year,
-        Month:Month
+        Year: Year,
+        Month: Month
     };
 }
 
-export function getNextMonths(Year,Month){
-    if(Month>12){
+export function getNextMonths(Year, Month) {
+    if (Month > 12) {
         Month = 12;
     }
-    if(Month<0){
+    if (Month < 0) {
         Month = 1;
     }
-    if(Month == 12){
+    if (Month == 12) {
         Year = Year + 1;
         Month = 1;
-    }else{
+    } else {
         Month = Month + 1;
     }
     return {
-        Year:Year,
-        Month:Month
+        Year: Year,
+        Month: Month
     };
 }

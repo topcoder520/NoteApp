@@ -1,6 +1,6 @@
 <template>
     <div class="list-header">
-        <van-nav-bar title="搜索笔记" left-text="返回" left-arrow @click-left="onClickLeft" />
+        <van-nav-bar title="所有记录" left-text="返回" left-arrow @click-left="onClickLeft" />
         <van-search v-model="searchKeyword" @search="onSearch" placeholder="请输入搜索关键词" />
         <van-dropdown-menu active-color="#ee0a24">
             <van-dropdown-item v-model="selValue1" :options="option1" />

@@ -7,7 +7,7 @@ import {
     TabbarItem,
     Col, Row, PullRefresh, List, Cell, CellGroup, NavBar, Field, 
     Icon, Popover, Calendar,SwipeCell,Button,Notify,Dialog,
-    Popup,Switch,Search,DropdownMenu, DropdownItem,
+    Popup,Switch,Search,DropdownMenu, DropdownItem,BackTop,Toast,
 } from 'vant';
 import 'vant/lib/index.css';
 
@@ -38,6 +38,8 @@ app.use(Search);
 app.use(DropdownMenu);
 app.use(DropdownItem);
 app.use(Dialog);
+app.use(BackTop);
+app.use(Toast);
 
 app.mount('#app');
 // document.addEventListener('deviceready',function(){

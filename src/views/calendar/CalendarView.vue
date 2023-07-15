@@ -1,8 +1,8 @@
 <template>
     <van-nav-bar title="日历" @click-right="clickRightEvent">
-        <template #right>
+        <!-- <template #right>
             <router-link to="/Search"> <van-icon name="search" size="18" /></router-link>
-        </template>
+        </template> -->
     </van-nav-bar>
     <van-calendar :show-title="false" :show-subtitle="false" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false"
         :show-confirm="false" :formatter="formatter" @select="SelectDate" @month-show="monthShow">

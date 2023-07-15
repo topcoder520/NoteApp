@@ -66,7 +66,7 @@ export function hasNoteOnYearMonthDate(context,{Year,Month,Date}) {
     });
 }
 
-export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=0,Day=0,State = 0,kw=''}){
+export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=0,Day=0,State = 0,Sort=0,kw=''}){
     return new Promise((resolve,reject)=>{
         var page = {pageIndex:pageIndex,pageSize:pageSize};
 
@@ -96,7 +96,12 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
             whereStr += " ( Title like '%"+kw+"%' " + " OR Content like '%"+kw+"%' " + " ) and ";
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
-        getRecordList(context.state.database, note  , whereStr,"","Sort desc,Timestamp desc",page,['Content']).then((res) => {
+        let sortBy = "Sort desc,Timestamp desc";
+        if(Sort != undefined && Sort>0){
+            sortBy = "Timestamp desc";
+        }
+        
+        getRecordList(context.state.database, note  , whereStr,"",sortBy,page,['Content']).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);

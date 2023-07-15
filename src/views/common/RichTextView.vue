@@ -1,6 +1,7 @@
 <template>
     <div class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="myKeydown" @blur="blurRichText"
         ref="richDiv"></div>
+    <van-back-top v-if="!editable" target=".richText"  bottom="5vh" right="3vw"/>
     <div class="tooltip" v-if="editable">
         <!--粗体-->
         <button @click="changeFont('B')">B</button>
@@ -36,6 +37,9 @@
         <button @click="changeFont('NList')">
             <van-icon name="descending" />
         </button>
+        <button @click="changeFont('Time')">
+            <van-icon name="tosend" />
+        </button>
     </div>
     <van-dialog class="showPicUrlDialog" v-model:show="showPicUrl" title="图片地址" show-cancel-button
         @confirm="showPicUrlconfirm" @closed="reCursorposition">
@@ -43,12 +47,14 @@
     </van-dialog>
 </template>
 <script>
-import { Toast } from 'vant';
+import { Toast } from '@vant/compat';
 import { ref } from 'vue';
 
 import { watch } from 'vue';
 
 import { Takefromgalery } from '@/plugin/camera';
+
+import { getNowDateString } from '@/util/date';
 
 export default {
     name: "RichText",
@@ -187,7 +193,13 @@ export default {
                     console.log(e);
                     Toast(e);
                 });
-            }
+            } else if (typ == 'Time') {//时间
+                //checkbox的html
+                var datestr = getNowDateString(1);
+                var htmlStr = `[${datestr}]`;
+                document.execCommand("insertHTML", false, htmlStr);
+                setRichText();
+            } 
         }
 
         let rangeRef = ref(null);

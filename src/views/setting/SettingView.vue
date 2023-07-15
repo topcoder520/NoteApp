@@ -13,7 +13,7 @@
 <script>
 
 import { onActivated, ref } from 'vue';
-import { Dialog } from 'vant';
+import { showConfirmDialog } from 'vant';
 import { useStore } from 'vuex';
 
 export default {
@@ -26,7 +26,7 @@ export default {
 
         const onUpdateValue = (newValue) => {
             console.log('newValue',newValue);
-            Dialog.confirm({
+            showConfirmDialog({
                 title: '提醒',
                 message: newValue?'是否开启指纹验证？':'是否关闭指纹验证？',
             }).then(() => {

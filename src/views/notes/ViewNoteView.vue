@@ -18,7 +18,7 @@
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
-import { Toast } from 'vant';
+import { Toast } from '@vant/compat';
 import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';

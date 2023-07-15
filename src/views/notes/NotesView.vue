@@ -1,29 +1,37 @@
 <template>
-  <van-nav-bar title="笔记" v-show="showNavbar"/>
-  <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
-    <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
-      <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
-        <template #left >
-          <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
-            @click="nextTop(item.Id)" />
-        </template>
-        <van-row @click="onNoteDetail(item.Id)">
-          <van-col span="24">
-            <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
-            <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
-          </van-col>
-        </van-row>
-        <template #right v-if="showSwitchBtn">
-          <van-button square style="height: 100% !important" text="隐藏" @click="preDelItem(item.Id)" type="danger"
-            class="delete-button" />
-        </template>
-      </van-swipe-cell>
-    </van-list>
-  </van-pull-refresh>
+  <van-nav-bar class="list-title" title="任务列表" v-show="showNavbar">
+    <template #right>
+      <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="18" /></router-link>
+    </template>
+  </van-nav-bar>
+  <div class="list-box">
+    <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
+      <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+        <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
+          <template #left>
+            <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
+              @click="nextTop(item.Id)" />
+          </template>
+          <van-row @click="onNoteDetail(item.Id)">
+            <van-col span="24">
+              <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
+              <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
+            </van-col>
+          </van-row>
+          <template #right v-if="showSwitchBtn">
+            <van-button square style="height: 100% !important" text="移出" @click="preDelItem(item.Id)" type="danger"
+              class="delete-button" />
+          </template>
+        </van-swipe-cell>
+      </van-list>
+    </van-pull-refresh>
+  </div>
+  <van-back-top bottom="15vh" />
 </template>
 <script>
 import { onActivated, ref, watch } from 'vue';
-import { Dialog, Notify, Toast } from 'vant';
+import { showConfirmDialog, showNotify } from 'vant';
+import { Toast } from '@vant/compat';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useWindowSize } from '@vant/use';
@@ -36,16 +44,16 @@ export default {
       default: () => ({ Year: 0, Month: 0, Day: 0 })
     },
     IsAll: Boolean,
-    Keywords:String,
-    ShowNavBar:{
-      type:Boolean,
-      default:()=>true
+    Keywords: String,
+    ShowNavBar: {
+      type: Boolean,
+      default: () => true
     }, //是否展示
   },
-  emits:{
-    'openNotedetail':null,
+  emits: {
+    'openNotedetail': null,
   },
-  setup(props,context) {
+  setup(props, context) {
 
     const router = useRouter();
     const store = useStore();
@@ -144,8 +152,8 @@ export default {
           return true;
         case 'right':
           return new Promise(() => {
-            Dialog.confirm({
-              title: '确定删除吗？',
+            showConfirmDialog({
+              title: '任务已完成，移出当前列表？',
             }).then(() => {
               store.dispatch('delNote', willDelItemId).then((resolve, reject) => {
                 if (resolve.rowsAffected > 0) {
@@ -156,9 +164,9 @@ export default {
                       break;
                     }
                   }
-                  Notify({ type: 'success', message: '已删除', position: 'bottom' });
+                  showNotify({ type: 'success', message: '已移出', position: 'bottom' });
                 } else {
-                  Toast.fail('删除失败：' + reject);
+                  Toast.fail('移出失败：' + reject);
                 }
               });
             }).catch(() => {
@@ -169,6 +177,8 @@ export default {
     };
 
     onActivated(() => {
+
+      store.commit('SelectTabBar', -1);
 
       const RefreshListState = store.state.RefreshListState;
       console.log('store.state.RefreshListState:' + store.state.RefreshListState);
@@ -182,7 +192,7 @@ export default {
 
     //监听传入的日期是否变化
     watch(() => props.Date, (newVal, oldVal) => {
-      console.log(JSON.stringify(newVal),JSON.stringify(oldVal));
+      console.log(JSON.stringify(newVal), JSON.stringify(oldVal));
       list.value = [];
       initPageIndex = 1;
       console.log('getNoteListByPage3');
@@ -190,7 +200,7 @@ export default {
     }, { deep: true });
     //监听关键字
     watch(() => props.Keywords, (newVal, oldVal) => {
-      console.log(JSON.stringify(newVal),JSON.stringify(oldVal));
+      console.log(JSON.stringify(newVal), JSON.stringify(oldVal));
       list.value = [];
       initPageIndex = 1;
       console.log('getNoteListByPage4');
@@ -199,8 +209,8 @@ export default {
 
     const getNoteListByPage = (pageIndex, pageSize) => {
       finished.value = false;
-      console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day+', '+props.Keywords);
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1),kw:props.Keywords }).then((resolve) => {
+      console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + props.Keywords);
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1),Sort:props.IsAll, kw: props.Keywords }).then((resolve) => {
         var listData = resolve;
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
@@ -219,7 +229,7 @@ export default {
     //查看详情
     const onNoteDetail = (Id) => {
       console.log(Id);
-      context.emit('openNotedetail',{Id:Id});
+      context.emit('openNotedetail', { Id: Id });
       router.push({
         path: '/ViewNote',
         query: { Id: Id }
@@ -245,13 +255,24 @@ export default {
       vheight,
       nextTop,
       showNavbar,
-      showSwitchBtn:!props.IsAll
+      showSwitchBtn: !props.IsAll
     };
   },
 }
 </script>
 
 <style lang="less">
+.list-title {
+  position: fixed;
+  width: 100%;
+  top: 0px;
+}
+
+.list-box {
+  overflow: auto;
+  margin-top: 46px;
+}
+
 .van-pull-refresh {
   background-color: #f9f9f9;
   //margin-bottom: 120px;
