@@ -1,5 +1,5 @@
 <template>
-  <van-nav-bar class="list-title" title="任务列表" v-show="showNavbar">
+  <van-nav-bar  class="list-title" title="任务列表" v-show="showNavbar">
     <template #right>
       <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="18" /></router-link>
     </template>
@@ -26,7 +26,6 @@
       </van-list>
     </van-pull-refresh>
   </div>
-  <van-back-top bottom="15vh" />
 </template>
 <script>
 import { onActivated, ref, watch } from 'vue';
@@ -269,7 +268,6 @@ export default {
 }
 
 .list-box {
-  overflow: auto;
   margin-top: 46px;
 }
 

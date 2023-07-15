@@ -12,7 +12,7 @@
     </van-calendar>
     <van-popup v-model:show="showPopup" @click-overlay="cancelPop" @click-close-icon="cancelPop" closeable position="bottom"
         :style="{ height: '80%' }">
-        <notes-view :Date="DateObj" :IsAll="true" @openNotedetail="openNotedetail"></notes-view>
+        <notes-view :Date="DateObj" :IsAll="true" :ShowNavBar="false" @openNotedetail="openNotedetail"></notes-view>
     </van-popup>
 </template>
 <script>
