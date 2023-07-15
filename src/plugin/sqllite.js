@@ -159,39 +159,35 @@ function delRecord(db, tableObject, whereObject, setObject) {
 function updateRecord(db, tableObject, whereObject, setObject) {
     var tableName = tableObject.tableName;
     var fields = tableObject.fields;
-
-    var whereStr = "";
-    if (typeof whereObject == "object") {
-        delete whereObject.State;
-        for (let key in whereObject) {
-            if (!checkNumber(fields[key])) {
-                whereStr += key + " = '" + whereObject[key] + "' and "
-            } else {
-                whereStr += key + " = " + whereObject[key] + " and "
-            }
-        }
-        whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
-    } else if (typeof whereObject == "string") {
-        whereStr = whereObject;
-    }
+    
     var setStr = "";
+    var setValArr = [];
     if (typeof setObject == "object") {
         for (let key in setObject) {
-            if (!checkNumber(fields[key])) {
-                setStr += key + " = '" + setObject[key] + "' , "
-            } else {
-                setStr += key + " = " + setObject[key] + " , "
-            }
+            setStr += key + " = ?, ";
+            setValArr.push(setObject[key]);
         }
         setStr = setStr.substring(0, setStr.lastIndexOf(','));
     } else if (typeof setObject == "string") {
         setStr = setObject;
     }
+
+    var whereStr = "";
+    if (typeof whereObject == "object") {
+        for (let key in whereObject) {
+            whereStr += key + " = ? and "
+            setValArr.push(whereObject[key]);
+        }
+        whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
+    } else if (typeof whereObject == "string") {
+        whereStr = whereObject;
+    }
     return new Promise((resolve, reject) => {
         db.transaction(function (tx) {
             var query = "update " + tableName + " set " + setStr + " WHERE " + whereStr;
-            console.log('SQL===> '+query);
-            tx.executeSql(query, [], function (tx, res) {
+            //console.log('SQL===> '+query);
+            console.log('SQL===> '+query+'   data:('+setValArr.join(',')+')');
+            tx.executeSql(query, setValArr, function (tx, res) {
                 //console.log("removeId: " + res.insertId);
                 //console.log("rowsAffected: " + res.rowsAffected);
                 resolve({ rowsAffected: res.rowsAffected });

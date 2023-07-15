@@ -79,6 +79,7 @@ export default {
                 }
             }
             if (Id.value > 0) {
+                //content.value = content.value.replaceAll("'","\"");
                 store.dispatch('updateNote', {
                     Id: Id.value,
                     Title: title.value,
