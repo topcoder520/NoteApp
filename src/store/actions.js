@@ -2,6 +2,7 @@ import {getNowDateString,getNowTimestamp,getPreMonths,getNextMonths} from '@/uti
 import {
     openDatabase,
     createTable,
+    addColumn,
     delRecord,
     updateRecord,
     addRecord,
@@ -13,8 +14,11 @@ import {
     tableName: "note",
     fields: {
         Id: "integer",
+        ParentId:'integer',//跟SType = 1时用
+        SType:'integer', //文件类型 0 文件  1目录
         Title: "text",
         Category: "text",
+        note_category_Id:'integer', //关联 note_category 表
         Content: "text",
         CreateTime: "text",
         State: "integer",
@@ -40,6 +44,17 @@ const version = {
     }
 };
 
+const noteCategory = {
+    tableName: "note_category",
+    fields: {
+        CName: "text",
+        Timestamp: "integer",
+        Des: "text",
+        CreateTime: "text",
+        State: "integer",
+    }
+};
+
 export function getNoteById(context, id) {
     return new Promise((resolve, reject) => {
         getRecord(context.state.database,note, {Id:id},"").then((res) => {
@@ -53,7 +68,7 @@ export function getNoteById(context, id) {
 export function hasNoteOnYearMonthDate(context,{Year,Month,Date}) {
     return new Promise((resolve, reject) => {
         var fieldSql = "count(1) as cnt";
-        getRecord(context.state.database,{tableName:note.tableName,fields:[]}, `Year =${Year} and Month=${Month} and Day=${Date}`, fieldSql).then((res) => {
+        getRecord(context.state.database,{tableName:note.tableName,fields:[]}, `note.SType = 0 and note.Year =${Year} and note.Month=${Month} and note.Day=${Date}`, fieldSql).then((res) => {
             var rowData = 0;
             for (var x = 0; x < res.rows.length; x++) {
                 rowData = res.rows.item(x).cnt;
@@ -83,22 +98,22 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
         if(Day>0){
             whereObject.Day = Day;
         }
-        var whereStr = '';
+        var whereStr = ' note.SType = 0 and ';
         for (let key in whereObject) {
             if (!checkNumber(note.fields[key])) {
-                whereStr += key + " = '" + whereObject[key] + "' and ";
+                whereStr += "note." + key + " = '" + whereObject[key] + "' and ";
             } else {
-                whereStr += key + " = " + whereObject[key] + " and ";
+                whereStr += "note." + key + " = " + whereObject[key] + " and ";
             }
         }
         console.log('kw:',kw,typeof kw,kw !== undefined && kw.trim().length>0);
         if(kw !== undefined && kw.trim().length>0){
-            whereStr += " ( Title like '%"+kw+"%' " + " OR Content like '%"+kw+"%' " + " ) and ";
+            whereStr += " ( note.Title like '%"+kw+"%' " + " OR note.Content like '%"+kw+"%' " + " ) and ";
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
-        let sortBy = "Sort desc,Timestamp desc";
+        let sortBy = "note.Sort desc,note.Timestamp desc";
         if(Sort != undefined && Sort>0){
-            sortBy = "Timestamp desc";
+            sortBy = "note.Timestamp desc";
         }
         
         getRecordList(context.state.database, note  , whereStr,"",sortBy,page,['Content']).then((res) => {
@@ -123,7 +138,7 @@ export function getNoteListNearMonth(context,{Year,Month}){
     return new Promise((resolve,reject)=>{
         const preData = getPreMonths(Year,Month);
         const nextData = getNextMonths(Year,Month);
-        getRecordList(context.state.database, note  , `(Year = ${preData.Year} and Month=${preData.Month} or Year = ${Year} and Month=${Month} or Year = ${nextData.Year} and Month=${nextData.Month})`,"","Year desc,Month desc",null,["Content"]).then((res) => {
+        getRecordList(context.state.database, note  , `note.SType = 0 and (note.Year = ${preData.Year} and note.Month=${preData.Month} or note.Year = ${Year} and note.Month=${Month} or note.Year = ${nextData.Year} and note.Month=${nextData.Month})`,"","note.Year desc,note.Month desc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -213,6 +228,22 @@ export function startupDatabase(context) {
                 createTable(db, note).then((res1) => {
                     if (res1.rowsAffected > 0) {
                         console.log('fileinfo 创建成功');
+                    }
+
+
+                    addColumn(db,note,'ParentId','integer',0);
+                    addColumn(db,note,'SType','integer',0);
+                    //note_category_Id
+                    addColumn(db,note,'note_category_Id','integer',0);
+
+
+                }).catch((reject1) => {
+                    console.log(reject1);
+                });
+                //创建分类表
+                createTable(db, noteCategory).then((res1) => {
+                    if (res1.rowsAffected > 0) {
+                        console.log('noteCategory 创建成功');
                     }
                 }).catch((reject1) => {
                     console.log(reject1);

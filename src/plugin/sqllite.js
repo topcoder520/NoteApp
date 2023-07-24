@@ -64,11 +64,37 @@ function createTable(db, tableObject) {
             const sql = `CREATE TABLE IF NOT EXISTS "` + tableName + `" ( 
                 `+ fieldList.join(' ') + ` 
             )`;
-            console.log('SQL===> '+sql);
+            console.log('SQL===> ' + sql);
             tx.executeSql(sql, [], (tx, res) => {
                 resolve(res);
                 if (res.rowsAffected > 0) {
                     console.log('fileinfo 创建成功');
+                }
+            });
+        }, function (error) {
+            console.log('transaction error: ' + error.message);
+            reject('transaction error: ' + error.message);
+        }, function () {
+            console.log('resolve transaction ok');
+        });
+    });
+}
+
+function addColumn(db, tableObject, columnName, columnType, defaultVal) {
+    var tableName = tableObject.tableName;
+    return new Promise((resolve, reject) => {
+        db.transaction(function (tx) {
+            tx.executeSql(`select count(*) as cnt from sqlite_master where name='${tableName}' and sql like '%${columnName}%'`, [], (tx, res) => {
+                var rowData = res.rows.item(0).cnt;
+                if (rowData == 0) {
+                    const sql = `alter table ${tableName} add column ${columnName} ${columnType} default ${defaultVal}`;
+                    console.log('SQL===> ' + sql);
+                    tx.executeSql(sql, [], (tx, res) => {
+                        if (res.rowsAffected > 0) {
+                            console.log('字段添加成功');
+                            resolve(res);
+                        }
+                    });
                 }
             });
         }, function (error) {
@@ -133,7 +159,7 @@ function delRecord(db, tableObject, whereObject, setObject) {
             } else {
                 query = "update " + tableName + " set " + setStr + " WHERE " + whereStr;
             }
-            console.log('SQL===> '+query);
+            console.log('SQL===> ' + query);
             tx.executeSql(query, [], function (tx, res) {
                 //console.log("removeId: " + res.insertId);
                 //console.log("rowsAffected: " + res.rowsAffected);
@@ -159,7 +185,7 @@ function delRecord(db, tableObject, whereObject, setObject) {
 function updateRecord(db, tableObject, whereObject, setObject) {
     var tableName = tableObject.tableName;
     var fields = tableObject.fields;
-    
+
     var setStr = "";
     var setValArr = [];
     if (typeof setObject == "object") {
@@ -186,7 +212,7 @@ function updateRecord(db, tableObject, whereObject, setObject) {
         db.transaction(function (tx) {
             var query = "update " + tableName + " set " + setStr + " WHERE " + whereStr;
             //console.log('SQL===> '+query);
-            console.log('SQL===> '+query+'   data:('+setValArr.join(',')+')');
+            console.log('SQL===> ' + query + '   data:(' + setValArr.join(',') + ')');
             tx.executeSql(query, setValArr, function (tx, res) {
                 //console.log("removeId: " + res.insertId);
                 //console.log("rowsAffected: " + res.rowsAffected);
@@ -225,7 +251,7 @@ function addRecord(db, tableObject, dataObject) {
     return new Promise((resolve, reject) => {
         db.transaction(function (tx) {
             var query = "INSERT INTO " + tableName + " (" + keyStr + ") VALUES (" + valStr + ")";
-            console.log('SQL===> '+query+'   data:('+valArr.join(',')+')');
+            console.log('SQL===> ' + query + '   data:(' + valArr.join(',') + ')');
             tx.executeSql(query, valArr, function (tx, res) {
                 //console.log("insertId: " + res.insertId + " -- probably 1");
                 //console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
@@ -248,12 +274,20 @@ function addRecord(db, tableObject, dataObject) {
 //      whereObject:查询条件,可以是 {Name:"sushan",Age:22} 或者 "Name='sushan' and Age = 22"
 //      childField: 其他的字段
 //      orderby: 排序
-function getRecord(db, tableObject, whereObject, childField,orderby) {
+function getRecord(db, tableObject, whereObject, childField, orderby) {
     var tableName = tableObject.tableName;
     var fields = tableObject.fields;
     var fieldStr = "";
+    let leftjoinTable = [];
     for (let key in fields) {
-        fieldStr += key + ",";
+        if (key.endsWith('_Id')) {
+            leftjoinTable.push(key.substring(0, key.lastIndexOf('_Id')));
+        }
+        if (key.indexOf('.') != -1) {
+            fieldStr += key + ",";
+        } else {
+            fieldStr += tableName + "." + key + ",";
+        }
     }
     if (childField) {
         if (childField.endsWith(',')) {
@@ -266,25 +300,40 @@ function getRecord(db, tableObject, whereObject, childField,orderby) {
     var whereStr = "";
     if (typeof whereObject == "object") {
         for (let key in whereObject) {
+            let skey = '';
+            if (key.indexOf('.') == -1) {
+                skey = tableName + "." + key
+            }else{
+                skey = key;
+            }
             if (!checkNumber(fields[key])) {
-                whereStr += key + " = '" + whereObject[key] + "' and ";
+                whereStr += skey + " = '" + whereObject[key] + "' and ";
             } else {
-                whereStr += key + " = " + whereObject[key] + " and ";
+                whereStr += skey + " = " + whereObject[key] + " and ";
             }
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
     } else if (typeof whereObject == "string") {
         whereStr = whereObject;
     }
-    if (orderby){
+    if (orderby) {
         orderby = " order by " + orderby
-    }else{
+    } else {
         orderby = "";
     }
+    //left join
+    var leftjoinStr = '';
+    if (leftjoinTable.length > 0) {
+        for (let i = 0; i < leftjoinTable.length; i++) {
+            const lftableName = leftjoinTable[i];
+            leftjoinStr += ` left join  ${lftableName} on ${lftableName}.Id = ${tableName}.${lftableName}_Id `;
+        }
+    }
+
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
-            const sql = "select " + fieldStr + " from " + tableName + " where " + whereStr+' '+orderby;
-            console.log('SQL===> '+sql);
+            const sql = "select " + fieldStr + " from " + tableName + leftjoinStr + " where " + whereStr + ' ' + orderby;
+            console.log('SQL===> ' + sql);
             tx.executeSql(sql, [], (tx, res) => {
                 var rowData = {};
                 for (var x = 0; x < res.rows.length; x++) {
@@ -308,15 +357,23 @@ function getRecord(db, tableObject, whereObject, childField,orderby) {
 //      orderby: 排序，例如: "Id DESC,Name ASC"
 //      page: 分页，{pageIndex:1,pageSize:20}
 //      ignore: 忽略查询的字段,['Id','State']
-function getRecordList(db, tableObject, whereObject, childField, orderby, page,ignore) {
+function getRecordList(db, tableObject, whereObject, childField, orderby, page, ignore) {
     var tableName = tableObject.tableName;
     var fields = tableObject.fields;
     var fieldStr = "";
+    let leftjoinTable = [];
     for (let key in fields) {
-        if(ignore && ignore.indexOf(key) != -1){
+        if (ignore && ignore.indexOf(key) != -1) {
             continue;
         }
-        fieldStr += key + ",";
+        if (key.endsWith('_Id')) {
+            leftjoinTable.push(key.substring(0, key.lastIndexOf('_Id')));
+        }
+        if (key.indexOf('.') != -1) {
+            fieldStr += key + ",";
+        } else {
+            fieldStr += tableName + "." + key + ",";
+        }
     }
     if (childField) {
         if (childField.endsWith(',')) {
@@ -329,24 +386,31 @@ function getRecordList(db, tableObject, whereObject, childField, orderby, page,i
     var whereStr = "";
     if (typeof whereObject == "object") {
         for (let key in whereObject) {
+            let skey = '';
+            if (key.indexOf('.') == -1) {
+                skey = tableName + "." + key
+            }else{
+                skey = key;
+            }
             if (!checkNumber(fields[key])) {
-                whereStr += key + " = '" + whereObject[key] + "' and ";
+                whereStr += skey + " = '" + whereObject[key] + "' and ";
             } else {
-                whereStr += key + " = " + whereObject[key] + " and ";
+                whereStr += skey + " = " + whereObject[key] + " and ";
             }
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
     } else if (typeof whereObject == "string") {
         whereStr = whereObject;
     }
-    if((whereStr.trim()).length == 0){
+    if ((whereStr.trim()).length == 0) {
         whereStr = " 1 = 1 ";
     }
     if (!orderby) {
-        orderby = " order by Id asc "
+        orderby = " order by " + tableName + ".Id asc "
     } else {
         orderby = " order by " + orderby
     }
+
     var pageStr = "";
     if (page && typeof page == "object" && Object.prototype.hasOwnProperty.call(page, "pageIndex") && Object.prototype.hasOwnProperty.call(page, "pageSize")) {
         var pageIndex = page.pageIndex;
@@ -357,10 +421,18 @@ function getRecordList(db, tableObject, whereObject, childField, orderby, page,i
         pageIndex = (pageIndex - 1) * pageSize;
         pageStr = " limit " + pageIndex + "," + pageSize;
     }
+    //left join
+    var leftjoinStr = '';
+    if (leftjoinTable.length > 0) {
+        for (let i = 0; i < leftjoinTable.length; i++) {
+            const lftableName = leftjoinTable[i];
+            leftjoinStr += ` left join  ${lftableName} on ${lftableName}.Id = ${tableName}.${lftableName}_Id `;
+        }
+    }
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
-            const sql = "select " + fieldStr + " from " + tableName + " where " + whereStr + " " + orderby + " " + pageStr;
-            console.log('SQL===> '+sql);
+            const sql = "select " + fieldStr + " from " + tableName + leftjoinStr + " where " + whereStr + " " + orderby + " " + pageStr;
+            console.log('SQL===> ' + sql);
             tx.executeSql(sql, [], (tx, res) => {
                 var rowData = [];
                 for (var x = 0; x < res.rows.length; x++) {
@@ -378,6 +450,7 @@ function getRecordList(db, tableObject, whereObject, childField, orderby, page,i
 export {
     openDatabase,
     createTable,
+    addColumn,
     delRecord,
     updateRecord,
     addRecord,
