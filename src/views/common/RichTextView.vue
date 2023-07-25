@@ -1,7 +1,7 @@
 <template>
-    <div class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="myKeydown" @blur="blurRichText"
-        ref="richDiv"></div>
-    <van-back-top v-if="!editable" target=".richText"  bottom="5vh" right="3vw"/>
+    <div class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="enterKeydown"
+        @blur="blurRichText" ref="richDiv"></div>
+    <van-back-top v-if="!editable" target=".richText" bottom="5vh" right="3vw" />
     <div class="tooltip" v-if="editable">
         <!--粗体-->
         <button @click="changeFont('B')">B</button>
@@ -51,6 +51,8 @@ import { Toast } from '@vant/compat';
 import { ref } from 'vue';
 
 import { watch } from 'vue';
+
+import { showImagePreview } from 'vant';
 
 import { Takefromgalery } from '@/plugin/camera';
 
@@ -119,6 +121,14 @@ export default {
                     }
                 }
                 setRichText({ changeInputCheck: true });
+            } else if (!editable.value && e.target.localName == 'img') {
+                //img 
+                var imgsrc = e.target.src;
+                let imgsrcList = [imgsrc];
+                showImagePreview({
+                images: imgsrcList,
+                startPosition: 0,
+            });
             }
         }
 
@@ -179,17 +189,17 @@ export default {
             } else if (typ == 'PH2') {//本地图片
                 getSelectionRange();
                 //调用相册接口
-                Takefromgalery().then((resole)=>{
+                Takefromgalery().then((resole) => {
                     console.log(resole);
-                    if(resole.type == 'base64'){
-                        var htmlStr = `<div class="photobox" style="width: 100%;"><img src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
+                    if (resole.type == 'base64') {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
                         document.execCommand("insertHTML", false, htmlStr);
-                    }else{
-                        var htmlStr = `<div class="photobox" style="width: 100%;"><img src="${resole.data}" style="width: 100%;"></div>`;
+                    } else {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
                         //document.execCommand("insertText", false, htmlStr);
                         document.execCommand("insertHTML", false, htmlStr);
                     }
-                }).catch((e)=>{
+                }).catch((e) => {
                     console.log(e);
                     Toast(e);
                 });
@@ -199,7 +209,7 @@ export default {
                 var htmlStr = `[${datestr}]`;
                 document.execCommand("insertHTML", false, htmlStr);
                 setRichText();
-            } 
+            }
         }
 
         let rangeRef = ref(null);
@@ -246,6 +256,7 @@ export default {
         //换行时去掉空div的类名checkdivChecked
         const enterAfter = (e) => {
             var parent = e.target;
+            //checkbox
             var checkdivList = parent.querySelectorAll('.checkdiv');
             console.log(checkdivList);
             if (checkdivList.length > 0) {
@@ -263,7 +274,6 @@ export default {
                     }
                 }
             }
-
         }
 
         //换行自动添加input[checkbox]
@@ -285,7 +295,7 @@ export default {
 
         //监听换行事件
         const incRef = ref(0);
-        const myKeydown = (e) => {
+        const enterKeydown = (e) => {
             console.log('键盘', e)
             let selection = window.getSelection();
             console.log(selection);
@@ -295,16 +305,16 @@ export default {
                 newInputCheckbox(range, incRef.value);
             }, 200)
             incRef.value = incRef.value + 1;
-
         }
 
         const editable = ref(props.editable);
+
 
         return {
             richDiv,
             blurRichText,
             changeFont,
-            myKeydown,
+            enterKeydown,
             clickRichText,
             editable,
             showPicUrl,

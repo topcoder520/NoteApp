@@ -15,7 +15,7 @@
   </router-view>
   <van-tabbar route v-show="IsShowTabBar">
     <van-tabbar-item icon="notes-o" to="/">笔记</van-tabbar-item>
-    <van-tabbar-item icon="plus" to="/AddNote">添加</van-tabbar-item>
+    <!-- <van-tabbar-item icon="plus" to="/AddNote">添加</van-tabbar-item> -->
     <van-tabbar-item icon="calendar-o" to="/Calendar">日历</van-tabbar-item>
     <van-tabbar-item icon="setting-o" to="/Setting">设置</van-tabbar-item>
   </van-tabbar>

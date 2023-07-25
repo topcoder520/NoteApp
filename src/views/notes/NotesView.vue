@@ -1,5 +1,5 @@
 <template>
-  <van-nav-bar  class="list-title" title="任务列表" v-show="showNavbar">
+  <van-nav-bar class="list-title" title="待完成列表" v-show="showNavbar">
     <template #right>
       <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="18" /></router-link>
     </template>
@@ -19,12 +19,17 @@
             </van-col>
           </van-row>
           <template #right v-if="showSwitchBtn">
-            <van-button square style="height: 100% !important" text="移出" @click="preDelItem(item.Id)" type="danger"
+            <van-button square style="height: 100% !important" text="已完成" @click="preDelItem(item.Id)" type="danger"
               class="delete-button" />
           </template>
         </van-swipe-cell>
       </van-list>
     </van-pull-refresh>
+    <div class="add-box" v-show="showNavbar">
+      <span class="border" @click="addNote">
+        <van-icon name="plus" />
+      </span>
+    </div>
   </div>
 </template>
 <script>
@@ -180,8 +185,9 @@ export default {
       store.commit('SelectTabBar', -1);
 
       const RefreshListState = store.state.RefreshListState;
-      console.log('store.state.RefreshListState:' + store.state.RefreshListState);
+      console.log('store.state.RefreshListState:' + RefreshListState,typeof RefreshListState);
       if (RefreshListState) {
+        store.commit('setRefreshListState', false);
         list.value = [];
         initPageIndex = 1;
         console.log('getNoteListByPage2');
@@ -209,7 +215,7 @@ export default {
     const getNoteListByPage = (pageIndex, pageSize) => {
       finished.value = false;
       console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + props.Keywords);
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1),Sort:props.IsAll, kw: props.Keywords }).then((resolve) => {
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords }).then((resolve) => {
         var listData = resolve;
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
@@ -241,6 +247,13 @@ export default {
     const { height } = useWindowSize();
     const vheight = ref(height.value + 'px');
 
+    //添加笔记
+    const addNote = () => {
+      router.push({
+        path: '/AddNote',
+      })
+    }
+
     return {
       Refresh,
       onRefresh,
@@ -254,7 +267,8 @@ export default {
       vheight,
       nextTop,
       showNavbar,
-      showSwitchBtn: !props.IsAll
+      showSwitchBtn: !props.IsAll,
+      addNote,
     };
   },
 }
@@ -271,12 +285,43 @@ export default {
   margin-top: 46px;
 }
 
+.list-box .add-box {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  position: fixed;
+  border-radius: 50%;
+  bottom: 60px;
+  right: 12px;
+}
+
+.list-box .add-box .border {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  background: #fff;
+  border: 1px solid #1989fa;
+  border-radius: 50%;
+  background-color: #1989fa;
+}
+
+.list-box .add-box .border .van-icon {
+  line-height: 42px;
+  font-size: 22px;
+  color: #ededed;
+}
+
+.list-box .add-box .border .van-icon:hover {
+  font-size: 24px;
+  color: #fff;
+}
+
 .van-pull-refresh {
   background-color: #f9f9f9;
   //margin-bottom: 120px;
 
   .van-list {
-    //height: v-bind("vheight");
+    margin-bottom: 80px;
     min-height: v-bind("vheight");
   }
 
@@ -314,5 +359,4 @@ export default {
     border-radius: 3px;
     margin-left: 9px;
   }
-}
-</style>
+}</style>

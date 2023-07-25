@@ -65,7 +65,6 @@ export default {
         };
 
         const onClickLeft = () => {
-            store.commit('setRefreshListState', false);
             history.back();
         };
         const onClickRight = () => {
@@ -87,7 +86,6 @@ export default {
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         Toast('保存成功');
-                        store.commit('setRefreshListState', true);
                         //history.back();
                     }
                 }).catch((reject) => {
@@ -115,6 +113,8 @@ export default {
                         Toast('添加成功');
                         Id.value = resolve.insertId;
                         store.commit('setRefreshListState', true);
+                        const RefreshListState = store.state.RefreshListState;
+                        console.log('store.state.RefreshListState:' + RefreshListState,typeof RefreshListState);
                         //history.back();
                     }
                 }).catch((reject) => {
@@ -151,7 +151,8 @@ export default {
         const PageTitle = ref('添加笔记');
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
-        if (Id.value) {
+        console.log('Id.value',Id.value);
+        if (Id.value && Id.value>0) {
             PageTitle.value = '编辑笔记';
             store.dispatch('getNoteById', Id.value).then((resolve) => {
                 const data = resolve;

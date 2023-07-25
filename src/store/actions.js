@@ -49,6 +49,7 @@ const noteCategory = {
     fields: {
         CName: "text",
         Timestamp: "integer",
+        note_Id:"integer",  //note.SType = 1时的note的数据Id
         Des: "text",
         CreateTime: "text",
         State: "integer",
@@ -245,6 +246,7 @@ export function startupDatabase(context) {
                     if (res1.rowsAffected > 0) {
                         console.log('noteCategory 创建成功');
                     }
+                    addColumn(db,noteCategory,'note_Id','integer',0);
                 }).catch((reject1) => {
                     console.log(reject1);
                 });

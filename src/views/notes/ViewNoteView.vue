@@ -61,7 +61,6 @@ export default {
         };
 
         const onClickLeft = () => {
-            store.commit('setRefreshListState', false);
             history.back();
         };
         const onClickRight = () => {

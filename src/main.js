@@ -8,6 +8,7 @@ import {
     Col, Row, PullRefresh, List, Cell, CellGroup, NavBar, Field, 
     Icon, Popover, Calendar,SwipeCell,Button,Notify,Dialog,
     Popup,Switch,Search,DropdownMenu, DropdownItem,BackTop,Toast,
+    ImagePreview,
 } from 'vant';
 import 'vant/lib/index.css';
 
@@ -40,6 +41,7 @@ app.use(DropdownItem);
 app.use(Dialog);
 app.use(BackTop);
 app.use(Toast);
+app.use(ImagePreview);
 
 app.mount('#app');
 // document.addEventListener('deviceready',function(){
