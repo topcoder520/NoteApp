@@ -159,7 +159,7 @@ export default {
             showConfirmDialog({
               title: '任务已完成，移出当前列表？',
             }).then(() => {
-              store.dispatch('delNote', willDelItemId).then((resolve, reject) => {
+              store.dispatch('delNote', {Id:willDelItemId,real:0}).then((resolve, reject) => {
                 if (resolve.rowsAffected > 0) {
                   for (let index = 0; index < list.value.length; index++) {
                     const item = list.value[index];

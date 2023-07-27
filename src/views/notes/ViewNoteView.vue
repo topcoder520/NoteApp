@@ -1,6 +1,9 @@
 <template>
-    <van-nav-bar :title="PageTitle" left-text="返回" right-text="编辑" left-arrow @click-left="onClickLeft"
-        @click-right="onClickRight" />
+    <van-nav-bar :title="PageTitle" left-text="返回" left-arrow @click-left="onClickLeft" @click-right="onClickRight">
+        <template #right>
+            <van-icon name="ellipsis" size="25" />
+        </template>
+    </van-nav-bar>
     <div class="content" ref="root">
         <!-- <input type="text" class="title" readonly placeholder="标题" v-model="title" /> -->
         <van-cell class="date-info" v-model:title="createTime" icon="calendar-o">
@@ -15,6 +18,8 @@
             <rich-text @getValue="getValue" :value="tmepContent" :editable="false"></rich-text>
         </div>
     </div>
+    <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
+        close-on-click-action @cancel="onCancel" />
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
@@ -23,6 +28,7 @@ import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
+import { showConfirmDialog } from 'vant';
 
 import RichText from '../common/RichTextView.vue';
 
@@ -64,10 +70,7 @@ export default {
             history.back();
         };
         const onClickRight = () => {
-            router.push({
-                path: '/AddNote',
-                query: { Id: Id.value }
-            });
+            showSheet.value = true;
         };
 
         const showPopover = ref(false);
@@ -85,7 +88,7 @@ export default {
         const vheight = ref(height + 'px');
         onMounted(() => {
             const rect = useRect(root);
-            vheight.value = (height.value - rect.height-50) + 'px';
+            vheight.value = (height.value - rect.height - 50) + 'px';
         });
 
         //内容
@@ -134,6 +137,45 @@ export default {
                 });
             }
         }
+
+        //
+        const showSheet = ref(false);
+        const actionsSheet = [
+            { name: '编辑', },
+            { name: '删除', color: 'red', },
+        ];
+        const onCancel = () => console.log('取消');
+        const selectSheet = (action, index) => {
+            console.log(action, index);
+            if (index == 0) {
+                router.push({
+                    path: '/AddNote',
+                    query: { Id: Id.value }
+                });
+            } else if (index == 1) {
+                showConfirmDialog({
+                    title: '确认删除该笔记？',
+                }).then(() => {
+                    console.log('shanchu biji ');
+                    store.dispatch('delNote', { Id: Id.value, real: 1 }).then((resolve, reject) => {
+                        if (resolve.rowsAffected > 0) {
+                            Toast.fail('删除成功');
+                            store.commit('setRefreshListState', true);
+                            setTimeout(function(){
+                                history.back();
+                            },400)
+                        } else {
+                            Toast.fail('移出失败：' + reject);
+                        }
+                    }).catch((reject)=>{
+                        console.log(reject);
+                    });
+                }).catch(() => {
+                    // on cancel
+                });
+            }
+        }
+
         return {
             getValue,
 
@@ -150,7 +192,13 @@ export default {
             onSelect,
             root,
             vheight,
-            Id
+            Id,
+
+            showSheet,
+            actionsSheet,
+            onCancel,
+            selectSheet,
+
         };
     }
 }

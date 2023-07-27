@@ -206,15 +206,25 @@ export function updateNoteSort(context,{
     });
 }
 
-export function delNote(context,id){
+export function delNote(context,{Id,real}){
     return new Promise((resolve, reject) => {
-        delRecord(context.state.database, note, { Id: id }, {
-            State: 0
-        }).then((res) => {
-            resolve(res);
-        }).catch((reject1) => {
-            reject(reject1);
-        });
+        if(real == 0){
+            //逻辑删除
+            delRecord(context.state.database, note, { Id: Id }, {
+                State: 0
+            }).then((res) => {
+                resolve(res);
+            }).catch((reject1) => {
+                reject(reject1);
+            });
+        }else{
+            //物理删除
+            delRecord(context.state.database, note, { Id: Id },"").then((res) => {
+                resolve(res);
+            }).catch((reject1) => {
+                reject(reject1);
+            });
+        }
     });
 }
 

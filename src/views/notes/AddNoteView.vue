@@ -113,8 +113,6 @@ export default {
                         Toast('添加成功');
                         Id.value = resolve.insertId;
                         store.commit('setRefreshListState', true);
-                        const RefreshListState = store.state.RefreshListState;
-                        console.log('store.state.RefreshListState:' + RefreshListState,typeof RefreshListState);
                         //history.back();
                     }
                 }).catch((reject) => {
