@@ -6,10 +6,9 @@
     </van-nav-bar>
     <div class="content" ref="root">
         <!-- <input type="text" class="title" readonly placeholder="标题" v-model="title" /> -->
-        <van-cell class="date-info" v-model:title="createTime" icon="calendar-o">
+        <van-cell class="date-info" v-model:title="createTime">
             <!-- 使用 right-icon 插槽来自定义右侧图标 -->
             <template #right-icon>
-                <van-icon size="20px" style="position: relative;top: 2px" name="label-o" />
                 <label class="category-name">{{ categoryName }}</label>
             </template>
         </van-cell>

@@ -3,16 +3,13 @@
         @click-right="onClickRight" />
     <div class="addcontent" ref="root">
         <input type="text" class="title" placeholder="标题" v-model="title" />
-        <van-cell class="date-info" v-model:title="createTime" icon="calendar-o">
+        <van-cell class="date-info" v-model:title="createTime">
             <!-- 使用 right-icon 插槽来自定义右侧图标 -->
             <template #right-icon>
-                <van-popover placement="left-start" v-model:show="showPopover" :actions="actions" @select="onSelect">
-                    <template #reference>
-                        <van-icon size="20px" style="position: relative;top: 2px" name="label-o" />
-                        <label class="category-name">{{ categoryName }}</label>
-                        <van-icon class="arrow-down" size="20px" name="arrow-down" />
-                    </template>
-                </van-popover>
+                <div style="display:inline-block;" @click="showPopup = true">
+                    <label class="category-name">{{ categoryName }}</label>
+                    <van-icon class="arrow-down" size="20px" name="arrow-down" />
+                </div>
             </template>
         </van-cell>
         <!-- <textarea class="note-content " v-model="content"></textarea> -->
@@ -20,6 +17,10 @@
             <rich-text @getValue="getValue" :value="tmepContent"></rich-text>
         </div>
     </div>
+    <van-popup v-model:show="showPopup" round position="bottom">
+        <van-cascader v-model="cascaderValue" title="请选择知识库和分类" :options="options" @close="showPopup = false"
+            @change="onChange" @finish="onFinish" />
+    </van-popup>
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
@@ -28,6 +29,7 @@ import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
+import { closeToast, showLoadingToast } from 'vant';
 
 import RichText from '../common/RichTextView.vue';
 
@@ -82,7 +84,10 @@ export default {
                     Id: Id.value,
                     Title: title.value,
                     Category: categoryName.value,
-                    Content: content.value
+                    Content: content.value,
+
+                    ParentId:ParentId.value,
+                    note_category_Id:note_category_Id.value,
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         Toast('保存成功');
@@ -106,7 +111,10 @@ export default {
                     Year: y,
                     Month: m,
                     Day: d,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+
+                    ParentId:ParentId.value,
+                    note_category_Id:note_category_Id.value,
                 }).then((resolve) => {
                     console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
@@ -119,16 +127,6 @@ export default {
                     Toast.fail('添加失败：' + reject);
                 });
             }
-        };
-
-        const showPopover = ref(false);
-        const actions = [
-            { text: '生活', icon: 'add-o' },
-            { text: '工作', icon: 'music-o' },
-            { text: '旅游', icon: 'more-o' },
-        ];
-        const onSelect = (action) => {
-            categoryName.value = action.text;
         };
 
         const { height } = useWindowSize();
@@ -147,10 +145,12 @@ export default {
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('添加笔记');
+        const ParentId = ref(0);
+        const note_category_Id = ref(0);
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
-        console.log('Id.value',Id.value);
-        if (Id.value && Id.value>0) {
+        console.log('Id.value', Id.value);
+        if (Id.value && Id.value > 0) {
             PageTitle.value = '编辑笔记';
             store.dispatch('getNoteById', Id.value).then((resolve) => {
                 const data = resolve;
@@ -159,6 +159,8 @@ export default {
                 content.value = data.Content;
                 tmepContent.val = data.Content;
                 createTime.value = data.CreateTime;
+                ParentId.value = data.ParentId;
+                note_category_Id.value = data.note_category_Id;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
@@ -172,6 +174,55 @@ export default {
             content.value = valObj.html;
             temTitle.value = valObj.text;
         }
+
+
+        //
+        const getCyNoteList = () => {
+            store.dispatch('getCyNoteList').then((resolve) => {
+                var listData = resolve;
+                console.log('getCyNoteList=>' + JSON.stringify(listData));
+                for (let i = 0; i < listData.length; i++) {
+                    var item = listData[i];
+                    options.value.push({ text: item.Title, value: item.Id, children: [] });
+                }
+            });
+        };
+        getCyNoteList();
+        const showPopup = ref(false);
+        const cascaderValue = ref('');
+        const options = ref([]);
+
+        const onChange = ({ value }) => {
+            // 模拟数据请求
+            showLoadingToast('加载中...');
+            store.dispatch('getCategoryList', { CyNoteId: value }).then((resolve) => {
+                var listData = resolve;
+                console.log('getCategoryList=>' + JSON.stringify(listData));
+                let selectData = [];
+                for (let i = 0; i < options.value.length; i++) {
+                    const item = options.value[i];
+                    if(item.value == value){
+                        selectData = item.children;
+                        break;
+                    }
+                }
+                for (let i = 0; i < listData.length; i++) {
+                    selectData.push({ value: listData[i].Id, text: listData[i].CName });
+                }
+                closeToast();
+            });
+        };
+
+        const onFinish = ({ selectedOptions }) => {
+            showPopup.value = false;
+            console.log('selectedOptions',JSON.stringify(selectedOptions));
+            categoryName.value = selectedOptions.map((option) => option.text).join('/');
+            var selectIdstr = selectedOptions.map((option) => option.value).join(' ');
+            var selectIdArr = selectIdstr.split(' ');
+            ParentId.value = Number(selectIdArr[0]);
+            note_category_Id.value = Number(selectIdArr[1]);
+        };
+
         return {
             getValue,
 
@@ -183,12 +234,16 @@ export default {
             content,
             tmepContent,
             createTime,
-            actions,
-            showPopover,
-            onSelect,
             root,
             vheight,
-            Id
+            Id,
+
+            showPopup,
+            options,
+            onChange,
+            onFinish,
+            cascaderValue,
+
         };
     }
 }

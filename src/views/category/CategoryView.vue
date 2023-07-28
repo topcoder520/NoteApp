@@ -1,7 +1,7 @@
 <template>
-  <van-nav-bar class="list-title" title="待完成列表" v-show="showNavbar">
+  <van-nav-bar class="list-title" title="知识库" v-show="showNavbar">
     <template #right>
-      <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="18" /></router-link>
+      <router-link v-if="showSwitchBtn" to="/AddCategory"> <van-icon name="plus" size="22" /></router-link>
     </template>
   </van-nav-bar>
   <div class="list-box">
@@ -9,27 +9,26 @@
       <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
           <template #left>
-            <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
+            <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消常用' : '常用'"
               @click="nextTop(item.Id)" />
           </template>
           <van-row @click="onNoteDetail(item.Id)">
             <van-col span="24">
-              <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
-              <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
+              <p class="van-multi-ellipsis--l3"><van-icon name="bookmark" style="margin-right: 5px;" color="blue" />{{
+                item.Title }}</p>
+              <p><span style="color:#999;margin-right:8px;">共{{ item.totalNotes }}篇笔记</span>{{ item.CreateTime }}<span
+                  class="top-tag" v-show="item.Sort > 1">常用</span></p>
             </van-col>
           </van-row>
           <template #right v-if="showSwitchBtn">
-            <van-button square style="height: 100% !important" text="已完成" @click="preDelItem(item.Id)" type="danger"
+            <van-button square style="height: 100% !important" text="编辑" @click="AddCategory(item.Id)" type="success"
+              class="delete-button" />
+            <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id)" type="danger"
               class="delete-button" />
           </template>
         </van-swipe-cell>
       </van-list>
     </van-pull-refresh>
-    <div class="add-box" v-show="showNavbar">
-      <span class="border" @click="addNote">
-        <van-icon name="plus" />
-      </span>
-    </div>
   </div>
 </template>
 <script>
@@ -41,7 +40,7 @@ import { useStore } from 'vuex';
 import { useWindowSize } from '@vant/use';
 
 export default {
-  name: 'NotesView',
+  name: 'CategoryView',
   props: {
     Date: {
       type: Object,
@@ -53,10 +52,6 @@ export default {
       type: Boolean,
       default: () => true
     }, //是否展示
-    SelectItem: {
-      type: Object,
-      default: () => ({ ParentId: 0, note_category_Id: 0})
-    },
   },
   emits: {
     'openNotedetail': null,
@@ -94,6 +89,26 @@ export default {
     const preDelItem = (Id) => {
       willDelItemId = Id;
       console.log(willDelItemId);
+      showConfirmDialog({
+        title: '是否删除该知识库？',
+      }).then(() => {
+        store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
+          if (resolve.rowsAffected > 0) {
+            for (let index = 0; index < list.value.length; index++) {
+              const item = list.value[index];
+              if (item.Id == willDelItemId) {
+                list.value.splice(index, 1);
+                break;
+              }
+            }
+            showNotify({ type: 'success', message: '删除成功', position: 'bottom' });
+          } else {
+            Toast.fail('移出失败：' + reject);
+          }
+        });
+      }).catch(() => {
+        // on cancel
+      });
     };
     //置顶
     let willTopItemId = 0;
@@ -160,26 +175,7 @@ export default {
           return true;
         case 'right':
           return new Promise(() => {
-            showConfirmDialog({
-              title: '任务已完成，移出当前列表？',
-            }).then(() => {
-              store.dispatch('delNote', {Id:willDelItemId,real:0}).then((resolve, reject) => {
-                if (resolve.rowsAffected > 0) {
-                  for (let index = 0; index < list.value.length; index++) {
-                    const item = list.value[index];
-                    if (item.Id == willDelItemId) {
-                      list.value.splice(index, 1);
-                      break;
-                    }
-                  }
-                  showNotify({ type: 'success', message: '已移出', position: 'bottom' });
-                } else {
-                  Toast.fail('移出失败：' + reject);
-                }
-              });
-            }).catch(() => {
-              // on cancel
-            });
+
           });
       }
     };
@@ -189,7 +185,7 @@ export default {
       store.commit('SelectTabBar', -1);
 
       const RefreshListState = store.state.RefreshListState;
-      console.log('store.state.RefreshListState:' + RefreshListState,typeof RefreshListState);
+      console.log('store.state.RefreshListState:' + RefreshListState, typeof RefreshListState);
       if (RefreshListState) {
         store.commit('setRefreshListState', false);
         list.value = [];
@@ -215,21 +211,13 @@ export default {
       console.log('getNoteListByPage4');
       getNoteListByPage(initPageIndex, 20);
     }, { deep: true });
-    //
-    watch(() => props.SelectItem, (newVal, oldVal) => {
-      console.log(JSON.stringify(newVal), JSON.stringify(oldVal));
-      list.value = [];
-      initPageIndex = 1;
-      console.log('getNoteListByPage3');
-      getNoteListByPage(initPageIndex, 20);
-    }, { deep: true });
 
     const getNoteListByPage = (pageIndex, pageSize) => {
       finished.value = false;
       console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + props.Keywords);
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords,ParentId: props.SelectItem.ParentId,note_category_Id:props.SelectItem.note_category_Id}).then((resolve) => {
+      store.dispatch('getCyNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords }).then((resolve) => {
         var listData = resolve;
-        console.log('getNoteListByPage=>' + JSON.stringify(listData));
+        console.log('getCyNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
           list.value.push(listData[i]);
         }
@@ -244,12 +232,16 @@ export default {
     };
 
     //查看详情
-    const onNoteDetail = (Id) => {
-      console.log(Id);
-      context.emit('openNotedetail', { Id: Id });
+    const AddCategory = (Id) => {
       router.push({
-        path: '/ViewNote',
+        path: '/AddCategory',
         query: { Id: Id }
+      });
+    };
+    const onNoteDetail = (CyId) => {
+      router.push({
+        path: '/Search',
+        query: { CyId: CyId }
       });
     };
 
@@ -259,13 +251,6 @@ export default {
     const { height } = useWindowSize();
     const vheight = ref(height.value + 'px');
 
-    //添加笔记
-    const addNote = () => {
-      router.push({
-        path: '/AddNote',
-      })
-    }
-
     return {
       Refresh,
       onRefresh,
@@ -274,13 +259,13 @@ export default {
       loading,
       finished,
       onNoteDetail,
+      AddCategory,
       preDelItem,
       beforeClose,
       vheight,
       nextTop,
       showNavbar,
       showSwitchBtn: !props.IsAll,
-      addNote,
     };
   },
 }

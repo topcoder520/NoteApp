@@ -5,6 +5,8 @@ import ViewNoteView from '../views/notes/ViewNoteView.vue'
 import CalendarView from '../views/calendar/CalendarView.vue'
 import SettingView from '../views/setting/SettingView.vue'
 import SearchView from '../views/search/SearchView.vue'
+import CategoryView from '../views/category/CategoryView.vue'
+import AddCategoryView from '../views/category/AddCategoryView.vue'
 
 const routes = [
   {
@@ -27,6 +29,18 @@ const routes = [
     }
   },
   {
+    path: '/Category',
+    name: 'CategoryView',
+    component: CategoryView
+  },
+  {
+    path: '/AddCategory',
+    name: 'AddCategory',
+    components: {
+      NewNote:AddCategoryView
+    }
+  },
+  {
     path: '/Calendar',
     name: 'CalendarView',
     component: CalendarView
@@ -35,7 +49,7 @@ const routes = [
     path: '/Search',
     name: 'SearchView',
     components: {
-      SearchNote:SearchView
+      NewNote:SearchView
     }
   },
   {
