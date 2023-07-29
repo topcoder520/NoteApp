@@ -43,7 +43,11 @@
     </div>
     <van-dialog class="showPicUrlDialog" v-model:show="showPicUrl" title="图片地址" show-cancel-button
         @confirm="showPicUrlconfirm" @closed="reCursorposition">
-        <input type="text" v-model="picUrl" />
+        <textarea v-model="picUrl" rows="6" style="width:96%;border: 1px solid #e1dcdc;"></textarea>
+    </van-dialog>
+    <van-dialog class="showPicUrlDialog" v-model:show="showLinkUrl" title="设置超链接" show-cancel-button
+        @confirm="showLinkUrlconfirm">
+        <textarea v-model="linkUrl" rows="6" style="width:96%;border: 1px solid #e1dcdc;"></textarea>
     </van-dialog>
 </template>
 <script>
@@ -146,6 +150,26 @@ export default {
             context.emit('getValue', rs);
         }
 
+        //设置超链接
+        const showLinkUrl = ref(false);
+        const linkUrl = ref(''); //地址
+        const showLinkUrlconfirm = () => {
+            console.log('linkUrl',linkUrl.value);
+            if (linkUrl.value.trim().length > 0) {
+                setSelectionRange();
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    console.log('恢复选择文本了');
+                    document.execCommand("CreateLink", false, linkUrl.value);
+                    setRichText();
+                }
+            } else {
+                Toast('请输入超链接地址')
+            }
+
+        }
+
+
         const showPicUrl = ref(false); //是否展示图片地址弹框
         const picUrl = ref(''); //图片网络地址
         const changeFont = (typ) => {
@@ -159,11 +183,9 @@ export default {
                 document.execCommand("Italic", false, null);
                 setRichText();
             } else if (typ == 'L') {//设置超链接,链接地址是选中的文字
-                const selection = window.getSelection();
-                if (selection.rangeCount > 0) {
-                    document.execCommand("CreateLink", false, selection.toString());
-                    setRichText();
-                }
+                linkUrl.value = "";
+                showLinkUrl.value = true;
+                getSelectionRange();
             } else if (typ == 'A') {//字体颜色
                 document.execCommand("ForeColor", false, '#ff4d4f');
                 setRichText();
@@ -320,6 +342,11 @@ export default {
             showPicUrl,
             showPicUrlconfirm,
             picUrl,
+
+            showLinkUrl,
+            linkUrl,
+            showLinkUrlconfirm,
+
         }
     }
 }

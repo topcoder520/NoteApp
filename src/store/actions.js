@@ -263,7 +263,8 @@ export function getNoteListNearMonth(context,{Year,Month}){
 
 export function getCyNoteList(context){
     return new Promise((resolve,reject)=>{
-        getRecordList(context.state.database, note  , `note.SType = 1 and note.State = 1 `,"","note.Sort desc,note.Timestamp desc",null,["Content"]).then((res) => {
+        let otherFeildSql = " (select count(1) from note nn where nn.SType=0 and nn.ParentId = note.Id) as TotalNoteNum ";
+        getRecordList(context.state.database, note  , `note.SType = 1 and note.State = 1 `,otherFeildSql,"note.Sort desc,note.Timestamp desc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -308,7 +309,6 @@ export function updateNote(context,{
             Category:Category,
             Content:Content,
             Timestamp:timestamp,
-            State:1,
             ParentId:ParentId,
             note_category_Id:note_category_Id,
         }).then((res) =>{
@@ -380,7 +380,8 @@ export function delCategory(context,{Id,real}){
 
 export function getCategoryList(context,{CyNoteId}){
     return new Promise((resolve,reject)=>{
-        getRecordList(context.state.database, noteCategory  , `note_category.note_Id = ${CyNoteId} and note_category.State = 1 `,"","note_category.Timestamp desc",null,[]).then((res) => {
+        let otherFeildSql = "(select count(1) from note nn where nn.SType=0 and nn.note_category_Id = note_category.Id) as TotalNoteNum";
+        getRecordList(context.state.database, noteCategory  , `note_category.note_Id = ${CyNoteId} and note_category.State = 1 `,otherFeildSql,"note_category.Timestamp desc",null,[]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);

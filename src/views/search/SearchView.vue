@@ -35,6 +35,7 @@ export default {
             console.log('SelectTabBar加载');
         });
         onUnmounted(() => {
+            store.commit('SelectTabBar', -1);
             console.log('SelectTabBar卸载');
         });
 
@@ -70,7 +71,7 @@ export default {
                 console.log('getCyNoteList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
                     var item = listData[i];
-                    option1.push({ text: item.Title, value: item.Id});
+                    option1.push({ text: item.Title+' ('+item.TotalNoteNum+')', value: item.Id});
                 }
                 if(!CyId.value){
                     CyId.value = 0;
@@ -89,7 +90,7 @@ export default {
                 var listData = resolve;
                 console.log('getCategoryList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
-                    option2.push({ value: listData[i].Id, text: listData[i].CName });
+                    option2.push({ value: listData[i].Id, text: listData[i].CName+' ('+listData[i].TotalNoteNum+')' });
                 }
                 selValue2.value = 0;
                 SelectItem.note_category_Id = 0;

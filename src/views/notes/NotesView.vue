@@ -1,21 +1,29 @@
 <template>
   <van-nav-bar class="list-title" title="待完成列表" v-show="showNavbar">
     <template #right>
-      <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="18" /></router-link>
+      <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="22" /></router-link>
     </template>
   </van-nav-bar>
   <div class="list-box">
     <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
       <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
-          <template #left>
+          <template #left v-if="showSwitchBtn">
             <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
-              @click="nextTop(item.Id)" />
+              @click="topItem(item.Id, item.Sort)" />
+          </template>
+          <template #left v-if="!showSwitchBtn && item.State == 0">
+            <van-button square type="success" style="height: 100% !important" :text="'待完成'"
+              @click="setNotState(item.Id, item.Sort)" />
           </template>
           <van-row @click="onNoteDetail(item.Id)">
             <van-col span="24">
               <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
-              <p>{{ item.CreateTime }}<span class="top-tag" v-show="item.Sort > 1">置顶</span></p>
+              <p>
+                <span v-show="item.State == 1" class="status"></span>
+                <span v-show="item.State == 0" class="status-over"></span>
+                <span style="margin-right:8px;">{{ item.Category.split('/')[0] }}</span>{{ item.CreateTime }}<span
+                  class="top-tag" v-show="item.Sort > 1">置顶</span></p>
             </van-col>
           </van-row>
           <template #right v-if="showSwitchBtn">
@@ -55,7 +63,7 @@ export default {
     }, //是否展示
     SelectItem: {
       type: Object,
-      default: () => ({ ParentId: 0, note_category_Id: 0})
+      default: () => ({ ParentId: 0, note_category_Id: 0 })
     },
   },
   emits: {
@@ -95,18 +103,12 @@ export default {
       willDelItemId = Id;
       console.log(willDelItemId);
     };
-    //置顶
-    let willTopItemId = 0;
-    const nextTop = (Id) => {
-      willTopItemId = Id;
-      console.log(willTopItemId);
-    };
 
-    const topItem = (item) => {
-      if (item.Sort > 1) {
+    const topItem = (Id, Sort) => {
+      if (Sort > 1) {
         //取消置顶
         store.dispatch('updateNoteSort', {
-          Id: item.Id,
+          Id: Id,
           Sort: 1
         }).then((resolve) => {
           if (resolve.rowsAffected > 0) {
@@ -124,7 +126,7 @@ export default {
       } else {
         //置顶
         store.dispatch('updateNoteSort', {
-          Id: item.Id,
+          Id: Id,
           Sort: Date.now()
         }).then((resolve) => {
           if (resolve.rowsAffected > 0) {
@@ -142,18 +144,31 @@ export default {
       }
     };
 
+    const setNotState = (Id, Sort) => {
+      store.dispatch('updateNoteSort', {
+        Id: Id,
+        Sort: Sort
+      }).then((resolve) => {
+        if (resolve.rowsAffected > 0) {
+          initPageIndex = 1;
+          list.value = [];
+          console.log('getNoteListByPage55');
+          getNoteListByPage(initPageIndex, 20);
+          setTimeout(function () {
+            Toast('已进入待完成列表');
+          }, 300);
+        }
+      }).catch((reject) => {
+        Toast.fail('设置失败：' + reject);
+      });
+    }
+
     // position 为关闭时点击的位置
     const beforeClose = ({ position }) => {
       switch (position) {
         case 'left':
           return new Promise(() => {
-            for (let index = 0; index < list.value.length; index++) {
-              const item = list.value[index];
-              if (item.Id == willTopItemId) {
-                topItem(item);
-                break;
-              }
-            }
+            console.log('click left');
           });
         case 'cell':
         case 'outside':
@@ -163,7 +178,7 @@ export default {
             showConfirmDialog({
               title: '任务已完成，移出当前列表？',
             }).then(() => {
-              store.dispatch('delNote', {Id:willDelItemId,real:0}).then((resolve, reject) => {
+              store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
                 if (resolve.rowsAffected > 0) {
                   for (let index = 0; index < list.value.length; index++) {
                     const item = list.value[index];
@@ -189,7 +204,7 @@ export default {
       store.commit('SelectTabBar', -1);
 
       const RefreshListState = store.state.RefreshListState;
-      console.log('store.state.RefreshListState:' + RefreshListState,typeof RefreshListState);
+      console.log('store.state.RefreshListState:' + RefreshListState, typeof RefreshListState);
       if (RefreshListState) {
         store.commit('setRefreshListState', false);
         list.value = [];
@@ -227,7 +242,7 @@ export default {
     const getNoteListByPage = (pageIndex, pageSize) => {
       finished.value = false;
       console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + props.Keywords);
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords,ParentId: props.SelectItem.ParentId,note_category_Id:props.SelectItem.note_category_Id}).then((resolve) => {
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords, ParentId: props.SelectItem.ParentId, note_category_Id: props.SelectItem.note_category_Id }).then((resolve) => {
         var listData = resolve;
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {
@@ -277,10 +292,11 @@ export default {
       preDelItem,
       beforeClose,
       vheight,
-      nextTop,
       showNavbar,
       showSwitchBtn: !props.IsAll,
       addNote,
+      setNotState,
+      topItem,
     };
   },
 }
@@ -371,4 +387,21 @@ export default {
     border-radius: 3px;
     margin-left: 9px;
   }
-}</style>
+}
+.status{
+  display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #07c160;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.status-over{
+  display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #ee0a24;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+</style>
