@@ -225,12 +225,25 @@ export function updateCategory(context,{
     Id,CName,note_Id,Des
 }){
     return new Promise((resolve, reject)=>{
-        const timestamp = getNowTimestamp();
         updateRecord(context.state.database, noteCategory, { Id: Id }, {
             CName: CName,
             note_Id:note_Id,
             Des:Des,
             State:1
+        }).then((res) =>{
+            resolve(res);
+        }).catch((reject1) => {
+            reject(reject1);
+        });
+    });
+}
+
+export function updateNoteTimestamp(context,{
+    Id,timestamp
+}){
+    return new Promise((resolve, reject)=>{
+        updateRecord(context.state.database, note, { Id: Id }, {
+            Timestamp: timestamp,
         }).then((res) =>{
             resolve(res);
         }).catch((reject1) => {
@@ -265,6 +278,16 @@ export function getCyNoteList(context){
     return new Promise((resolve,reject)=>{
         let otherFeildSql = " (select count(1) from note nn where nn.SType=0 and nn.ParentId = note.Id) as TotalNoteNum ";
         getRecordList(context.state.database, note  , `note.SType = 1 and note.State = 1 `,otherFeildSql,"note.Sort desc,note.Timestamp desc",null,["Content"]).then((res) => {
+            resolve(res);
+        }).catch((reject1) => {
+            reject(reject1);
+        });
+    });
+}
+
+export function getNoteList(context,{note_category_Id}){
+    return new Promise((resolve,reject)=>{
+        getRecordList(context.state.database, note  , `note.SType = 0 and note.note_category_Id = ${note_category_Id}`,"","note.Timestamp asc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);

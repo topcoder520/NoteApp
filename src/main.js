@@ -8,7 +8,7 @@ import {
     Col, Row, PullRefresh, List, Cell, CellGroup, NavBar, Field, 
     Icon, Popover, Calendar,SwipeCell,Button,Notify,Dialog,
     Popup,Switch,Search,DropdownMenu, DropdownItem,BackTop,Toast,
-    ImagePreview,ActionSheet,Cascader,
+    ImagePreview,ActionSheet,Cascader,TextEllipsis,
 } from 'vant';
 import 'vant/lib/index.css';
 
@@ -44,6 +44,7 @@ app.use(Toast);
 app.use(ImagePreview);
 app.use(ActionSheet);
 app.use(Cascader);
+app.use(TextEllipsis);
 
 app.mount('#app');
 // document.addEventListener('deviceready',function(){

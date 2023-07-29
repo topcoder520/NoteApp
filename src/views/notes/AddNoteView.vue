@@ -148,6 +148,8 @@ export default {
         const ParentId = ref(0);
         const note_category_Id = ref(0);
 
+        const aId = ref(route.query.aId ?? 0);
+
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
         console.log('Id.value', Id.value);
         if (Id.value && Id.value > 0) {
@@ -159,6 +161,17 @@ export default {
                 content.value = data.Content;
                 tmepContent.val = data.Content;
                 createTime.value = data.CreateTime;
+                ParentId.value = data.ParentId;
+                note_category_Id.value = data.note_category_Id;
+            }).catch((reject) => {
+                console.log('查询笔记失败：' + reject);
+                Toast.fail('查询笔记失败：' + reject);
+            });
+        }
+        if(aId.value && aId.value>0){
+            store.dispatch('getNoteById', aId.value).then((resolve) => {
+                const data = resolve;
+                categoryName.value = data.Category;
                 ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
             }).catch((reject) => {

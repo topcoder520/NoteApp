@@ -13,12 +13,32 @@
             </template>
         </van-cell>
         <!-- <textarea class="note-content " v-model="content"></textarea> -->
+        <div class="leftMenu" @click="openMenu">
+            <van-icon name="arrow-left" />
+        </div>
         <div class="note-content">
             <rich-text @getValue="getValue" :value="tmepContent" :editable="false"></rich-text>
         </div>
     </div>
     <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
         close-on-click-action @cancel="onCancel" />
+    <van-popup v-model:show="showRightMenu" position="right" :style="{ width: '80%', height: '100%' }">
+        <p class="menutitle">{{ categoryName }}</p>
+        <div class="menubox">
+            <van-swipe-cell v-for="(item, index) in listMenu" :key="index">
+                <van-row @click="openOtherNoteDetail(item.Id)" :class="['vrow', item.select == 1 ? 'cur' : '']">
+                    <p style="text-align:left;">{{ item.name }}</p>
+                </van-row>
+                <template #right>
+                    <van-button v-show="index == 0 ? false : true" square type="default" text="上移"
+                        @click="upmove(0, index)" />
+                    <van-button v-show="index == item.len ? false : true" square type="default" text="下移"
+                        @click="upmove(1, index)" />
+                </template>
+            </van-swipe-cell>
+        </div>
+        <van-button type="default" @click="addNote" style="margin-top:20px;" block>添加笔记</van-button>
+    </van-popup>
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
@@ -27,7 +47,7 @@ import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
-import { showConfirmDialog } from 'vant';
+import { showConfirmDialog, closeToast, showLoadingToast } from 'vant';
 
 import RichText from '../common/RichTextView.vue';
 
@@ -97,10 +117,13 @@ export default {
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('详情');
+        const note_category_Id = ref(0);
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
-        if (Id.value) {
-            store.dispatch('getNoteById', Id.value).then((resolve) => {
+
+        const getNoteById = (cId) => {
+            showLoadingToast('加载中...');
+            store.dispatch('getNoteById', cId).then((resolve) => {
                 const data = resolve;
                 title.value = data.Title;
                 PageTitle.value = data.Title;
@@ -108,11 +131,19 @@ export default {
                 content.value = data.Content;
                 tmepContent.val = data.Content;
                 createTime.value = data.CreateTime;
+                note_category_Id.value = data.note_category_Id;
+                closeToast();
+                showRightMenu.value = false;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
             });
+
+        };
+        if (Id.value) {
+            getNoteById(Id.value);
         }
+
 
         //获取富文本值
         const temTitle = ref('');
@@ -160,13 +191,13 @@ export default {
                         if (resolve.rowsAffected > 0) {
                             Toast.fail('删除成功');
                             store.commit('setRefreshListState', true);
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 history.back();
-                            },400)
+                            }, 400)
                         } else {
                             Toast.fail('移出失败：' + reject);
                         }
-                    }).catch((reject)=>{
+                    }).catch((reject) => {
                         console.log(reject);
                     });
                 }).catch(() => {
@@ -174,6 +205,87 @@ export default {
                 });
             }
         }
+        //目录
+        const showRightMenu = ref(false);
+        const openMenu = () => {
+            showRightMenu.value = true;
+            if(note_category_Id.value>0){
+                onLoadMenuData(note_category_Id.value);
+            }
+        };
+        const listMenu = ref([]);
+        const onLoadMenuData = (CyId) => {
+            listMenu.value.length = 0;
+            showLoadingToast('加载中...');
+            store.dispatch('getNoteList', { note_category_Id: CyId }).then((resolve) => {
+                var listData = resolve;
+                console.log('getNoteList=>' + JSON.stringify(listData));
+                let len = listData.length - 1;
+                for (let i = 0; i < listData.length; i++) {
+                    var select = 0;
+                    if (listData[i].Id == Id.value) {
+                        select = 1;
+                    }
+                    listMenu.value.push({ Id: listData[i].Id, name: listData[i].Title, timestamp: listData[i].Timestamp, select: select, len: len });
+                }
+                closeToast();
+            });
+        }
+        //flag 0上移 1下移
+        const upmove = (flag, index) => {
+            var item1Id = 0;
+            var item1Timestamp = 0;
+            var item2Id = 0;
+            var item2Timestamp = 0;
+            if (flag == 0) {
+                item1Id = listMenu.value[index].Id;
+                item1Timestamp = listMenu.value[index - 1].timestamp;
+                item2Id = listMenu.value[index - 1].Id;
+                item2Timestamp = listMenu.value[index].timestamp;
+            } else {
+                item1Id = listMenu.value[index].Id;
+                item1Timestamp = listMenu.value[index + 1].timestamp;
+                item2Id = listMenu.value[index + 1].Id;
+                item2Timestamp = listMenu.value[index].timestamp;
+            }
+            store.dispatch('updateNoteTimestamp', {
+                Id: item1Id,
+                timestamp: item1Timestamp,
+            }).then((resolve) => {
+                if (resolve.rowsAffected > 0) {
+                    store.dispatch('updateNoteTimestamp', {
+                        Id: item2Id,
+                        timestamp: item2Timestamp,
+                    }).then((resolve2) => {
+                        if (resolve2.rowsAffected > 0) {
+                            onLoadMenuData(note_category_Id.value);
+                        }
+                    }).catch((reject) => {
+                        Toast.fail('保存失败：' + reject);
+                    });
+                }
+            }).catch((reject) => {
+                Toast.fail('保存失败：' + reject);
+            });
+        }
+        //文章详情
+        const openOtherNoteDetail = (cId) => {
+            router.push({
+                path: '/ViewNote',
+                query: { Id: cId },
+                replace: true 
+            });
+            Id.value = cId;
+            getNoteById(cId);
+        }
+        //添加新文章
+        const addNote = ()=>{
+            router.push({
+                path: '/AddNote',
+                query: { Id: 0,aId:Id.value },
+                replace: true 
+            });
+        };
 
         return {
             getValue,
@@ -197,6 +309,13 @@ export default {
             actionsSheet,
             onCancel,
             selectSheet,
+
+            openMenu,
+            showRightMenu,
+            listMenu,
+            upmove,
+            openOtherNoteDetail,
+            addNote,
 
         };
     }
@@ -236,5 +355,53 @@ export default {
         height: v-bind("vheight");
         word-wrap: break-word;
     }
+
+    .leftMenu {
+        display: inline-block;
+        position: fixed;
+        width: 48px;
+        height: 48px;
+        right: -28px;
+        bottom: 200px;
+        background: #fdfdfd;
+        line-height: 48px;
+        padding-left: 3px;
+        text-align: left;
+        border-radius: 50%;
+        box-shadow: 0 0 3px #bfb8b8;
+        z-index: 2000;
+    }
+}
+
+.menutitle {
+    margin: 0px;
+    padding: 12px 3px;
+    width: 100%;
+    border-bottom: 1px solid #e3dddd;
+}
+
+.menubox {
+    overflow: auto;
+    height: 80%;
+}
+
+.vrow {
+    border-bottom: 1px solid #eee;
+    padding: 15px 10px;
+}
+
+.cur {
+    background: #d6d6d6;
+}
+
+.vrow:hover {
+    background: #d6d6d6;
+}
+
+.vrow p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0px;
 }
 </style>

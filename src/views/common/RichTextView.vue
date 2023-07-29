@@ -1,7 +1,7 @@
 <template>
     <div class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="enterKeydown"
         @blur="blurRichText" ref="richDiv"></div>
-    <van-back-top v-if="!editable" target=".richText" bottom="5vh" right="3vw" />
+    <van-back-top v-if="!editable" target=".richText" bottom="10vh" right="3vw" />
     <div class="tooltip" v-if="editable">
         <!--粗体-->
         <button @click="changeFont('B')">B</button>
