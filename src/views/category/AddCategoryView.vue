@@ -15,7 +15,8 @@
                     </van-row>
                     <template #right>
                         <van-button square type="primary" text="编辑" @click="addCategory(item.Id, item.name)" />
-                        <van-button square type="danger" text="删除" @click="delCategory(item.Id, item.name)" />
+                        <van-button square type="danger" text="删除"
+                            @click="delCategory(item.Id, item.name, item.TotalNoteNum)" />
                     </template>
                 </van-swipe-cell>
             </div>
@@ -88,7 +89,9 @@ export default {
                     Id: Id.value,
                     Title: title.value,
                     Category: '',
-                    Content: content.value
+                    Content: content.value,
+                    ParentId: ParentId.value,
+                    note_category_Id: note_category_Id.value,
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         Toast('保存成功');
@@ -115,7 +118,9 @@ export default {
                     Year: y,
                     Month: m,
                     Day: d,
-                    timestamp: Date.now()
+                    timestamp: Date.now(),
+                    ParentId: ParentId.value,
+                    note_category_Id: note_category_Id.value,
                 }).then((resolve) => {
                     console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
@@ -155,6 +160,8 @@ export default {
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('创建知识库');
+        const ParentId = ref(0);
+        const note_category_Id = ref(0);
 
         console.log('Id.value', Id.value);
         if (Id.value && Id.value > 0) {
@@ -164,6 +171,8 @@ export default {
                 title.value = data.Title;
                 content.value = data.Content;
                 createTime.value = data.CreateTime;
+                ParentId.value = data.ParentId;
+                note_category_Id.value = data.note_category_Id;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
@@ -177,7 +186,7 @@ export default {
                 var listData = resolve;
                 console.log('getCategoryList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
-                    list.value.push({ Id: listData[i].Id, name: listData[i].CName });
+                    list.value.push({ Id: listData[i].Id, name: listData[i].CName+'('+listData[i].TotalNoteNum+')',TotalNoteNum:listData[i].TotalNoteNum });
                 }
             });
 
@@ -244,10 +253,15 @@ export default {
                 categoryId.value = cyId;
             }
         }
-        const delCategory = (cyId, cname) => {
+        const delCategory = (cyId, cname, TotalNoteNum) => {
+            console.log(cyId, cname, TotalNoteNum)
             showConfirmDialog({
                 title: '确定删除 \'' + cname + '\' 分类？',
             }).then(() => {
+                if (TotalNoteNum > 0) {
+                    Toast.fail('该分类有数据不能删除!');
+                    return;
+                }
                 store.dispatch('delCategory', { Id: cyId, real: 0 }).then((resolve, reject) => {
                     if (resolve.rowsAffected > 0) {
                         for (let index = 0; index < list.value.length; index++) {

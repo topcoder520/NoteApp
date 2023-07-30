@@ -23,7 +23,7 @@
           <template #right v-if="showSwitchBtn">
             <van-button square style="height: 100% !important" text="编辑" @click="AddCategory(item.Id)" type="success"
               class="delete-button" />
-            <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id)" type="danger"
+            <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id,item.totalNotes)" type="danger"
               class="delete-button" />
           </template>
         </van-swipe-cell>
@@ -86,12 +86,16 @@ export default {
 
     let willDelItemId = 0;
     //删除
-    const preDelItem = (Id) => {
+    const preDelItem = (Id,totalNotes) => {
       willDelItemId = Id;
       console.log(willDelItemId);
       showConfirmDialog({
         title: '是否删除该知识库？',
       }).then(() => {
+        if(totalNotes>0){
+          Toast.fail('知识库有数据不能删除!');
+          return;
+        }
         store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
           if (resolve.rowsAffected > 0) {
             for (let index = 0; index < list.value.length; index++) {
@@ -103,7 +107,7 @@ export default {
             }
             showNotify({ type: 'success', message: '删除成功', position: 'bottom' });
           } else {
-            Toast.fail('移出失败：' + reject);
+            Toast.fail('删除失败：' + reject);
           }
         });
       }).catch(() => {

@@ -154,6 +154,7 @@ export default {
         console.log('Id.value', Id.value);
         if (Id.value && Id.value > 0) {
             PageTitle.value = '编辑笔记';
+            showLoadingToast('加载中...');
             store.dispatch('getNoteById', Id.value).then((resolve) => {
                 const data = resolve;
                 title.value = data.Title;
@@ -163,6 +164,7 @@ export default {
                 createTime.value = data.CreateTime;
                 ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
+                closeToast();
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
@@ -203,7 +205,7 @@ export default {
         getCyNoteList();
         const showPopup = ref(false);
         const cascaderValue = ref('');
-        const options = ref([]);
+        const options = ref([{ text: '未分类', value: 0, children: [{ text: '未分类', value: 0}] }]);
 
         const onChange = ({ value }) => {
             // 模拟数据请求
@@ -216,6 +218,9 @@ export default {
                     const item = options.value[i];
                     if(item.value == value){
                         selectData = item.children;
+                        if(value>0){
+                            selectData.length = 0;
+                        }
                         break;
                     }
                 }
@@ -234,6 +239,9 @@ export default {
             var selectIdArr = selectIdstr.split(' ');
             ParentId.value = Number(selectIdArr[0]);
             note_category_Id.value = Number(selectIdArr[1]);
+            if(ParentId.value == 0){
+                categoryName.value = categoryName.value.split('/')[0];
+            }
         };
 
         return {

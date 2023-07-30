@@ -12,10 +12,6 @@
             <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
               @click="topItem(item.Id, item.Sort)" />
           </template>
-          <template #left v-if="!showSwitchBtn && item.State == 0">
-            <van-button square type="success" style="height: 100% !important" :text="'待完成'"
-              @click="setNotState(item.Id, item.Sort)" />
-          </template>
           <van-row @click="onNoteDetail(item.Id)">
             <van-col span="24">
               <p class="van-multi-ellipsis--l3">{{ item.Title }}</p>
@@ -23,12 +19,15 @@
                 <span v-show="item.State == 1" class="status"></span>
                 <span v-show="item.State == 0" class="status-over"></span>
                 <span style="margin-right:8px;">{{ item.Category.split('/')[0] }}</span>{{ item.CreateTime }}<span
-                  class="top-tag" v-show="item.Sort > 1">置顶</span></p>
+                  class="top-tag" v-show="item.Sort > 1">置顶</span>
+              </p>
             </van-col>
           </van-row>
-          <template #right v-if="showSwitchBtn">
-            <van-button square style="height: 100% !important" text="已完成" @click="preDelItem(item.Id)" type="danger"
-              class="delete-button" />
+          <template #right>
+            <van-button v-show="item.State == 1" square style="height: 100% !important" text="已完成"
+              @click="preDelItem(item.Id)" type="danger" class="delete-button" />
+            <van-button v-show="!showSwitchBtn && item.State == 0" square type="success" style="height: 100% !important"
+              :text="'待完成'" @click="setNotState(item.Id, item.Sort)" />
           </template>
         </van-swipe-cell>
       </van-list>
@@ -102,6 +101,30 @@ export default {
     const preDelItem = (Id) => {
       willDelItemId = Id;
       console.log(willDelItemId);
+      showConfirmDialog({
+        title: '该任务已完成？',
+      }).then(() => {
+        store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
+          if (resolve.rowsAffected > 0) {
+            for (let index = 0; index < list.value.length; index++) {
+              const item = list.value[index];
+              if (item.Id == willDelItemId) {
+                if (props.IsAll) {
+                  item.State = 0;
+                } else {
+                  list.value.splice(index, 1);
+                }
+                break;
+              }
+            }
+            showNotify({ type: 'success', message: '已移出', position: 'bottom' });
+          } else {
+            Toast.fail('移出失败：' + reject);
+          }
+        });
+      }).catch(() => {
+        // on cancel
+      });
     };
 
     const topItem = (Id, Sort) => {
@@ -145,21 +168,28 @@ export default {
     };
 
     const setNotState = (Id, Sort) => {
-      store.dispatch('updateNoteSort', {
-        Id: Id,
-        Sort: Sort
-      }).then((resolve) => {
-        if (resolve.rowsAffected > 0) {
-          initPageIndex = 1;
-          list.value = [];
-          console.log('getNoteListByPage55');
-          getNoteListByPage(initPageIndex, 20);
-          setTimeout(function () {
-            Toast('已进入待完成列表');
-          }, 300);
-        }
-      }).catch((reject) => {
-        Toast.fail('设置失败：' + reject);
+      showConfirmDialog({
+        title: '设置任务状态未完成？',
+      }).then(() => {
+        store.dispatch('updateNoteSort', {
+          Id: Id,
+          Sort: Sort
+        }).then((resolve) => {
+          if (resolve.rowsAffected > 0) {
+            for (let index = 0; index < list.value.length; index++) {
+              const item = list.value[index];
+              if (item.Id == Id) {
+                item.State = 1;
+                break;
+              }
+            }
+            setTimeout(function () {
+              Toast('已进入待完成列表');
+            }, 300);
+          }
+        }).catch((reject) => {
+          Toast.fail('设置失败：' + reject);
+        });
       });
     }
 
@@ -175,26 +205,7 @@ export default {
           return true;
         case 'right':
           return new Promise(() => {
-            showConfirmDialog({
-              title: '任务已完成，移出当前列表？',
-            }).then(() => {
-              store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
-                if (resolve.rowsAffected > 0) {
-                  for (let index = 0; index < list.value.length; index++) {
-                    const item = list.value[index];
-                    if (item.Id == willDelItemId) {
-                      list.value.splice(index, 1);
-                      break;
-                    }
-                  }
-                  showNotify({ type: 'success', message: '已移出', position: 'bottom' });
-                } else {
-                  Toast.fail('移出失败：' + reject);
-                }
-              });
-            }).catch(() => {
-              // on cancel
-            });
+
           });
       }
     };
@@ -388,20 +399,22 @@ export default {
     margin-left: 9px;
   }
 }
-.status{
+
+.status {
   display: inline-block;
-    width: 8px;
-    height: 8px;
-    background-color: #07c160;
-    border-radius: 50%;
-    margin-right: 6px;
+  width: 8px;
+  height: 8px;
+  background-color: #07c160;
+  border-radius: 50%;
+  margin-right: 6px;
 }
-.status-over{
+
+.status-over {
   display: inline-block;
-    width: 8px;
-    height: 8px;
-    background-color: #ee0a24;
-    border-radius: 50%;
-    margin-right: 6px;
+  width: 8px;
+  height: 8px;
+  background-color: #ee0a24;
+  border-radius: 50%;
+  margin-right: 6px;
 }
 </style>

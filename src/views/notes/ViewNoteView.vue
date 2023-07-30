@@ -37,7 +37,7 @@
                 </template>
             </van-swipe-cell>
         </div>
-        <van-button type="default" @click="addNote" style="margin-top:20px;" block>添加笔记</van-button>
+        <van-button type="default" @click="addNote" style="width: 80%;margin: 20px auto 0px;" block>添加笔记</van-button>
     </van-popup>
 </template>
 <script>
@@ -117,6 +117,7 @@ export default {
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('详情');
+        const ParentId = ref(0);
         const note_category_Id = ref(0);
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
@@ -131,6 +132,7 @@ export default {
                 content.value = data.Content;
                 tmepContent.val = data.Content;
                 createTime.value = data.CreateTime;
+                ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
                 closeToast();
                 showRightMenu.value = false;
@@ -157,7 +159,9 @@ export default {
                     Id: Id.value,
                     Title: title.value,
                     Category: categoryName.value,
-                    Content: content.value
+                    Content: content.value,
+                    ParentId:ParentId.value,
+                    note_category_Id:note_category_Id.value,
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         //Toast('保存成功');
@@ -391,10 +395,6 @@ export default {
 }
 
 .cur {
-    background: #d6d6d6;
-}
-
-.vrow:hover {
     background: #d6d6d6;
 }
 

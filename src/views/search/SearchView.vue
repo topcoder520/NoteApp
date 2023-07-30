@@ -3,22 +3,22 @@
         <van-nav-bar title="搜索记录" left-text="返回" left-arrow @click-left="onClickLeft" />
         <van-search v-model="searchKeyword" @search="onSearch" placeholder="请输入搜索关键词" />
         <van-dropdown-menu active-color="#ee0a24">
-            <van-dropdown-item v-model="selValue1" :options="option1" @change="changeOption1"/>
-            <van-dropdown-item v-model="selValue2" :options="option2" @change="changeOption2"/>
+            <van-dropdown-item v-model="selValue1" :options="option1" @change="changeOption1" />
+            <van-dropdown-item v-model="selValue2" :options="option2" @change="changeOption2" />
         </van-dropdown-menu>
     </div>
     <div class="list-data">
-        <notes-view :ShowNavBar="false" :SelectItem="SelectItem" :Keywords="confirmSearchKeyword" :IsAll="true"></notes-view>
+        <notes-view :ShowNavBar="false" :SelectItem="SelectItem" :Keywords="confirmSearchKeyword"
+            :IsAll="true"></notes-view>
     </div>
 </template>
 <script>
 
-import { onUnmounted, ref, onMounted, onActivated,reactive } from 'vue';
+import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
 import { useStore } from 'vuex';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import NotesView from '../notes/NotesView.vue';
-import { isFunction } from '@vue/shared';
 
 export default {
     name: "Search",
@@ -28,6 +28,7 @@ export default {
     setup() {
         const store = useStore()
         const route = useRoute();
+        const router = useRouter();
 
         //keep-alive 缓存的组件激活时调用
         onMounted(() => {
@@ -42,6 +43,7 @@ export default {
         onActivated(() => {
             console.log('onActivated Search');
             store.commit('SelectTabBar', 1);
+            console.log('route.query.CyId', route.query.CyId);
         });
 
         const onClickLeft = () => {
@@ -52,7 +54,12 @@ export default {
         const searchKeyword = ref('');
         const confirmSearchKeyword = ref('');
         ///监听确认按钮
-        const onSearch = (val) => {
+        const onSearch = () => {
+            router.push({
+                path: '/Search',
+                query: { CyId: CyId.value, CaId: CaId.value, kw: searchKeyword.value },
+                replace: true
+            });
             confirmSearchKeyword.value = searchKeyword.value;
         };
         //筛选
@@ -71,38 +78,56 @@ export default {
                 console.log('getCyNoteList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
                     var item = listData[i];
-                    option1.push({ text: item.Title+' ('+item.TotalNoteNum+')', value: item.Id});
+                    option1.push({ text: item.Title + ' (' + item.TotalNoteNum + ')', value: item.Id });
                 }
-                if(!CyId.value){
+                if (!CyId.value) {
                     CyId.value = 0;
                 }
                 selValue1.value = Number(CyId.value);
-                if(selValue1.value>0){
-                    changeOption1(selValue1.value);
-                }
+                changeOptionFn(selValue1.value);
             });
         };
         getCyNoteList();
-        const changeOption1 = (val)=>{
+        const changeOptionFn = (val) => {
             option2.length = 0;
             option2.push({ text: '全部分类', value: 0 });
             store.dispatch('getCategoryList', { CyNoteId: val }).then((resolve) => {
                 var listData = resolve;
                 console.log('getCategoryList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
-                    option2.push({ value: listData[i].Id, text: listData[i].CName+' ('+listData[i].TotalNoteNum+')' });
+                    option2.push({ value: listData[i].Id, text: listData[i].CName + ' (' + listData[i].TotalNoteNum + ')' });
                 }
-                selValue2.value = 0;
-                SelectItem.note_category_Id = 0;
+                if (!CaId.value) {
+                    CaId.value = 0;
+                }
+                selValue2.value = Number(CaId.value);
+                SelectItem.note_category_Id = Number(CaId.value);
                 SelectItem.ParentId = val;
             });
+        }
+        const changeOption1 = (val) => {
+            router.push({
+                path: '/Search',
+                query: { CyId: val, CaId: 0, kw: kw.value },
+                replace: true
+            });
+            CaId.value = 0;
+            changeOptionFn(val);
         };
-        const changeOption2 = (val)=>{
+        const changeOption2 = (val) => {
+            router.push({
+                path: '/Search',
+                query: { CyId: CyId.value, CaId: val, kw: kw.value},
+                replace: true
+            });
             SelectItem.note_category_Id = val;
         };
 
         const CyId = ref(route.query.CyId ?? 0);
-
+        const CaId = ref(route.query.CaId ?? 0);
+        const kw = ref(!route.query.kw ? '' : route.query.kw);
+        confirmSearchKeyword.value = kw.value;
+        searchKeyword.value = kw.value;
 
         return {
             onClickLeft,
@@ -127,7 +152,8 @@ export default {
     top: 0px;
     z-index: 1000000;
 }
-.list-data{
+
+.list-data {
     margin-top: 150px;
 }
 </style>
