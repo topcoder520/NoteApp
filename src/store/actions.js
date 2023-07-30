@@ -404,7 +404,7 @@ export function delCategory(context,{Id,real}){
 export function getCategoryList(context,{CyNoteId}){
     return new Promise((resolve,reject)=>{
         let otherFeildSql = "(select count(1) from note nn where nn.SType=0 and nn.note_category_Id = note_category.Id) as TotalNoteNum";
-        getRecordList(context.state.database, noteCategory  , `note_category.note_Id = ${CyNoteId} and note_category.State = 1 `,otherFeildSql,"note_category.Timestamp desc",null,[]).then((res) => {
+        getRecordList(context.state.database, noteCategory  , `note_category.note_Id = ${CyNoteId} and note_category.State = 1 `,otherFeildSql,"note_category.Timestamp asc",null,[]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);

@@ -14,9 +14,9 @@
                         <p style="text-align:center;">{{ item.name }}</p>
                     </van-row>
                     <template #right>
-                        <van-button square type="primary" text="编辑" @click="addCategory(item.Id, item.name)" />
+                        <van-button square type="primary" text="编辑" @click="addCategory(item.Id, item.tname)" />
                         <van-button square type="danger" text="删除"
-                            @click="delCategory(item.Id, item.name, item.TotalNoteNum)" />
+                            @click="delCategory(item.Id, item.tname, item.TotalNoteNum)" />
                     </template>
                 </van-swipe-cell>
             </div>
@@ -182,11 +182,17 @@ export default {
         const list = ref([]);
 
         const onLoad = () => {
+            list.value.length = 0;
             store.dispatch('getCategoryList', { CyNoteId: Id.value }).then((resolve) => {
                 var listData = resolve;
                 console.log('getCategoryList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
-                    list.value.push({ Id: listData[i].Id, name: listData[i].CName+'('+listData[i].TotalNoteNum+')',TotalNoteNum:listData[i].TotalNoteNum });
+                    list.value.push({
+                         Id: listData[i].Id, 
+                         name: listData[i].CName+'('+listData[i].TotalNoteNum+')',
+                         tname:listData[i].CName,
+                         TotalNoteNum:listData[i].TotalNoteNum 
+                        });
                 }
             });
 
@@ -210,7 +216,8 @@ export default {
                                 for (let i = 0; i < list.value.length; i++) {
                                     const item = list.value[i];
                                     if (item.Id == categoryId.value) {
-                                        item.name = categoryName.value;
+                                        item.name = categoryName.value+'('+item.TotalNoteNum+')';
+                                        item.tname = categoryName.value;
                                         break;
                                     }
                                 }
@@ -227,14 +234,14 @@ export default {
                             console.log(JSON.stringify(resolve));
                             if (resolve.rowsAffected > 0) {
                                 categoryId.value = resolve.insertId;
-                                list.value.push({ name: categoryName.value, Id: resolve.insertId });
+                                list.value.push({ name: categoryName.value+'(0)',tname:categoryName.value, Id: resolve.insertId });
                             }
                         }).catch((reject) => {
                             Toast.fail('添加失败：' + reject);
                         });
                     }
                 } else {
-                    list.value.push({ name: categoryName.value, Id: 0 });
+                    list.value.push({ name: categoryName.value+'(0)',tname:categoryName.value, Id: 0 });
                 }
 
             }

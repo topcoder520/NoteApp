@@ -373,7 +373,7 @@ export default {
 
   .van-list {
     margin-bottom: 80px;
-    min-height: v-bind("vheight");
+    //min-height: v-bind("vheight");
   }
 
   .van-row {
