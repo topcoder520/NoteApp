@@ -1,7 +1,7 @@
 <template>
   <van-nav-bar class="list-title" title="待完成列表" v-show="showNavbar">
     <template #right>
-      <router-link v-if="showSwitchBtn" to="/Search"> <van-icon name="search" size="22" /></router-link>
+      <router-link v-if="showSwitchBtn" to="/Search?lz=1"> <van-icon name="search" size="22" /></router-link>
     </template>
   </van-nav-bar>
   <div class="list-box">
@@ -55,14 +55,17 @@ export default {
       default: () => ({ Year: 0, Month: 0, Day: 0 })
     },
     IsAll: Boolean,
-    Keywords: String,
     ShowNavBar: {
       type: Boolean,
       default: () => true
     }, //是否展示
-    SelectItem: {
+    Lazyload: {
+      type: Boolean,
+      default: () => false
+    },
+    QueryItem: {
       type: Object,
-      default: () => ({ ParentId: 0, note_category_Id: 0 })
+      default: () => ({ ParentId: 0, note_category_Id: 0,Keywords:''})
     },
   },
   emits: {
@@ -79,21 +82,29 @@ export default {
     var initPageIndex = 0;
 
     const onRefresh = () => {
-      setTimeout(() => {
-        Toast('刷新成功');
-        initPageIndex = 1;
-        list.value = [];
-        console.log('getNoteListByPage5');
-        getNoteListByPage(initPageIndex, 20);
-        Refresh.value = false;
-      }, 1000);
+      if (!Lazyload.value) {
+        setTimeout(() => {
+          Toast('刷新成功');
+          initPageIndex = 1;
+          list.value = [];
+          console.log('getNoteListByPage5');
+          getNoteListByPage(initPageIndex, 20);
+          Refresh.value = false;
+        }, 1000);
+      }
     };
 
+    const Lazyload = ref(props.Lazyload);
     const onLoad = () => {
       // 异步更新数据
-      initPageIndex = initPageIndex + 1;
-      console.log('getNoteListByPage6');
-      getNoteListByPage(initPageIndex, 20);
+      if (!Lazyload.value) {
+        initPageIndex = initPageIndex + 1;
+        console.log('getNoteListByPage6');
+        getNoteListByPage(initPageIndex, 20);
+      }else{
+        // 加载状态结束
+        loading.value = false;
+      }
     };
 
     let willDelItemId = 0;
@@ -117,7 +128,7 @@ export default {
                 break;
               }
             }
-            showNotify({ type: 'success', message: '已移出', position: 'bottom' });
+            //showNotify({ type: 'success', message: '已移出', position: 'bottom' });
           } else {
             Toast.fail('移出失败：' + reject);
           }
@@ -190,7 +201,9 @@ export default {
         }).catch((reject) => {
           Toast.fail('设置失败：' + reject);
         });
-      });
+      }).catch(() => {
+        // on cancel
+      });;
     }
 
     // position 为关闭时点击的位置
@@ -211,7 +224,7 @@ export default {
     };
 
     onActivated(() => {
-
+      Lazyload.value = false;
       store.commit('SelectTabBar', -1);
 
       const RefreshListState = store.state.RefreshListState;
@@ -231,29 +244,24 @@ export default {
       list.value = [];
       initPageIndex = 1;
       console.log('getNoteListByPage3');
-      getNoteListByPage(initPageIndex, 20);
-    }, { deep: true });
-    //监听关键字
-    watch(() => props.Keywords, (newVal, oldVal) => {
-      console.log(JSON.stringify(newVal), JSON.stringify(oldVal));
-      list.value = [];
-      initPageIndex = 1;
-      console.log('getNoteListByPage4');
+      Lazyload.value = false;
       getNoteListByPage(initPageIndex, 20);
     }, { deep: true });
     //
-    watch(() => props.SelectItem, (newVal, oldVal) => {
+    watch(() => props.QueryItem, (newVal, oldVal) => {
       console.log(JSON.stringify(newVal), JSON.stringify(oldVal));
       list.value = [];
       initPageIndex = 1;
       console.log('getNoteListByPage3');
+      Lazyload.value = false;
       getNoteListByPage(initPageIndex, 20);
     }, { deep: true });
 
     const getNoteListByPage = (pageIndex, pageSize) => {
       finished.value = false;
-      console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + props.Keywords);
-      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: props.Keywords, ParentId: props.SelectItem.ParentId, note_category_Id: props.SelectItem.note_category_Id }).then((resolve) => {
+      let Keywords = props.QueryItem.Keywords;
+      console.log(pageIndex + ', ' + pageSize + ', ' + props.Date.Year + ', ' + props.Date.Month + ', ' + props.Date.Day + ', ' + Keywords);
+      store.dispatch('getNoteListByPage', { pageIndex: pageIndex, pageSize: pageSize, Year: props.Date.Year, Month: props.Date.Month, Day: props.Date.Day, State: (props.IsAll ? 0 : 1), Sort: props.IsAll, kw: Keywords, ParentId: props.QueryItem.ParentId, note_category_Id: props.QueryItem.note_category_Id }).then((resolve) => {
         var listData = resolve;
         console.log('getNoteListByPage=>' + JSON.stringify(listData));
         for (let i = 0; i < listData.length; i++) {

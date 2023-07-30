@@ -8,7 +8,7 @@
         </van-dropdown-menu>
     </div>
     <div class="list-data">
-        <notes-view :ShowNavBar="false" :SelectItem="SelectItem" :Keywords="confirmSearchKeyword"
+        <notes-view :ShowNavBar="false" @openNotedetail="openNotedetail" :Lazyload="Lazyload" :QueryItem="QueryItem"
             :IsAll="true"></notes-view>
     </div>
 </template>
@@ -50,20 +50,31 @@ export default {
             history.back();
         };
 
-        //搜索关键字
+        const lz = ref(!route.query.lz ? 0 : Number(route.query.lz));
+        console.log('lz',lz.value,typeof lz.value)
+        const Lazyload = ref(lz.value==1);
+        console.log(Lazyload.value,typeof Lazyload.value);
+
+        const CyId = ref(!route.query.CyId ? 0 : route.query.CyId);
+        const CaId = ref(!route.query.CaId ? 0 : route.query.CaId);
+        const kw = ref(!route.query.kw ? '' : route.query.kw);
         const searchKeyword = ref('');
-        const confirmSearchKeyword = ref('');
+        searchKeyword.value = kw.value;
+        
+
+        //搜索关键字
         ///监听确认按钮
         const onSearch = () => {
+            QueryItem.Keywords = searchKeyword.value;
             router.push({
                 path: '/Search',
-                query: { CyId: CyId.value, CaId: CaId.value, kw: searchKeyword.value },
+                query: { CyId: CyId.value, CaId: CaId.value, kw: searchKeyword.value,lz:1 },
                 replace: true
             });
-            confirmSearchKeyword.value = searchKeyword.value;
+
         };
         //筛选
-        const SelectItem = reactive({ ParentId: 0, note_category_Id: 0 });
+        const QueryItem = reactive({ ParentId: 0, note_category_Id: 0,Keywords:'' });
         const selValue1 = ref(0);
         const selValue2 = ref(0);
         const option1 = [
@@ -101,38 +112,41 @@ export default {
                     CaId.value = 0;
                 }
                 selValue2.value = Number(CaId.value);
-                SelectItem.note_category_Id = Number(CaId.value);
-                SelectItem.ParentId = val;
+                QueryItem.note_category_Id = Number(CaId.value);
+                QueryItem.ParentId = val;
+                QueryItem.Keywords = searchKeyword.value;
+                if(searchKeyword.value.trim().length == 0){
+                    QueryItem.Keywords = "  ";
+                }
             });
         }
         const changeOption1 = (val) => {
             router.push({
                 path: '/Search',
-                query: { CyId: val, CaId: 0, kw: kw.value },
+                query: { CyId: val, CaId: 0, kw: searchKeyword.value,lz:1 },
                 replace: true
             });
+            CyId.value = val;
             CaId.value = 0;
             changeOptionFn(val);
         };
         const changeOption2 = (val) => {
             router.push({
                 path: '/Search',
-                query: { CyId: CyId.value, CaId: val, kw: kw.value},
+                query: { CyId: CyId.value, CaId: val, kw: searchKeyword.value,lz:1},
                 replace: true
             });
-            SelectItem.note_category_Id = val;
+            CaId.value = val;
+            QueryItem.note_category_Id = val;
         };
 
-        const CyId = ref(route.query.CyId ?? 0);
-        const CaId = ref(route.query.CaId ?? 0);
-        const kw = ref(!route.query.kw ? '' : route.query.kw);
-        confirmSearchKeyword.value = kw.value;
-        searchKeyword.value = kw.value;
+        const openNotedetail = (data) => {
+            console.log('openNotedetail', JSON.stringify(data));
+        };
 
         return {
             onClickLeft,
             searchKeyword,
-            confirmSearchKeyword,
             onSearch,
             selValue1,
             selValue2,
@@ -140,7 +154,9 @@ export default {
             option2,
             changeOption1,
             changeOption2,
-            SelectItem,
+            QueryItem,
+            Lazyload,
+            openNotedetail,
         }
     }
 }
@@ -155,5 +171,11 @@ export default {
 
 .list-data {
     margin-top: 150px;
+}
+.van-overlay{
+    z-index: 1000000 !important;
+}
+.van-dialog{
+    z-index: 1000000 !important;
 }
 </style>

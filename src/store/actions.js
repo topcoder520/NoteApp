@@ -109,7 +109,7 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
         }
         console.log('kw:',kw,typeof kw,kw !== undefined && kw.trim().length>0);
         if(kw !== undefined && kw.trim().length>0){
-            whereStr += " ( note.Title like '%"+kw+"%' " + " OR note.Content like '%"+kw+"%' " + " ) and ";
+            whereStr += " ( note.Title like '%"+kw.trim()+"%' " + " OR note.Content like '%"+kw.trim()+"%' " + " ) and ";
         }
         if(ParentId>0){
             whereStr += " note.ParentId = "+ParentId +" and ";
@@ -158,7 +158,7 @@ export function getCyNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Mont
         }
         console.log('kw:',kw,typeof kw,kw !== undefined && kw.trim().length>0);
         if(kw !== undefined && kw.trim().length>0){
-            whereStr += " ( note.Title like '%"+kw+"%' " + " OR note.Content like '%"+kw+"%' " + " ) and ";
+            whereStr += " ( note.Title like '%"+kw.trim()+"%' " + " OR note.Content like '%"+kw.trim()+"%' " + " ) and ";
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));
         let sortBy = "note.Sort desc,note.Timestamp desc";
