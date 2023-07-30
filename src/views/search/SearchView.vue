@@ -172,10 +172,10 @@ export default {
 .list-data {
     margin-top: 150px;
 }
-.van-overlay{
+.task-finish-overlay{
     z-index: 1000000 !important;
 }
-.van-dialog{
+.task-finish-dialog{
     z-index: 1000000 !important;
 }
 </style>

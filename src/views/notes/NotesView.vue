@@ -114,6 +114,8 @@ export default {
       console.log(willDelItemId);
       showConfirmDialog({
         title: '该任务已完成？',
+        className:'task-finish-dialog',
+        overlayClass:'task-finish-overlay',
       }).then(() => {
         store.dispatch('delNote', { Id: willDelItemId, real: 0 }).then((resolve, reject) => {
           if (resolve.rowsAffected > 0) {
@@ -181,6 +183,8 @@ export default {
     const setNotState = (Id, Sort) => {
       showConfirmDialog({
         title: '设置任务状态未完成？',
+        className:'task-finish-dialog',
+        overlayClass:'task-finish-overlay',
       }).then(() => {
         store.dispatch('updateNoteSort', {
           Id: Id,
