@@ -1,4 +1,5 @@
 <template>
+  <p><h3>app page</h3></p>
   <!-- 路由出口 -->
   <!-- 路由匹配到的组件将渲染在这里 -->
   <router-view v-slot="{ Component }">

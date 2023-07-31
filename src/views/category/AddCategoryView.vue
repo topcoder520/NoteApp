@@ -130,7 +130,7 @@ export default {
                             for (let i = 0; i < list.value.length; i++) {
                                 const item = list.value[i];
                                 store.dispatch('addCategory', {
-                                    CName: item.name,
+                                    CName: item.tname,
                                     note_Id: Id.value,
                                     Des: "",
                                 }).then((resolve) => {
