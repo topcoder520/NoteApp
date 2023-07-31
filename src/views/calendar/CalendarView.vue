@@ -10,7 +10,7 @@
             <van-icon v-show="day.topInfo > 0" class="tips" color="red" name="bookmark" />
         </template>
     </van-calendar>
-    <van-popup v-model:show="showPopup" @click-overlay="cancelPop" @click-close-icon="cancelPop" closeable position="bottom"
+    <van-popup v-model:show="showPopup" @click-overlay="cancelPop" position="bottom"
         :style="{ height: '80%' }">
         <notes-view :Date="DateObj" :IsAll="true" :ShowNavBar="false" @openNotedetail="openNotedetail"></notes-view>
     </van-popup>

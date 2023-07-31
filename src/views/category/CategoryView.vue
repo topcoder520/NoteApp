@@ -4,8 +4,8 @@
       <router-link v-if="showSwitchBtn" to="/AddCategory"> <van-icon name="plus" size="22" /></router-link>
     </template>
   </van-nav-bar>
-  <div class="list-box">
-    <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
+  <div class="list-box-cy">
+    <van-pull-refresh class="van-pull-refresh-cy" v-model="Refresh" @refresh="onRefresh">
       <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
           <template #left>
@@ -254,7 +254,7 @@ export default {
     const showNavbar = ref(props.ShowNavBar);
 
     const { height } = useWindowSize();
-    const vheight = ref(height.value + 'px');
+    const vheight = ref(height.value - 46 + 'px');
 
     return {
       Refresh,
@@ -283,11 +283,11 @@ export default {
   top: 0px;
 }
 
-.list-box {
+.list-box-cy {
   margin-top: 46px;
 }
 
-.list-box .add-box {
+.list-box-cy .add-box {
   display: inline-block;
   width: 60px;
   height: 60px;
@@ -297,7 +297,7 @@ export default {
   right: 12px;
 }
 
-.list-box .add-box .border {
+.list-box-cy .add-box .border {
   display: inline-block;
   width: 42px;
   height: 42px;
@@ -307,23 +307,24 @@ export default {
   background-color: #1989fa;
 }
 
-.list-box .add-box .border .van-icon {
+.list-box-cy .add-box .border .van-icon {
   line-height: 42px;
   font-size: 22px;
   color: #ededed;
 }
 
-.list-box .add-box .border .van-icon:hover {
+.list-box-cy .add-box .border .van-icon:hover {
   font-size: 24px;
   color: #fff;
 }
 
-.van-pull-refresh {
+.van-pull-refresh-cy {
   background-color: #f9f9f9;
   //margin-bottom: 120px;
 
   .van-list {
-    margin-bottom: 80px;
+    //margin-bottom: 80px;
+    min-height: v-bind("vheight");
   }
 
   .van-row {

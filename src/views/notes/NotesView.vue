@@ -6,7 +6,7 @@
   </van-nav-bar>
   <div class="list-box">
     <van-pull-refresh v-model="Refresh" @refresh="onRefresh">
-      <van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+      <van-list  v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-swipe-cell v-for="(item, index) in list" :key="index" :before-close="beforeClose">
           <template #left v-if="showSwitchBtn">
             <van-button square type="primary" style="height: 100% !important" :text="item.Sort > 1 ? '取消置顶' : '置顶'"
@@ -295,7 +295,12 @@ export default {
     const showNavbar = ref(props.ShowNavBar);
 
     const { height } = useWindowSize();
-    const vheight = ref(height.value + 'px');
+    const vheight = ref((props.IsAll?(height.value - 46 - 100):(height.value - 46)) + 'px');
+
+    const marginbottom = ref('0px');
+    if(!props.IsAll){
+      marginbottom.value = '80px';
+    }
 
     //添加笔记
     const addNote = () => {
@@ -315,6 +320,7 @@ export default {
       preDelItem,
       beforeClose,
       vheight,
+      marginbottom,
       showNavbar,
       showSwitchBtn: !props.IsAll,
       addNote,
@@ -372,8 +378,8 @@ export default {
   //margin-bottom: 120px;
 
   .van-list {
-    margin-bottom: 80px;
-    //min-height: v-bind("vheight");
+    margin-bottom: v-bind("marginbottom");
+    min-height: v-bind("vheight");
   }
 
   .van-row {

@@ -131,12 +131,7 @@ export default {
 
         const { height } = useWindowSize();
         const root = ref();
-        const vheight = ref(height + 'px');
-        onMounted(() => {
-            const rect = useRect(root);
-            vheight.value = (height.value - rect.height - 50) + 'px';
-            console.log('vheight', vheight.value);
-        });
+        const vheight = ref(height.value - 92 + 'px');
 
         //内容
         const Id = ref(route.query.Id ?? 0);
