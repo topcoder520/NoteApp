@@ -134,11 +134,11 @@ export default {
             console.log('getNoteListByPage7');
             getNoteListByPage(initPageIndex, 20);
             setTimeout(function () {
-              Toast('已取消置顶');
+              Toast('已取消常用');
             }, 300);
           }
         }).catch((reject) => {
-          Toast.fail('取消置顶失败：' + reject);
+          Toast.fail('取消常用失败：' + reject);
         });
       } else {
         //置顶
@@ -152,11 +152,11 @@ export default {
             console.log('getNoteListByPage1');
             getNoteListByPage(initPageIndex, 20);
             setTimeout(function () {
-              Toast('已置顶');
+              Toast('已设置常用');
             }, 300);
           }
         }).catch((reject) => {
-          Toast.fail('置顶失败：' + reject);
+          Toast.fail('常用失败：' + reject);
         });
       }
     };

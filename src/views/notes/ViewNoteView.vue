@@ -24,7 +24,7 @@
         close-on-click-action @cancel="onCancel" />
     <van-popup v-model:show="showRightMenu" position="right" :style="{ width: '80%', height: '100%' }">
         <p class="menutitle">{{ categoryName }}</p>
-        <div class="menubox">
+        <div class="menubox" ref="menuRef">
             <van-swipe-cell v-for="(item, index) in listMenu" :key="index">
                 <van-row @click="openOtherNoteDetail(item.Id)" :class="['vrow', item.select == 1 ? 'cur' : '']">
                     <p style="text-align:left;">{{ item.name }}</p>
@@ -215,6 +215,7 @@ export default {
             }
         };
         const listMenu = ref([]);
+        const menuRef = ref(null);
         const onLoadMenuData = (CyId) => {
             listMenu.value.length = 0;
             showLoadingToast('加载中...');
@@ -222,13 +223,23 @@ export default {
                 var listData = resolve;
                 console.log('getNoteList=>' + JSON.stringify(listData));
                 let len = listData.length - 1;
+                let selectheight = 0;
                 for (let i = 0; i < listData.length; i++) {
                     var select = 0;
                     if (listData[i].Id == Id.value) {
                         select = 1;
+                        selectheight = i+1;
                     }
                     listMenu.value.push({ Id: listData[i].Id, name: listData[i].Title, timestamp: listData[i].Timestamp, select: select, len: len });
                 }
+                setTimeout(() => {
+                    var rowHeight = document.querySelector('.vrow').clientHeight+1;
+                    selectheight = selectheight*rowHeight;
+                    console.log('vrow height',rowHeight);
+                    var menuClientHeight = menuRef.value.clientHeight;
+                    console.log('selectheight',selectheight,'menuClientHeight',menuClientHeight)
+                    menuRef.value.scrollTop = (selectheight - menuClientHeight)+ menuClientHeight/2;
+                }, 100);
                 closeToast();
             });
         }
@@ -317,6 +328,7 @@ export default {
             upmove,
             openOtherNoteDetail,
             addNote,
+            menuRef,
 
         };
     }
