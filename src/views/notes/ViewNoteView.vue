@@ -289,6 +289,7 @@ export default {
             });
             Id.value = cId;
             getNoteById(cId);
+            document.querySelector('.richText').scrollTop = 0;
         }
         //添加新文章
         const addNote = ()=>{

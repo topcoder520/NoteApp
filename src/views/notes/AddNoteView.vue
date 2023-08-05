@@ -1,5 +1,5 @@
 <template>
-    <van-nav-bar :title="PageTitle" left-text="返回" right-text="保存" left-arrow @click-left="onClickLeft"
+    <van-nav-bar class="nav-bar-addnote" :title="PageTitle" left-text="返回" right-text="保存" left-arrow @click-left="onClickLeft"
         @click-right="onClickRight" />
     <div class="addcontent" ref="root">
         <input type="text" class="title" placeholder="标题" v-model="title" />
@@ -131,7 +131,7 @@ export default {
 
         const { height } = useWindowSize();
         const root = ref();
-        const vheight = ref(height.value - 92 + 'px');
+        const vheight = ref(height.value - 94 + 'px');
 
         //内容
         const Id = ref(route.query.Id ?? 0);
@@ -265,7 +265,13 @@ export default {
 }
 </script>
 <style lang="less">
+.nav-bar-addnote{
+    position: fixed;
+    width: 100%;
+    top: 0px;
+}
 .addcontent {
+    margin-top: 46px;
     padding: 16px 20px;
 
     .title {
