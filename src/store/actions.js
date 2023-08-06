@@ -295,6 +295,16 @@ export function getNoteList(context,{note_category_Id}){
     });
 }
 
+export function getNoteListByParentId(context,{ParentId}){
+    return new Promise((resolve,reject)=>{
+        let otherFeildSql = " note_category.CName ";
+        getRecordList(context.state.database, note  , `note.SType = 0 and note.ParentId = ${ParentId}`,otherFeildSql,"note.note_category_Id asc,note.Timestamp asc",null,["Content"]).then((res) => {
+            resolve(res);
+        }).catch((reject1) => {
+            reject(reject1);
+        });
+    });
+}
 
 export function addNote(context,{
     Title,Category,Content,CreateTime,Year,Month,Day,timestamp,ParentId,note_category_Id

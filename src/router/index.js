@@ -7,6 +7,7 @@ import SettingView from '../views/setting/SettingView.vue'
 import SearchView from '../views/search/SearchView.vue'
 import CategoryView from '../views/category/CategoryView.vue'
 import AddCategoryView from '../views/category/AddCategoryView.vue'
+import CategoryDetailView from '../views/category/CategoryDetailView.vue'
 
 const routes = [
   {
@@ -39,6 +40,13 @@ const routes = [
     components: {
       NewNote:AddCategoryView
     }
+  },
+  {
+    path: '/CategoryDetail',
+    name: 'CategoryDetailView',
+    components:{
+      NewNote:CategoryDetailView
+    } 
   },
   {
     path: '/Calendar',

@@ -12,6 +12,9 @@ import {
 } from 'vant';
 import 'vant/lib/index.css';
 
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
+
 const app = createApp(App);
 app.use(store);
 app.use(router);
@@ -45,6 +48,8 @@ app.use(ImagePreview);
 app.use(ActionSheet);
 app.use(Cascader);
 app.use(TextEllipsis);
+
+app.use(Antd);
 
 app.mount('#app');
 // document.addEventListener('deviceready',function(){

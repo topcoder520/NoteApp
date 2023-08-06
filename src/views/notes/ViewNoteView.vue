@@ -288,8 +288,8 @@ export default {
                 replace: true 
             });
             Id.value = cId;
-            getNoteById(cId);
             document.querySelector('.richText').scrollTop = 0;
+            getNoteById(cId);
         }
         //添加新文章
         const addNote = ()=>{

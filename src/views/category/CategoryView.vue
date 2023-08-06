@@ -244,9 +244,8 @@ export default {
     };
     const onNoteDetail = (CyId) => {
       router.push({
-        path: '/Search',
-        query: { CyId: CyId },
-        query: { CyId: CyId, CaId: 0, kw: '',lz:1},
+        path: '/CategoryDetail',
+        query: { CyId: CyId},
       });
     };
 
