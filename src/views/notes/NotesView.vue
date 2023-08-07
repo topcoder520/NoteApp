@@ -65,7 +65,7 @@ export default {
     },
     QueryItem: {
       type: Object,
-      default: () => ({ ParentId: 0, note_category_Id: 0,Keywords:''})
+      default: () => ({ ParentId: 0, note_category_Id: -1,Keywords:''})
     },
   },
   emits: {

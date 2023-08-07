@@ -23,8 +23,8 @@
           <template #right v-if="showSwitchBtn">
             <van-button square style="height: 100% !important" text="编辑" @click="AddCategory(item.Id)" type="success"
               class="delete-button" />
-            <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id,item.totalNotes)" type="danger"
-              class="delete-button" />
+            <!-- <van-button square style="height: 100% !important" text="删除" @click="preDelItem(item.Id,item.totalNotes)" type="danger"
+              class="delete-button" /> -->
           </template>
         </van-swipe-cell>
       </van-list>

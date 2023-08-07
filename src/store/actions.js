@@ -58,7 +58,8 @@ const noteCategory = {
 
 export function getNoteById(context, id) {
     return new Promise((resolve, reject) => {
-        getRecord(context.state.database,note, {Id:id},"").then((res) => {
+        let childFeildSql = "(select count(1) from note nn where nn.SType = 0 and nn.ParentId = note.Id ) as totalNotes";
+        getRecord(context.state.database,note, {Id:id},childFeildSql).then((res) => {
             resolve(res)
         }).catch((reject1) => {
             reject(reject1);
@@ -114,7 +115,7 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
         if(ParentId>0){
             whereStr += " note.ParentId = "+ParentId +" and ";
         }
-        if(note_category_Id>0){
+        if(note_category_Id>=0){
             whereStr += " note.note_category_Id = "+note_category_Id +" and ";
         }
         whereStr = whereStr.substring(0, whereStr.lastIndexOf('and'));

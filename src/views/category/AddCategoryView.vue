@@ -7,7 +7,11 @@
         </van-cell>
         <textarea class="note-content " rows="6" placeholder="描述" v-model="content"></textarea>
         <div class="categorylist">
-            <p>分类</p>
+            <p>
+                <span>分类</span>
+                <van-button @click="addCategory(0, '')"
+                    style="padding: 0px 3px;height: 24px;position: absolute;right: 24px;" type="primary">添加</van-button>
+            </p>
             <div class="listdata">
                 <van-swipe-cell v-for="(item, index) in list" :key="index">
                     <van-row class="vrow">
@@ -20,9 +24,8 @@
                     </template>
                 </van-swipe-cell>
             </div>
-            <van-button @click="addCategory(0, '')" type="primary" block
-                style="width: 80%;margin: 20px auto;">添加分类</van-button>
         </div>
+        <van-button v-if="Id > 0" type="danger" style="margin-top:60px;" block @click="delCyNote">删除知识库</van-button>
     </div>
     <van-dialog class="showPicUrlDialog" v-model:show="showPicUrl" title="分类" show-cancel-button
         @confirm="showPicUrlconfirm">
@@ -155,13 +158,15 @@ export default {
         };
 
         //内容
-        const Id = ref(route.query.Id ?? 0);
+        const Id = ref(!route.query.Id ? 0 : Number(route.query.Id));
+        const back = ref(route.query.back ?? 0);
         const title = ref('');
         const content = ref('');
         const createTime = ref(getNowDateString());
         const PageTitle = ref('创建知识库');
         const ParentId = ref(0);
         const note_category_Id = ref(0);
+        const totalNotes = ref(0);
 
         console.log('Id.value', Id.value);
         if (Id.value && Id.value > 0) {
@@ -173,6 +178,7 @@ export default {
                 createTime.value = data.CreateTime;
                 ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
+                totalNotes.value = data.totalNotes;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
@@ -188,11 +194,11 @@ export default {
                 console.log('getCategoryList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
                     list.value.push({
-                         Id: listData[i].Id, 
-                         name: listData[i].CName+'('+listData[i].TotalNoteNum+')',
-                         tname:listData[i].CName,
-                         TotalNoteNum:listData[i].TotalNoteNum 
-                        });
+                        Id: listData[i].Id,
+                        name: listData[i].CName + '(' + listData[i].TotalNoteNum + ')',
+                        tname: listData[i].CName,
+                        TotalNoteNum: listData[i].TotalNoteNum
+                    });
                 }
             });
 
@@ -216,7 +222,7 @@ export default {
                                 for (let i = 0; i < list.value.length; i++) {
                                     const item = list.value[i];
                                     if (item.Id == categoryId.value) {
-                                        item.name = categoryName.value+'('+item.TotalNoteNum+')';
+                                        item.name = categoryName.value + '(' + item.TotalNoteNum + ')';
                                         item.tname = categoryName.value;
                                         break;
                                     }
@@ -234,14 +240,14 @@ export default {
                             console.log(JSON.stringify(resolve));
                             if (resolve.rowsAffected > 0) {
                                 categoryId.value = resolve.insertId;
-                                list.value.push({ name: categoryName.value+'(0)',tname:categoryName.value, Id: resolve.insertId });
+                                list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: resolve.insertId });
                             }
                         }).catch((reject) => {
                             Toast.fail('添加失败：' + reject);
                         });
                     }
                 } else {
-                    list.value.push({ name: categoryName.value+'(0)',tname:categoryName.value, Id: 0 });
+                    list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: 0 });
                 }
 
             }
@@ -288,6 +294,31 @@ export default {
             });
         }
 
+        const delCyNote = () => {
+            showConfirmDialog({
+                title: '是否删除该知识库？',
+            }).then(() => {
+                if (totalNotes.value > 0) {
+                    Toast.fail('知识库有数据不能删除!');
+                    return;
+                }
+                store.dispatch('delNote', { Id: Id.value, real: 0 }).then((resolve, reject) => {
+                    if (resolve.rowsAffected > 0) {
+                        store.commit('setRefreshListState', true);
+                        if (!back.value || back.value == 0) {
+                            history.back();
+                        } else {
+                            history.go(-2);
+                        }
+                    } else {
+                        Toast.fail('删除失败：' + reject);
+                    }
+                });
+            }).catch(() => {
+                // on cancel
+            });
+        };
+
         return {
             onClickLeft,
             onClickRight,
@@ -303,6 +334,7 @@ export default {
             showPicUrlconfirm,
             addCategory,
             delCategory,
+            delCyNote,
         };
     }
 }
@@ -334,6 +366,10 @@ export default {
     }
 
     .categorylist {
+        margin-top: 30px;
+        padding-top: 18px;
+        border-top: 1px solid #eee;
+
         p {
             text-align: left;
         }

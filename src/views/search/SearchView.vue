@@ -51,16 +51,16 @@ export default {
         };
 
         const lz = ref(!route.query.lz ? 0 : Number(route.query.lz));
-        console.log('lz',lz.value,typeof lz.value)
-        const Lazyload = ref(lz.value==1);
-        console.log(Lazyload.value,typeof Lazyload.value);
+        console.log('lz', lz.value, typeof lz.value)
+        const Lazyload = ref(lz.value == 1);
+        console.log(Lazyload.value, typeof Lazyload.value);
 
         const CyId = ref(!route.query.CyId ? 0 : route.query.CyId);
-        const CaId = ref(!route.query.CaId ? 0 : route.query.CaId);
+        const CaId = ref(!route.query.CaId ? -1 : route.query.CaId);
         const kw = ref(!route.query.kw ? '' : route.query.kw);
         const searchKeyword = ref('');
         searchKeyword.value = kw.value;
-        
+
 
         //搜索关键字
         ///监听确认按钮
@@ -68,20 +68,20 @@ export default {
             QueryItem.Keywords = searchKeyword.value;
             router.push({
                 path: '/Search',
-                query: { CyId: CyId.value, CaId: CaId.value, kw: searchKeyword.value,lz:1 },
+                query: { CyId: CyId.value, CaId: CaId.value, kw: searchKeyword.value, lz: 1 },
                 replace: true
             });
 
         };
         //筛选
-        const QueryItem = reactive({ ParentId: 0, note_category_Id: 0,Keywords:'' });
+        const QueryItem = reactive({ ParentId: 0, note_category_Id: -1, Keywords: '' });
         const selValue1 = ref(0);
-        const selValue2 = ref(0);
+        const selValue2 = ref(-1);
         const option1 = [
             { text: '全部知识库', value: 0 },
         ];
         const option2 = [
-            { text: '全部分类', value: 0 },
+            { text: '全部分类', value: -1 },
         ];
         const getCyNoteList = () => {
             store.dispatch('getCyNoteList').then((resolve) => {
@@ -89,7 +89,7 @@ export default {
                 console.log('getCyNoteList=>' + JSON.stringify(listData));
                 for (let i = 0; i < listData.length; i++) {
                     var item = listData[i];
-                    option1.push({ text: item.Title + ' (' + item.TotalNoteNum + ')', value: item.Id });
+                    option1.push({ text: item.Title + ' (' + item.TotalNoteNum + ')', value: item.Id, num: item.TotalNoteNum });
                 }
                 if (!CyId.value) {
                     CyId.value = 0;
@@ -101,21 +101,38 @@ export default {
         getCyNoteList();
         const changeOptionFn = (val) => {
             option2.length = 0;
-            option2.push({ text: '全部分类', value: 0 });
+            option2.push({ text: '全部分类', value: -1 });
+            let notCategoryItem = { text: '未分类', value: 0 };
+            let selOption = null;
+            if (val > 0) {
+                option2.push(notCategoryItem);
+                for (let i = 0; i < option1.length; i++) {
+                    const item = option1[i];
+                    if (item.value == val) {
+                        selOption = item;
+                        break;
+                    }
+                }
+            }
             store.dispatch('getCategoryList', { CyNoteId: val }).then((resolve) => {
                 var listData = resolve;
                 console.log('getCategoryList=>' + JSON.stringify(listData));
+                let totalNum = 0;
                 for (let i = 0; i < listData.length; i++) {
+                    totalNum += listData[i].TotalNoteNum;
                     option2.push({ value: listData[i].Id, text: listData[i].CName + ' (' + listData[i].TotalNoteNum + ')' });
                 }
+                if(selOption != null){
+                    notCategoryItem.text = '未分类(' + (selOption.num - totalNum) + ')'
+                }
                 if (!CaId.value) {
-                    CaId.value = 0;
+                    CaId.value = -1;
                 }
                 selValue2.value = Number(CaId.value);
                 QueryItem.note_category_Id = Number(CaId.value);
                 QueryItem.ParentId = val;
                 QueryItem.Keywords = searchKeyword.value;
-                if(searchKeyword.value.trim().length == 0){
+                if (searchKeyword.value.trim().length == 0) {
                     QueryItem.Keywords = "  ";
                 }
             });
@@ -123,17 +140,17 @@ export default {
         const changeOption1 = (val) => {
             router.push({
                 path: '/Search',
-                query: { CyId: val, CaId: 0, kw: searchKeyword.value,lz:1 },
+                query: { CyId: val, CaId: -1, kw: searchKeyword.value, lz: 1 },
                 replace: true
             });
             CyId.value = val;
-            CaId.value = 0;
+            CaId.value = -1;
             changeOptionFn(val);
         };
         const changeOption2 = (val) => {
             router.push({
                 path: '/Search',
-                query: { CyId: CyId.value, CaId: val, kw: searchKeyword.value,lz:1},
+                query: { CyId: CyId.value, CaId: val, kw: searchKeyword.value, lz: 1 },
                 replace: true
             });
             CaId.value = val;
@@ -172,10 +189,12 @@ export default {
 .list-data {
     margin-top: 150px;
 }
-.task-finish-overlay{
+
+.task-finish-overlay {
     z-index: 1000000 !important;
 }
-.task-finish-dialog{
+
+.task-finish-dialog {
     z-index: 1000000 !important;
 }
 </style>

@@ -1,10 +1,9 @@
 <template>
-  <van-nav-bar class="list-title" :title="menuTitle" left-text="返回" left-arrow 
-  @click-left="onClickLeft"
-  @click-right="onClickRight"
-  >
+  <van-nav-bar class="list-title" title="知识库详情" left-text="返回" left-arrow @click-left="onClickLeft">
     <template #right>
-      <van-icon name="search" size="22" />
+      <div class="icon-box" @click="onSearch"><van-icon name="search" size="22" /></div>
+      <div class="icon-box" @click="onAddNote"><van-icon name="plus" size="22" /></div>
+      <div class="icon-box" @click="onShowActionsheet"><van-icon name="ellipsis" size="25" /></div>
     </template>
   </van-nav-bar>
   <div class="list-box-detail">
@@ -13,16 +12,16 @@
       <p>{{ menuContent }}</p>
     </div>
     <div class="cybody">
-      <a-tree :tree-data="treeData" :default-expandAll=true @select="selectNode"
-        v-model:expandedKeys="expandedKeys"
-      >
+      <a-tree :tree-data="treeData" :default-expandAll=true @select="selectNode" v-model:expandedKeys="expandedKeys">
         <template #switcherIcon="{ switcherCls }"><down-outlined :class="switcherCls" /></template>
       </a-tree>
     </div>
   </div>
+  <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
+    close-on-click-action @cancel="onCancel" />
 </template>
 <script>
-import { onActivated,onMounted,onUnmounted, ref } from 'vue';
+import { onActivated, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -43,45 +42,83 @@ export default {
 
     const CyId = ref(!route.query.CyId ? 0 : Number(route.query.CyId));
     console.log(CyId.value)
-    const nodeClassName = "cyLleafNote";
     const expandedKeys = ref([]);
-    const getNoteListByParentId = async (PId) => {
-      await store.dispatch('getNoteListByParentId', { ParentId: PId }).then((resolve) => {
+    const getNoteListByParentId = (PId) => {
+      store.dispatch('getCategoryList', { CyNoteId: PId }).then((resolve) => {
         var listData = resolve;
-        console.log('getNoteListByParentId=>' + JSON.stringify(listData));
-        let CId = -1;
-        treeData.value.length = 0;
-        let groupDataChild = null;
+        console.log('getCategoryList=>' + JSON.stringify(listData));
+        let sortlistData = [];
         for (let i = 0; i < listData.length; i++) {
-          let item = listData[i];
-          if (item.note_category_Id != CId) {
-            CId = item.note_category_Id;
-            groupDataChild = {
-              title: item.CName,
-              key: 'cy_'+item.note_category_Id,
-              selectable: false,
-              children: []
-            }
-            expandedKeys.value.push('cy_'+item.note_category_Id);
-            treeData.value.push(groupDataChild);
-          }
-          groupDataChild.children.push({ title: item.Title, key: item.Id,class:nodeClassName});
+          sortlistData.push({
+            key: 'cy_' + listData[i].Id,
+            title: listData[i].CName,
+            selectable: false,
+            class: 'cyLParentNote',
+            timestamp: listData[i].Timestamp,
+            children: []
+          });
+          expandedKeys.value.push('cy_' + listData[i].Id);
         }
-        console.log(treeData.value);
+        store.dispatch('getNoteListByParentId', { ParentId: PId }).then((resolve) => {
+          var listData = resolve;
+          console.log('getNoteListByParentId=>' + JSON.stringify(listData));
+          treeData.value.length = 0;
+          for (let i = 0; i < listData.length; i++) {
+            let item = listData[i];
+            if (item.note_category_Id == 0) {
+              insertDataSortTimestamp({
+                title: item.Title,
+                key: item.Id,
+                class: 'cyLleafNote',
+                timestamp: item.Timestamp
+              }, sortlistData);
+              continue;
+            }
+            for (let j = 0; j < sortlistData.length; j++) {
+              const categoryItem = sortlistData[j];
+              let cykey = 'cy_'+item.note_category_Id;
+              if (categoryItem.key == cykey && categoryItem.children) {
+                categoryItem.children.push({ title: item.Title, key: item.Id, class: 'cyLleafNote' });
+                break;
+              }
+            }
+          }
+          for (let i = 0; i < sortlistData.length; i++) {
+            const categoryItem = sortlistData[i];
+            treeData.value.push(categoryItem);
+          }
+          console.log(treeData.value);
+        });
       });
     }
     getNoteListByParentId(CyId.value);
 
+    const insertDataSortTimestamp = (item, arr) => {
+      if (!item || !arr || arr.length == 0) {
+        return;
+      }
+      for (let i = arr.length - 1; i >= 0; i--) {
+        const el = arr[i];
+        if (item.timestamp > el.timestamp) {
+          arr.splice(i + 1, 0, item);
+          break;
+        }
+        if(i == 0){
+          arr.splice(i, 0, item);
+        }
+      }
+    };
+
     const menuTitle = ref('');
     const menuContent = ref('');
-    const getNoteById = (CId)=>{
+    const getNoteById = (CId) => {
       store.dispatch('getNoteById', CId).then((resolve) => {
-                const data = resolve;
-                menuTitle.value = data.Title;
-                menuContent.value = data.Content;
-            }).catch((reject) => {
-                console.log('查询笔记失败：' + reject);
-            });
+        const data = resolve;
+        menuTitle.value = data.Title;
+        menuContent.value = data.Content;
+      }).catch((reject) => {
+        console.log('查询笔记失败：' + reject);
+      });
     };
     getNoteById(CyId.value);
 
@@ -90,13 +127,13 @@ export default {
       console.log('cydetail onActivated')
     });
     onMounted(() => {
-            store.commit('SelectTabBar', 1);
-            console.log('加载');
-        });
-        onUnmounted(() => {
-            store.commit('SelectTabBar', -1);
-            console.log('卸载');
-        });
+      store.commit('SelectTabBar', 1);
+      console.log('加载');
+    });
+    onUnmounted(() => {
+      store.commit('SelectTabBar', -1);
+      console.log('卸载');
+    });
     const onClickLeft = () => {
       history.back();
     };
@@ -110,22 +147,58 @@ export default {
       });
     }
 
-    const onClickRight = ()=>{
+    const onSearch = () => {
       router.push({
         path: '/Search',
-        query: { CyId: CyId.value, CaId: 0, kw: '',lz:1},
+        query: { CyId: CyId.value, CaId: -1, kw: '', lz: 1 },
       });
     };
+    const onAddNote = () => {
+      router.push({
+        path: '/AddNote',
+        query: { Id: 0, CyId: CyId.value },
+      });
+    };
+
+    const showSheet = ref(false);
+    const onShowActionsheet = () => {
+      showSheet.value = true;
+    };
+    const actionsSheet = [
+      { name: '编辑', },
+      { name: '刷新', },
+    ];
+    const onCancel = () => console.log('取消');
+    const selectSheet = (action, index) => {
+      console.log(action, index);
+      if (index == 0) {
+        router.push({
+          path: '/AddCategory',
+          query: { Id: CyId.value,back:1 }
+        });
+      } else if (index == 1) {
+        getNoteById(CyId.value);
+        getNoteListByParentId(CyId.value);
+      }
+    }
+
     return {
       treeData,
       selectNode,
       expandedKeys,
 
       onClickLeft,
-      onClickRight,
+      onSearch,
+      onAddNote,
 
       menuTitle,
       menuContent,
+
+      showSheet,
+      selectSheet,
+      actionsSheet,
+      onCancel,
+      onShowActionsheet,
 
     };
   },
@@ -138,10 +211,10 @@ export default {
   width: 100%;
   top: 0px;
 }
-.list-box-detail{
 
-}
-.cybody{
+.list-box-detail {}
+
+.cybody {
   padding: 6px 12px 6px;
   width: 100%;
   overflow: hidden;
@@ -151,26 +224,57 @@ export default {
   margin-top: 46px;
 
   .cydes {
-    border-bottom: 1px solid #ccc;
     padding: 20px 0px 30px;
+    background-image: url(@/assets/img/bg-cy-detail.jpg);
+    background-size: 100%;
+
+    h2 {
+      word-wrap: break-word;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    p {
+      word-wrap: break-word;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
   }
 }
-.cyLleafNote{
+
+.ant-tree {
+  margin-bottom: 12px;
+}
+
+.cyLParentNote {
+  margin-top: 8px;
+}
+
+.cyLleafNote {
   width: 86%;
-  border-bottom: 1px solid #eef;
-  padding: 6px 1px 6px !important;
+  border-bottom: 1px solid #f3f3f8;
+  padding: 8px 1px 8px !important;
   margin-left: 24px;
 }
-.cyLleafNote .ant-tree-switcher{
+
+.cyLleafNote .ant-tree-switcher {
   width: 0px;
 }
-.cyLleafNote .ant-tree-node-content-wrapper{
+
+.cyLleafNote .ant-tree-node-content-wrapper {
   white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0px;
 }
-.cyLleafNote .ant-tree-switcher .anticon,.cyLleafNote .ant-tree-indent{
+
+.cyLleafNote .ant-tree-switcher .anticon,
+.cyLleafNote .ant-tree-indent {
   display: none;
+}
+
+.icon-box {
+  display: inline-block;
+  padding-left: 18px;
 }
 </style>

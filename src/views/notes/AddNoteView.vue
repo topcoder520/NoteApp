@@ -145,6 +145,8 @@ export default {
 
         const aId = ref(route.query.aId ?? 0);
 
+        const CyId = ref(route.query.CyId ?? 0);
+
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
         console.log('Id.value', Id.value);
         if (Id.value && Id.value > 0) {
@@ -171,6 +173,17 @@ export default {
                 categoryName.value = data.Category;
                 ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
+            }).catch((reject) => {
+                console.log('查询笔记失败：' + reject);
+                Toast.fail('查询笔记失败：' + reject);
+            });
+        }
+        if(CyId.value && CyId.value>0){
+            store.dispatch('getNoteById', CyId.value).then((resolve) => {
+                const data = resolve;
+                categoryName.value = data.Title+'/未分类';
+                ParentId.value = data.Id;
+                note_category_Id.value = 0;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);
@@ -215,6 +228,7 @@ export default {
                         selectData = item.children;
                         if(value>0){
                             selectData.length = 0;
+                            selectData.push({ value: 0, text: '未分类' });        
                         }
                         break;
                     }
