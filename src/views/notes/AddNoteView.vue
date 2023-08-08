@@ -146,9 +146,11 @@ export default {
         const aId = ref(route.query.aId ?? 0);
 
         const CyId = ref(route.query.CyId ?? 0);
+        const NCId = ref(route.query.NCId ?? 0);
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
         console.log('Id.value', Id.value);
+        //笔记Id
         if (Id.value && Id.value > 0) {
             PageTitle.value = '编辑笔记';
             showLoadingToast('加载中...');
@@ -167,6 +169,7 @@ export default {
                 Toast.fail('查询笔记失败：' + reject);
             });
         }
+        //其他笔记的Id
         if(aId.value && aId.value>0){
             store.dispatch('getNoteById', aId.value).then((resolve) => {
                 const data = resolve;
@@ -178,12 +181,25 @@ export default {
                 Toast.fail('查询笔记失败：' + reject);
             });
         }
+        //知识库的Id
         if(CyId.value && CyId.value>0){
             store.dispatch('getNoteById', CyId.value).then((resolve) => {
                 const data = resolve;
                 categoryName.value = data.Title+'/未分类';
                 ParentId.value = data.Id;
                 note_category_Id.value = 0;
+            }).catch((reject) => {
+                console.log('查询笔记失败：' + reject);
+                Toast.fail('查询笔记失败：' + reject);
+            });
+        }
+        //分类的Id
+        if(NCId.value && NCId.value>0){
+            store.dispatch('getCategoryById', NCId.value).then((resolve) => {
+                const data = resolve;
+                categoryName.value = data.Title+'/'+data.CName;
+                ParentId.value = data.note_Id;
+                note_category_Id.value = data.Id;
             }).catch((reject) => {
                 console.log('查询笔记失败：' + reject);
                 Toast.fail('查询笔记失败：' + reject);

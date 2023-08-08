@@ -423,6 +423,21 @@ export function getCategoryList(context,{CyNoteId}){
     });
 }
 
+//------------note_Category  start ----------------------------------
+
+export function getCategoryById(context, id) {
+    return new Promise((resolve, reject) => {
+        let childFeildSql = "note.Title";
+        getRecord(context.state.database,noteCategory, {Id:id},childFeildSql).then((res) => {
+            resolve(res)
+        }).catch((reject1) => {
+            reject(reject1);
+        });
+    });
+}
+
+//------------note_Category  end ----------------------------------
+
 
 export function startupDatabase(context) {
     return new Promise((resolve) => {

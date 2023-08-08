@@ -12,7 +12,8 @@
       <p>{{ menuContent }}</p>
     </div>
     <div class="cybody">
-      <a-tree :tree-data="treeData" :default-expandAll=true @select="selectNode" v-model:expandedKeys="expandedKeys">
+      <a-tree :tree-data="treeData" :default-expandAll=true @expand="expandNode" @select="selectNode"
+        v-model:expandedKeys="expandedKeys">
         <template #switcherIcon="{ switcherCls }"><down-outlined :class="switcherCls" /></template>
       </a-tree>
     </div>
@@ -52,7 +53,7 @@ export default {
           sortlistData.push({
             key: 'cy_' + listData[i].Id,
             title: listData[i].CName,
-            selectable: false,
+            selectable: true,
             class: 'cyLParentNote',
             timestamp: listData[i].Timestamp,
             children: []
@@ -76,7 +77,7 @@ export default {
             }
             for (let j = 0; j < sortlistData.length; j++) {
               const categoryItem = sortlistData[j];
-              let cykey = 'cy_'+item.note_category_Id;
+              let cykey = 'cy_' + item.note_category_Id;
               if (categoryItem.key == cykey && categoryItem.children) {
                 categoryItem.children.push({ title: item.Title, key: item.Id, class: 'cyLleafNote' });
                 break;
@@ -103,7 +104,7 @@ export default {
           arr.splice(i + 1, 0, item);
           break;
         }
-        if(i == 0){
+        if (i == 0) {
           arr.splice(i, 0, item);
         }
       }
@@ -138,25 +139,40 @@ export default {
       history.back();
     };
     const treeData = ref([]);
+    const NCId = ref(-1);
 
-    const selectNode = (key, e) => {
-      console.log(key, e.node);
-      router.push({
-        path: '/ViewNote',
-        query: { Id: key }
-      });
-    }
+    const selectNode = (keys, e) => {
+      console.log(keys, e);
+      if (keys.length > 0) {
+        let keystr = e.node.key + '';
+        if (keystr.indexOf('cy_') != -1) {
+          NCId.value = Number(keystr.substring(keystr.indexOf('cy_') + 3));
+        } else {
+          NCId.value = -1;
+          router.push({
+            path: '/ViewNote',
+            query: { Id: keystr }
+          });
+        }
+      } else {
+        NCId.value = -1;
+      }
+    };
+    const expandNode = (key, e) => {
+      console.log(key, e);
+      //NCId.value = -1;
+    };
 
     const onSearch = () => {
       router.push({
         path: '/Search',
-        query: { CyId: CyId.value, CaId: -1, kw: '', lz: 1 },
+        query: { CyId: CyId.value, CaId: NCId.value, kw: '', lz: 1 },
       });
     };
     const onAddNote = () => {
       router.push({
         path: '/AddNote',
-        query: { Id: 0, CyId: CyId.value },
+        query: { Id: 0, CyId: CyId.value, NCId: NCId.value },
       });
     };
 
@@ -174,7 +190,7 @@ export default {
       if (index == 0) {
         router.push({
           path: '/AddCategory',
-          query: { Id: CyId.value,back:1 }
+          query: { Id: CyId.value, back: 1 }
         });
       } else if (index == 1) {
         getNoteById(CyId.value);
@@ -185,6 +201,7 @@ export default {
     return {
       treeData,
       selectNode,
+      expandNode,
       expandedKeys,
 
       onClickLeft,
@@ -211,8 +228,6 @@ export default {
   width: 100%;
   top: 0px;
 }
-
-.list-box-detail {}
 
 .cybody {
   padding: 6px 12px 6px;
@@ -248,6 +263,10 @@ export default {
 
 .cyLParentNote {
   margin-top: 8px;
+}
+
+.cyLParentNote span.ant-tree-node-selected {
+  background-color: #b9c1c8 !important;
 }
 
 .cyLleafNote {
