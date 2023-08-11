@@ -295,7 +295,7 @@ export default {
         const addNote = ()=>{
             router.push({
                 path: '/AddNote',
-                query: { Id: 0,aId:Id.value },
+                query: { Id: 0,aId:Id.value,State:0 },
                 replace: true 
             });
         };

@@ -308,7 +308,7 @@ export function getNoteListByParentId(context,{ParentId}){
 }
 
 export function addNote(context,{
-    Title,Category,Content,CreateTime,Year,Month,Day,timestamp,ParentId,note_category_Id
+    Title,Category,Content,CreateTime,Year,Month,Day,timestamp,ParentId,note_category_Id,State
 }){
     return new Promise((resolve, reject) => {
         addRecord(context.state.database, note, {
@@ -320,7 +320,7 @@ export function addNote(context,{
             Year:Year,
             Month:Month,
             Day:Day,
-            State:1,
+            State:State,
             Sort:1,
             Timestamp:timestamp,
             ParentId:ParentId,

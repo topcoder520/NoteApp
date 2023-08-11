@@ -12,7 +12,7 @@ import {
 } from 'vant';
 import 'vant/lib/index.css';
 
-import Antd from 'ant-design-vue';
+import {Tree} from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
 
 const app = createApp(App);
@@ -49,7 +49,8 @@ app.use(ActionSheet);
 app.use(Cascader);
 app.use(TextEllipsis);
 
-app.use(Antd);
+//ant
+app.use(Tree);
 
 app.mount('#app');
 // document.addEventListener('deviceready',function(){

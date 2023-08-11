@@ -69,6 +69,8 @@ export default {
         const onClickLeft = () => {
             history.back();
         };
+
+        const State = ref(!route.query.State?1:Number(route.query.State));
         const onClickRight = () => {
             tmepContent.type = '1';
             if (title.value.trim().length == 0) {
@@ -112,6 +114,7 @@ export default {
                     Month: m,
                     Day: d,
                     timestamp: Date.now(),
+                    State:State.value,
 
                     ParentId:ParentId.value,
                     note_category_Id:note_category_Id.value,

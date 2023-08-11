@@ -1,5 +1,5 @@
 <template>
-    <div class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="enterKeydown"
+    <div id="richTextID" class="richText" @click="clickRichText" :contenteditable="editable" @keydown.enter="enterKeydown"
         @blur="blurRichText" ref="richDiv"></div>
     <van-back-top v-if="!editable" target=".richText" bottom="10vh" right="3vw" />
     <div class="tooltip" v-if="editable">
@@ -128,11 +128,20 @@ export default {
             } else if (!editable.value && e.target.localName == 'img') {
                 //img 
                 var imgsrc = e.target.src;
-                let imgsrcList = [imgsrc];
+                let imgsrcList = [];
+                let imgs = document.getElementById('richTextID').getElementsByTagName('img');
+                let location = 0;
+                for (let i = 0; i < imgs.length; i++) {
+                    const img = imgs[i];
+                    if (img.src == imgsrc) {
+                        location = i;
+                    }
+                    imgsrcList.push(img.src);
+                }
                 showImagePreview({
-                images: imgsrcList,
-                startPosition: 0,
-            });
+                    images: imgsrcList,
+                    startPosition: location,
+                });
             }
         }
 
@@ -154,7 +163,7 @@ export default {
         const showLinkUrl = ref(false);
         const linkUrl = ref(''); //地址
         const showLinkUrlconfirm = () => {
-            console.log('linkUrl',linkUrl.value);
+            console.log('linkUrl', linkUrl.value);
             if (linkUrl.value.trim().length > 0) {
                 setSelectionRange();
                 const selection = window.getSelection();

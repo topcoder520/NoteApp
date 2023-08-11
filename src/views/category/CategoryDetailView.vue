@@ -172,7 +172,7 @@ export default {
     const onAddNote = () => {
       router.push({
         path: '/AddNote',
-        query: { Id: 0, CyId: CyId.value, NCId: NCId.value },
+        query: { Id: 0, CyId: CyId.value, NCId: NCId.value,State:0 },
       });
     };
 
