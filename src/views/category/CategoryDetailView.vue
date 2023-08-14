@@ -95,7 +95,11 @@ export default {
     getNoteListByParentId(CyId.value);
 
     const insertDataSortTimestamp = (item, arr) => {
-      if (!item || !arr || arr.length == 0) {
+      if (!item || !arr) {
+        return;
+      }
+      if(arr.length == 0){
+        arr.push(item);
         return;
       }
       for (let i = arr.length - 1; i >= 0; i--) {

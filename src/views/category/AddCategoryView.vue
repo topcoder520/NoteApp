@@ -9,7 +9,7 @@
         <div class="categorylist">
             <p>
                 <span>分类</span>
-                <van-button @click="addCategory(0, '')"
+                <van-button @click="addCategory(0, '', -1)"
                     style="padding: 0px 3px;height: 24px;position: absolute;right: 24px;" type="primary">添加</van-button>
             </p>
             <div class="listdata">
@@ -18,9 +18,9 @@
                         <p style="text-align:center;">{{ item.name }}</p>
                     </van-row>
                     <template #right>
-                        <van-button square type="primary" text="编辑" @click="addCategory(item.Id, item.tname)" />
+                        <van-button square type="primary" text="编辑" @click="addCategory(item.Id, item.tname, index)" />
                         <van-button square type="danger" text="删除"
-                            @click="delCategory(item.Id, item.tname, item.TotalNoteNum)" />
+                            @click="delCategory(item.Id, item.tname, item.TotalNoteNum, index)" />
                     </template>
                 </van-swipe-cell>
             </div>
@@ -247,7 +247,13 @@ export default {
                         });
                     }
                 } else {
-                    list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: 0 });
+                    if (categoryIndex.value >= 0) {
+                        list.value[categoryIndex.value].name = categoryName.value + '(0)';
+                        list.value[categoryIndex.value].Id = categoryId.value;
+                        list.value[categoryIndex.value].tname = categoryName.value;
+                    } else {
+                        list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: 0 });
+                    }
                 }
 
             }
@@ -256,9 +262,11 @@ export default {
 
         const categoryName = ref('');
         const categoryId = ref(0);
-        const addCategory = (cyId, cname) => {
+        const categoryIndex = ref(-1);
+        const addCategory = (cyId, cname, index) => {
             showPicUrl.value = true;
-            if (cyId == 0) {
+            categoryIndex.value = index;
+            if (cyId == 0 && cname.length == 0) {
                 categoryName.value = '';
                 categoryId.value = 0;
             } else {
@@ -266,8 +274,8 @@ export default {
                 categoryId.value = cyId;
             }
         }
-        const delCategory = (cyId, cname, TotalNoteNum) => {
-            console.log(cyId, cname, TotalNoteNum)
+        const delCategory = (cyId, cname, TotalNoteNum, index) => {
+            console.log(cyId, cname, TotalNoteNum, index)
             showConfirmDialog({
                 title: '确定删除 \'' + cname + '\' 分类？',
             }).then(() => {
@@ -275,20 +283,26 @@ export default {
                     Toast.fail('该分类有数据不能删除!');
                     return;
                 }
-                store.dispatch('delCategory', { Id: cyId, real: 0 }).then((resolve, reject) => {
-                    if (resolve.rowsAffected > 0) {
-                        for (let index = 0; index < list.value.length; index++) {
-                            const item = list.value[index];
-                            if (item.Id == cyId) {
-                                list.value.splice(index, 1);
-                                break;
+                if (cyId > 0) {
+                    store.dispatch('delCategory', { Id: cyId, real: 0 }).then((resolve, reject) => {
+                        if (resolve.rowsAffected > 0) {
+                            for (let i = 0; i < list.value.length; i++) {
+                                const item = list.value[i];
+                                if (item.Id == cyId) {
+                                    list.value.splice(i, 1);
+                                    break;
+                                }
                             }
+                            showNotify({ type: 'success', message: '已删除', position: 'bottom' });
+                        } else {
+                            Toast.fail('移出失败：' + reject);
                         }
-                        showNotify({ type: 'success', message: '已删除', position: 'bottom' });
-                    } else {
-                        Toast.fail('移出失败：' + reject);
-                    }
-                });
+                    });
+                } else {
+                    list.value.splice(index, 1);
+                    showNotify({ type: 'success', message: '已删除', position: 'bottom' });
+                }
+
             }).catch(() => {
                 // on cancel
             });
