@@ -8,6 +8,12 @@
 ## 添加平台
   `cordova platform add android`
 
+
+
+
+
+
+
 ## 添加插件
   `cordova plugin add cordova-plugin-android-fingerprint-auth`
   `cordova plugin add cordova-plugin-camera`

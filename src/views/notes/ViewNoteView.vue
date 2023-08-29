@@ -16,7 +16,7 @@
         <div class="leftMenu" @click="openMenu">
             <van-icon name="arrow-left" />
         </div>
-        <div class="note-content">
+        <div class="note-content" ref="noteContent">
             <rich-text @getValue="getValue" :value="tmepContent" :editable="false"></rich-text>
         </div>
     </div>
@@ -49,7 +49,11 @@ import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
 import { showConfirmDialog, closeToast, showLoadingToast } from 'vant';
 
+import html2canvas from 'html2canvas';
+
 import RichText from '../common/RichTextView.vue';
+
+import { saveImage } from '@/plugin/file'
 
 export default {
     name: 'ViewNoteView',
@@ -105,7 +109,7 @@ export default {
         const { height } = useWindowSize();
         const root = ref();
         const vheight = ref(height.value - 92 + 'px');
-        
+
 
         //内容
         const Id = ref(route.query.Id ?? 0);
@@ -157,8 +161,8 @@ export default {
                     Title: title.value,
                     Category: categoryName.value,
                     Content: content.value,
-                    ParentId:ParentId.value,
-                    note_category_Id:note_category_Id.value,
+                    ParentId: ParentId.value,
+                    note_category_Id: note_category_Id.value,
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         //Toast('保存成功');
@@ -173,9 +177,11 @@ export default {
         const showSheet = ref(false);
         const actionsSheet = [
             { name: '编辑', },
+            { name: '笔记截图', },
             { name: '删除', color: 'red', },
         ];
         const onCancel = () => console.log('取消');
+        const noteContent = ref(null);
         const selectSheet = (action, index) => {
             console.log(action, index);
             if (index == 0) {
@@ -184,6 +190,40 @@ export default {
                     query: { Id: Id.value }
                 });
             } else if (index == 1) {
+                console.log('笔记截图');
+                const el = noteContent.value;
+                console.log(el.clientHeight);
+                console.log(el.clientWidth);
+                showLoadingToast('截图中...');
+                html2canvas(el, {
+                    allowTaint:true,
+                    backgroundColor:'#fff',
+                    useCORS: true,
+                    imageTimeout:15000,
+                    scale:4,  //数值越大图片越清晰
+                    //height:el.clientHeight,
+                    //width:el.clientWidth,
+
+                }).then((canvas) => {
+                    //console.log(canvas.toDataURL('image/jpeg',1));
+
+                    canvas.toBlob((blob) => {
+                        saveImage(blob).then((resole) => {
+                            closeToast();
+                            Toast.success('截图已保存');
+                        }).catch((err) => 
+                        {
+                            closeToast();
+                            Toast.fail('截图保存失败：' + err);
+                        });
+                    }, "image/jpeg", 2)
+
+                }).catch((err)=>{
+                    closeToast();
+                    Toast.fail('截图失败：' + err);
+                })
+            }
+            else if (index == 2) {
                 showConfirmDialog({
                     title: '确认删除该笔记？',
                 }).then(() => {
@@ -210,7 +250,7 @@ export default {
         const showRightMenu = ref(false);
         const openMenu = () => {
             showRightMenu.value = true;
-            if(note_category_Id.value>0){
+            if (note_category_Id.value > 0) {
                 onLoadMenuData(note_category_Id.value);
             }
         };
@@ -228,17 +268,17 @@ export default {
                     var select = 0;
                     if (listData[i].Id == Id.value) {
                         select = 1;
-                        selectheight = i+1;
+                        selectheight = i + 1;
                     }
                     listMenu.value.push({ Id: listData[i].Id, name: listData[i].Title, timestamp: listData[i].Timestamp, select: select, len: len });
                 }
                 setTimeout(() => {
-                    var rowHeight = document.querySelector('.vrow').clientHeight+1;
-                    selectheight = selectheight*rowHeight;
-                    console.log('vrow height',rowHeight);
+                    var rowHeight = document.querySelector('.vrow').clientHeight + 1;
+                    selectheight = selectheight * rowHeight;
+                    console.log('vrow height', rowHeight);
                     var menuClientHeight = menuRef.value.clientHeight;
-                    console.log('selectheight',selectheight,'menuClientHeight',menuClientHeight)
-                    menuRef.value.scrollTop = (selectheight - menuClientHeight)+ menuClientHeight/2;
+                    console.log('selectheight', selectheight, 'menuClientHeight', menuClientHeight)
+                    menuRef.value.scrollTop = (selectheight - menuClientHeight) + menuClientHeight / 2;
                 }, 100);
                 closeToast();
             });
@@ -285,18 +325,18 @@ export default {
             router.push({
                 path: '/ViewNote',
                 query: { Id: cId },
-                replace: true 
+                replace: true
             });
             Id.value = cId;
             document.querySelector('.richText').scrollTop = 0;
             getNoteById(cId);
         }
         //添加新文章
-        const addNote = ()=>{
+        const addNote = () => {
             router.push({
                 path: '/AddNote',
-                query: { Id: 0,aId:Id.value,State:0 },
-                replace: true 
+                query: { Id: 0, aId: Id.value, State: 0 },
+                replace: true
             });
         };
 
@@ -322,6 +362,7 @@ export default {
             actionsSheet,
             onCancel,
             selectSheet,
+            noteContent,
 
             openMenu,
             showRightMenu,
