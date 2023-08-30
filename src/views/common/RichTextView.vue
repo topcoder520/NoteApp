@@ -25,6 +25,10 @@
         <button @click="changeFont('PH2')">
             <van-icon name="photo" />
         </button>
+        <!--本地图片 base64编码方式存到app-->
+        <button @click="changeFont('PH3')">
+            <van-icon name="photo" color="red"/>
+        </button>
         <!--待办复选框-->
         <button @click="changeFont('TODO')">
             <van-icon name="certificate" />
@@ -58,7 +62,7 @@ import { watch } from 'vue';
 
 import { showImagePreview } from 'vant';
 
-import { Takefromgalery } from '@/plugin/camera';
+import { Takefromgalery,Takefromgalery2DataURL} from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
 
@@ -221,6 +225,23 @@ export default {
                 getSelectionRange();
                 //调用相册接口
                 Takefromgalery().then((resole) => {
+                    console.log(resole);
+                    if (resole.type == 'base64') {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
+                        document.execCommand("insertHTML", false, htmlStr);
+                    } else {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
+                        //document.execCommand("insertText", false, htmlStr);
+                        document.execCommand("insertHTML", false, htmlStr);
+                    }
+                }).catch((e) => {
+                    console.log(e);
+                    Toast(e);
+                });
+            }else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
+                getSelectionRange();
+                //调用相册接口
+                Takefromgalery2DataURL().then((resole) => {
                     console.log(resole);
                     if (resole.type == 'base64') {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;

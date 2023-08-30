@@ -37,3 +37,31 @@ export function Takefromgalery(){
         },cameraOptions);
     });
 }
+
+export function Takefromgalery2DataURL(){
+    return new Promise((resolve, reject)=>{
+        var cameraOptions = {
+            quality : 100,
+            destinationType : Camera.DestinationType.DATA_URL,
+            //destinationType : Camera.DestinationType.FILE_URI,
+            sourceType : Camera.PictureSourceType.SAVEDPHOTOALBUM, //相册类型
+            allowEdit : false, 
+            encodingType : Camera.EncodingType.JPEG,
+            //targetWdith : 100,
+            //targetHeight : 100,
+            popoverOptions : CameraPopoverOptions,
+            saveToPhotoAlbum : false,
+        };
+        console.log('调用相册接口');
+
+        //todo 图片放入缓存文件来代替数据库
+
+        navigator.camera.getPicture((imgUri)=>{
+            //console.log('onCameraSuccess:',imgUri);
+            resolve({type:'base64',data:imgUri});
+        },(e)=>{
+            console.log('onCameraError:',e);
+            reject(e);
+        },cameraOptions);
+    });
+}

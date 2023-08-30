@@ -27,7 +27,7 @@
         <div class="menubox" ref="menuRef">
             <van-swipe-cell v-for="(item, index) in listMenu" :key="index">
                 <van-row @click="openOtherNoteDetail(item.Id)" :class="['vrow', item.select == 1 ? 'cur' : '']">
-                    <p style="text-align:left;">{{ item.name }}</p>
+                    <p style="text-align:left;font-size: 14px;">{{ item.name }}</p>
                 </van-row>
                 <template #right>
                     <van-button v-show="index == 0 ? false : true" square type="default" text="上移"
