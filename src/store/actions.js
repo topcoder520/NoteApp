@@ -1,4 +1,5 @@
 import {getNowDateString,getNowTimestamp,getPreMonths,getNextMonths} from '@/util/date'
+import {filesPath} from '@/util/config'
 import {
     openDatabase,
     createTable,
@@ -58,7 +59,7 @@ const noteCategory = {
 
 export function getNoteById(context, id) {
     return new Promise((resolve, reject) => {
-        let childFeildSql = "(select count(1) from note nn where nn.SType = 0 and nn.ParentId = note.Id ) as totalNotes";
+        let childFeildSql = "(select count(1) from note nn where ifnull(nn.SType,0) = 0 and nn.ParentId = note.Id ) as totalNotes";
         getRecord(context.state.database,note, {Id:id},childFeildSql).then((res) => {
             resolve(res)
         }).catch((reject1) => {
@@ -70,7 +71,7 @@ export function getNoteById(context, id) {
 export function hasNoteOnYearMonthDate(context,{Year,Month,Date}) {
     return new Promise((resolve, reject) => {
         var fieldSql = "count(1) as cnt";
-        getRecord(context.state.database,{tableName:note.tableName,fields:[]}, `note.SType = 0 and note.Year =${Year} and note.Month=${Month} and note.Day=${Date}`, fieldSql).then((res) => {
+        getRecord(context.state.database,{tableName:note.tableName,fields:[]}, `ifnull(note.SType,0) = 0 and note.Year =${Year} and note.Month=${Month} and note.Day=${Date}`, fieldSql).then((res) => {
             var rowData = 0;
             for (var x = 0; x < res.rows.length; x++) {
                 rowData = res.rows.item(x).cnt;
@@ -100,7 +101,7 @@ export function getNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Month=
         if(Day>0){
             whereObject.Day = Day;
         }
-        var whereStr = ' note.SType = 0 and ';
+        var whereStr = ' ifnull(note.SType,0) = 0 and ';
         for (let key in whereObject) {
             if (!checkNumber(note.fields[key])) {
                 whereStr += "note." + key + " = '" + whereObject[key] + "' and ";
@@ -149,7 +150,7 @@ export function getCyNoteListByPage(context,{pageIndex=1,pageSize=20,Year=0,Mont
         if(Day>0){
             whereObject.Day = Day;
         }
-        var whereStr = ' note.SType = 1 and ';
+        var whereStr = ' ifnull(note.SType,0) = 1 and ';
         for (let key in whereObject) {
             if (!checkNumber(note.fields[key])) {
                 whereStr += "note." + key + " = '" + whereObject[key] + "' and ";
@@ -267,7 +268,7 @@ export function getNoteListNearMonth(context,{Year,Month}){
     return new Promise((resolve,reject)=>{
         const preData = getPreMonths(Year,Month);
         const nextData = getNextMonths(Year,Month);
-        getRecordList(context.state.database, note  , `note.SType = 0 and (note.Year = ${preData.Year} and note.Month=${preData.Month} or note.Year = ${Year} and note.Month=${Month} or note.Year = ${nextData.Year} and note.Month=${nextData.Month})`,"","note.Year desc,note.Month desc",null,["Content"]).then((res) => {
+        getRecordList(context.state.database, note  , `ifnull(note.SType,0) = 0 and (note.Year = ${preData.Year} and note.Month=${preData.Month} or note.Year = ${Year} and note.Month=${Month} or note.Year = ${nextData.Year} and note.Month=${nextData.Month})`,"","note.Year desc,note.Month desc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -277,8 +278,8 @@ export function getNoteListNearMonth(context,{Year,Month}){
 
 export function getCyNoteList(context){
     return new Promise((resolve,reject)=>{
-        let otherFeildSql = " (select count(1) from note nn where nn.SType=0 and nn.ParentId = note.Id) as TotalNoteNum ";
-        getRecordList(context.state.database, note  , `note.SType = 1 and note.State = 1 `,otherFeildSql,"note.Sort desc,note.Timestamp desc",null,["Content"]).then((res) => {
+        let otherFeildSql = " (select count(1) from note nn where ifnull(nn.SType,0)=0 and nn.ParentId = note.Id) as TotalNoteNum ";
+        getRecordList(context.state.database, note  , `ifnull(note.SType,0) = 1 and note.State = 1 `,otherFeildSql,"note.Sort desc,note.Timestamp desc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -288,7 +289,7 @@ export function getCyNoteList(context){
 
 export function getNoteList(context,{note_category_Id}){
     return new Promise((resolve,reject)=>{
-        getRecordList(context.state.database, note  , `note.SType = 0 and note.note_category_Id = ${note_category_Id}`,"","note.Timestamp asc",null,["Content"]).then((res) => {
+        getRecordList(context.state.database, note  , `ifnull(note.SType,0) = 0 and note.note_category_Id = ${note_category_Id}`,"","note.Timestamp asc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -299,7 +300,7 @@ export function getNoteList(context,{note_category_Id}){
 export function getNoteListByParentId(context,{ParentId}){
     return new Promise((resolve,reject)=>{
         let otherFeildSql = " note_category.CName ";
-        getRecordList(context.state.database, note  , `note.SType = 0 and note.ParentId = ${ParentId}`,otherFeildSql,"note.note_category_Id asc,note.Timestamp asc",null,["Content"]).then((res) => {
+        getRecordList(context.state.database, note  , `ifnull(note.SType,0) = 0 and note.ParentId = ${ParentId}`,otherFeildSql,"note.note_category_Id asc,note.Timestamp asc",null,["Content"]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
             reject(reject1);
@@ -317,6 +318,7 @@ export function addNote(context,{
             Category:Category,
             Content:Content,
             CreateTime:CreateTime,
+            SType:0,
             Year:Year,
             Month:Month,
             Day:Day,
@@ -414,7 +416,7 @@ export function delCategory(context,{Id,real}){
 
 export function getCategoryList(context,{CyNoteId}){
     return new Promise((resolve,reject)=>{
-        let otherFeildSql = "(select count(1) from note nn where nn.SType=0 and nn.note_category_Id = note_category.Id) as TotalNoteNum";
+        let otherFeildSql = "(select count(1) from note nn where ifnull(nn.SType,0)=0 and nn.note_category_Id = note_category.Id) as TotalNoteNum";
         getRecordList(context.state.database, noteCategory  , `note_category.note_Id = ${CyNoteId} and note_category.State = 1 `,otherFeildSql,"note_category.Timestamp asc",null,[]).then((res) => {
             resolve(res);
         }).catch((reject1) => {
@@ -442,7 +444,7 @@ export function getCategoryById(context, id) {
 export function startupDatabase(context) {
     return new Promise((resolve) => {
         document.addEventListener('deviceready', () => {
-            openDatabase('MyDatabase').then((res) => {
+            openDatabase('NoteDatabase',filesPath).then((res) => {
                 const db = res;
                 context.commit('setDatabase', db);
                 //创建文件信息表
@@ -450,14 +452,6 @@ export function startupDatabase(context) {
                     if (res1.rowsAffected > 0) {
                         console.log('fileinfo 创建成功');
                     }
-
-
-                    addColumn(db,note,'ParentId','integer',0);
-                    addColumn(db,note,'SType','integer',0);
-                    //note_category_Id
-                    addColumn(db,note,'note_category_Id','integer',0);
-
-
                 }).catch((reject1) => {
                     console.log(reject1);
                 });
@@ -466,7 +460,6 @@ export function startupDatabase(context) {
                     if (res1.rowsAffected > 0) {
                         console.log('noteCategory 创建成功');
                     }
-                    addColumn(db,noteCategory,'note_Id','integer',0);
                 }).catch((reject1) => {
                     console.log(reject1);
                 });

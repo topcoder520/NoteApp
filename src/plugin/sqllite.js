@@ -1,3 +1,4 @@
+import {copyFile} from '@/plugin/file'
 //cordova plugin
 //step1: npm install cordova-sqlite-storage
 //step2: npm install @ionic-native/sqlite
@@ -23,12 +24,25 @@
 
 // openDatabase 创建或打开数据库
 //      databaseName: 数据库名称
-function openDatabase(databaseName) {
+function openDatabase(databaseName,dblocation) {
+    // console.log('datadirect: ',cordova.file.dataDirectory)
+    // let dbpath  = cordova.file.dataDirectory;
+    // if(dbpath.endsWith('files/')){
+    //     dbpath = dbpath.substring(0,dbpath.lastIndexOf('files/'))+'databases/';
+    // }
+    //console.log('database: ',dbpath)
     return new Promise((resolve) => {
         databaseName = databaseName || "default_database_db";
         const db = (window.cordova.platformId === 'browser') ?
             window.openDatabase(databaseName, '1.0', 'Data', 2 * 1024 * 1024) :
-            window.sqlitePlugin.openDatabase({ name: databaseName + '.db', location: 'default', androidDatabaseImplementation: 2 });
+            window.sqlitePlugin.openDatabase({ 
+                name: databaseName + '.db', 
+                androidDatabaseLocation:dblocation,
+                //androidDatabaseLocation:cordova.file.externalDataDirectory,
+                //location: 'default', 
+                //androidDatabaseImplementation: 2 
+            });
+        //copyFile(dbpath+databaseName+'.db',cordova.file.externalDataDirectory,'database',databaseName+'.db')
         resolve(db);
     });
 }

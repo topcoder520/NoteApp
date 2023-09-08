@@ -1,17 +1,28 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.github.topcoder520" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Note笔记</name>
-    <description>Sample Apache Cordova App</description>
-    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
+    <description>基于cordova实现的一个简单笔记app。</description>
+    <author email="dream4haji@gmail.com" href="https://github.com/topcoder520">
+        huangjing，一个对技术感兴趣的程序员!
     </author>
     <content src="index.html" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
     <platform name="android">
         <preference name="AndroidInsecureFileModeEnabled" value="true" />
         <preference name="AndroidPersistentFileLocation" value="Compatibility" />
         <preference name="iosExtraFilesystems" value="library,library-nosync,documents,documents-nosync,cache,bundle,root" />
         <preference name="AndroidExtraFilesystems" value="files,files-external,documents,sdcard,cache,cache-external,assets,root" />
+
+        <preference name="allowFileAccessFromFileURLs" value="true" />
+        <preference name="allowUniversalAccessFromFileURLs" value="true" />
+
+        <config-file parent="/*" platform="android" target="AndroidManifest.xml" xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
     </platform>
 </widget>

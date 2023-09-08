@@ -26,9 +26,9 @@
             <van-icon name="photo" />
         </button>
         <!--本地图片 base64编码方式存到app-->
-        <button @click="changeFont('PH3')">
-            <van-icon name="photo" color="red"/>
-        </button>
+        <!-- <button @click="changeFont('PH3')">
+            <van-icon name="photo" color="red" />
+        </button> -->
         <!--待办复选框-->
         <button @click="changeFont('TODO')">
             <van-icon name="certificate" />
@@ -62,9 +62,10 @@ import { watch } from 'vue';
 
 import { showImagePreview } from 'vant';
 
-import { Takefromgalery,Takefromgalery2DataURL} from '@/plugin/camera';
+import { Takefromgalery, Takefromgalery2DataURL } from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
+import { replaceNativeURL } from '@/util/path';
 
 export default {
     name: "RichText",
@@ -86,12 +87,35 @@ export default {
     setup(props, context) {
 
         const richDiv = ref(null);
-
         watch(() => props.value, (newVal, oldVal) => {
+            var rs = { };
             if (newVal.type == '0') {
                 richDiv.value.innerHTML = newVal.val;
+
+                if (!editable.value) {
+                    let imgs = document.getElementById('richTextID').getElementsByTagName('img');
+                    if (imgs.length > 0) {
+                        let num = 0;
+                        for (let i = 0; i < imgs.length; i++) {
+                            const img = imgs[i];
+                            let imgsrc = img.src;
+                            if (imgsrc.startsWith('file://')) {
+                                imgsrc = replaceNativeURL(imgsrc);
+                                if (imgsrc != img.src) {
+                                    img.src = imgsrc;
+                                    num++;
+                                }
+                            }
+                        }
+                        if (num > 0) {
+                            rs = { changeInputCheck: true };
+                        }
+
+                    }
+
+                }
             }
-            setRichText();
+            setRichText(rs);
         }, { deep: true });
         //input[checkbox] 状态保存
         const clickRichText = (e) => {
@@ -238,7 +262,7 @@ export default {
                     console.log(e);
                     Toast(e);
                 });
-            }else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
+            } else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
                 getSelectionRange();
                 //调用相册接口
                 Takefromgalery2DataURL().then((resole) => {

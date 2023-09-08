@@ -20,6 +20,8 @@
   `cordova plugin add cordova-plugin-file`
   `cordova plugin add cordova-sqlite-storage`
 
+  ** cordova-sqlite-evcore-extbuild-free插件替代cordova-sqlite-storage插件 **
+
 # 构建
 npm run build && cordova build android
 # 运行 browser

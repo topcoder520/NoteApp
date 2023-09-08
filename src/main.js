@@ -15,6 +15,11 @@ import 'vant/lib/index.css';
 import {Tree} from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
 
+/*app中加入console插件调试 ------start------*/
+// import VConsole from "vconsole";
+// import { initPlugin } from 'vue-vconsole-devtools'
+// initPlugin(new VConsole());// 需要在创建Vue根实例前调用
+/*app中加入console插件调试 ------end------*/
 const app = createApp(App);
 app.use(store);
 app.use(router);
@@ -53,7 +58,3 @@ app.use(TextEllipsis);
 app.use(Tree);
 
 app.mount('#app');
-// document.addEventListener('deviceready',function(){
-//     app.mount('#app');
-// },false)
-

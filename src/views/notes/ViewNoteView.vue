@@ -214,13 +214,13 @@ export default {
                         }).catch((err) => 
                         {
                             closeToast();
-                            Toast.fail('截图保存失败：' + err);
+                            Toast.fail('截图保存失败：' + JSON.stringify(err));
                         });
                     }, "image/jpeg", 2)
 
                 }).catch((err)=>{
                     closeToast();
-                    Toast.fail('截图失败：' + err);
+                    Toast.fail('截图失败：' + JSON.stringify(err));
                 })
             }
             else if (index == 2) {
