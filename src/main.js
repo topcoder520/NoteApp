@@ -58,3 +58,4 @@ app.use(TextEllipsis);
 app.use(Tree);
 
 app.mount('#app');
+

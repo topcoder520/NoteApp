@@ -19,7 +19,8 @@
   `cordova plugin add cordova-plugin-camera`
   `cordova plugin add cordova-plugin-file`
   `cordova plugin add cordova-sqlite-storage`
-
+  `cordova plugin add cordova-plugin-downresource`
+  
   ** cordova-sqlite-evcore-extbuild-free插件替代cordova-sqlite-storage插件 **
 
 # 构建

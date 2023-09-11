@@ -1,36 +1,37 @@
-import {rootPath} from '@/util/config'
+import { rootPath, cachePath, picFolderName } from '@/util/config'
+//import {fetchImage} from '@/plugin/request'
 
 var permissions = "";
 
-document.addEventListener('deviceready',function(){
-    permissions = (window.cordova.platformId === 'browser')?"":cordova.plugins.permissions;
-},false)
+document.addEventListener('deviceready', function () {
+    permissions = (window.cordova.platformId === 'browser') ? "" : cordova.plugins.permissions;
+}, false)
 
 //保存图片
 export function saveImage(blob) {
     return new Promise((resolve, reject) => {
-        permissions.checkPermission(permissions.WRITE_EXTERNAL_STORAGE, function( status ){
-            if ( status.hasPermission ) {
-                saveImageAsBlob(blob,resolve,reject);
+        permissions.checkPermission(permissions.WRITE_EXTERNAL_STORAGE, function (status) {
+            if (status.hasPermission) {
+                saveImageAsBlob(blob, resolve, reject);
             }
             else {
-              //reject('没有写入权限')
-              permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE,(stat)=>{
-                if( !stat.hasPermission ){
-                    reject('获取写入权限失败');
-                }else{
-                    saveImageAsBlob(blob,resolve,reject);
-                }
-              },err=>{
-                reject(JSON.stringify(err));
-              });
+                //reject('没有写入权限')
+                permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, (stat) => {
+                    if (!stat.hasPermission) {
+                        reject('获取写入权限失败');
+                    } else {
+                        saveImageAsBlob(blob, resolve, reject);
+                    }
+                }, err => {
+                    reject(JSON.stringify(err));
+                });
             }
-          });
+        });
     });
 
 }
 
-function saveImageAsBlob(blob,resolve,reject){
+function saveImageAsBlob(blob, resolve, reject) {
     window.resolveLocalFileSystemURL(rootPath, function (root) {
         // 先查找这个文件，如果没有则创建
         if (root.isDirectory) {
@@ -61,9 +62,9 @@ function saveImageAsBlob(blob,resolve,reject){
                 });
             })
         }
-    }, function (err) { 
-        console.log('出错2', JSON.stringify(err)); 
-        reject('出错2' + JSON.stringify(err)); 
+    }, function (err) {
+        console.log('出错2', JSON.stringify(err));
+        reject('出错2' + JSON.stringify(err));
     });
 }
 
@@ -80,15 +81,15 @@ function dataURItoBlob(dataURI) {
     return new Blob([intArray], { type: mimeString });
 }
 
-export function copyFile(fromFileURL, toParentDirectURL,newFolder, newName) {
-    console.log('fromFileURL',fromFileURL);
-    console.log('toParentDirectURL',toParentDirectURL);
-    console.log('newFolder',newFolder);
-    console.log('newName',newName);
+export function copyFile(fromFileURL, toParentDirectURL, newFolder, newName) {
+    console.log('fromFileURL', fromFileURL);
+    console.log('toParentDirectURL', toParentDirectURL);
+    console.log('newFolder', newFolder);
+    console.log('newName', newName);
     return new Promise((resolve, reject) => {
         window.resolveLocalFileSystemURL(toParentDirectURL, (dirEntry) => {
-            console.log('dirEntry ',dirEntry.toURL(),'isDirectory',dirEntry.isDirectory);
-            dirEntry.getDirectory(newFolder,{create:true},(newFolderEntry)=>{
+            console.log('dirEntry ', dirEntry.toURL(), 'isDirectory', dirEntry.isDirectory);
+            dirEntry.getDirectory(newFolder, { create: true }, (newFolderEntry) => {
                 window.resolveLocalFileSystemURL(fromFileURL, function (root) {
                     // 先查找这个文件，如果没有则创建
                     if (root.isFile) {
@@ -102,19 +103,67 @@ export function copyFile(fromFileURL, toParentDirectURL,newFolder, newName) {
                     } else {
                         console.log('fromFileURL: ', fromFileURL, ' isFile:false')
                     }
-                }, function (err) { 
-                    console.log('fromFileURL出错2', JSON.stringify(err)); 
-                    reject('fromFileURL出错2' + JSON.stringify(err)); 
+                }, function (err) {
+                    console.log('fromFileURL出错2', JSON.stringify(err));
+                    reject('fromFileURL出错2' + JSON.stringify(err));
                 });
-            },(err)=>{
-                console.log('create newFolder error',JSON.stringify(err));
-                reject('create newFolder error:'+ JSON.stringify(err)); 
-            });           
+            }, (err) => {
+                console.log('create newFolder error', JSON.stringify(err));
+                reject('create newFolder error:' + JSON.stringify(err));
+            });
         }, (err) => {
-            console.log('err',JSON.stringify(err),'toParentDirectURL:',toParentDirectURL)
+            console.log('err', JSON.stringify(err), 'toParentDirectURL:', toParentDirectURL)
             reject(JSON.stringify(err));
         });
     });
 }
+//下载网络图片 用插件下载图片避免跨域
+export function saveNetImage(url) {
+    return new Promise((resolve, reject) => {
+        window.resolveLocalFileSystemURL(cachePath, (root) => {
+            root.getDirectory(picFolderName, { create: true }, (dirEntry) => {
+                let filename = "";
+                let fromFileURL = "";
+                if (url.indexOf('?') > -1) {
+                    fromFileURL = url.substring(0, url.indexOf('?'));
+                } else {
+                    fromFileURL = url
+                }
+                if (fromFileURL.endsWith('.jpg')
+                    || fromFileURL.endsWith('.jpeg')
+                    || fromFileURL.endsWith('.png')
+                    || fromFileURL.endsWith('.gif')) {
+                    filename = fromFileURL.substring(fromFileURL.lastIndexOf('/') + 1);
+                } else {
+                    filename = hashCode(url);
+                    filename = "image_note_" + filename + '.jpg';
+                }
+                dirEntry.getFile(filename, { create: true }, (fileEntry) => {
+                    console.log('axios url ', url);
+                    console.log('local path ', fileEntry.toURL());
+                    Downresource.fetchFromURL(url, fileEntry.toURL(), 0, (res) => {
+                        console.log('res', res);
+                        resolve(fileEntry.toURL());
+                    }, (err) => {
+                        console.log('err', err);
+                        reject(err);
+                    });
+                })
+            });
+        });
+    })
+}
 
 
+
+
+function hashCode(str) {
+    var hash = 0, i, chr;
+    if (str.length === 0) return hash;
+    for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+};

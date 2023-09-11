@@ -17,5 +17,15 @@ module.exports = defineConfig({
   assetsDir: 'assets',
   // eslint-loader 是否在保存的时候检查
   lintOnSave: process.env.NODE_ENV !== 'production',
-  
+  //服务配置
+  devServer: {
+    proxy: {
+      "/mmbiz_png":{
+        target:'https://mmbiz.qpic.cn',
+        changeOrigin: true,//表示是否跨域
+        secure:true,
+
+      }
+    }
+  }
 })

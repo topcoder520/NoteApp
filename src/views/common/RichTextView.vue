@@ -66,6 +66,9 @@ import { Takefromgalery, Takefromgalery2DataURL } from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
 import { replaceNativeURL } from '@/util/path';
+import { saveNetImage } from '@/plugin/file';
+import { fetchImage } from '@/plugin/request';
+
 
 export default {
     name: "RichText",
@@ -88,19 +91,19 @@ export default {
 
         const richDiv = ref(null);
         watch(() => props.value, (newVal, oldVal) => {
-            var rs = { };
+            var rs = {};
             if (newVal.type == '0') {
                 richDiv.value.innerHTML = newVal.val;
-
-                if (!editable.value) {
-                    let imgs = document.getElementById('richTextID').getElementsByTagName('img');
-                    if (imgs.length > 0) {
+                let imgs = document.getElementById('richTextID').getElementsByTagName('img');
+                console.log('imgs length ', imgs.length);
+                if (imgs.length > 0) {
+                    if (!editable.value) {//阅读模式下
                         let num = 0;
                         for (let i = 0; i < imgs.length; i++) {
                             const img = imgs[i];
                             let imgsrc = img.src;
                             if (imgsrc.startsWith('file://')) {
-                                imgsrc = replaceNativeURL(imgsrc);
+                                imgsrc = replaceNativeURL(imgsrc);//替换跟宿主机路径不一样的图片路径
                                 if (imgsrc != img.src) {
                                     img.src = imgsrc;
                                     num++;
@@ -110,12 +113,10 @@ export default {
                         if (num > 0) {
                             rs = { changeInputCheck: true };
                         }
-
                     }
-
                 }
+                setRichText(rs);
             }
-            setRichText(rs);
         }, { deep: true });
         //input[checkbox] 状态保存
         const clickRichText = (e) => {
@@ -185,6 +186,30 @@ export default {
                 rs = Object.assign({}, rs, obj);
             }
             context.emit('getValue', rs);
+
+            let imgs = document.getElementById('richTextID').getElementsByTagName('img');
+            if (imgs.length > 0) {
+                for (let i = 0; i < imgs.length; i++) {
+                    const simg = imgs[i];
+                    if (simg.src.startsWith('http://') || simg.src.startsWith('https://')) {
+                        saveNetImage(simg.src).then(res => {
+                            console.log('res', res);
+                            simg.setAttribute('data-source-url', simg.src)
+                            simg.src = res;
+                        });
+                    } else if (simg.src.startsWith('data:image/') || simg.src.startsWith('file://')) {
+                        let sourceurl = simg.getAttribute('data-source-url');
+                        if (sourceurl) {
+                            saveNetImage(sourceurl).then(res => {
+                                console.log('res', res);
+                                if(simg.src != res){
+                                    simg.src = res;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
         }
 
         //设置超链接
@@ -318,6 +343,7 @@ export default {
                 //document.execCommand("insertImage", false, picUrl.value);
                 var htmlStr = `<img src="${picUrl.value}" style="width: 100%;">`;
                 document.execCommand("insertHTML", false, htmlStr);
+                setRichText();
             } else {
                 Toast('请输入图片地址')
             }
