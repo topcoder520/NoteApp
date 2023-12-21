@@ -1,6 +1,6 @@
 <template>
-    <van-nav-bar class="nav-bar-addnote" :title="PageTitle" left-text="返回" right-text="保存" left-arrow @click-left="onClickLeft"
-        @click-right="onClickRight" />
+    <van-nav-bar class="nav-bar-addnote" :title="PageTitle" left-text="返回" right-text="保存" left-arrow
+        @click-left="onClickLeft" @click-right="onClickRight" />
     <div class="addcontent" ref="root">
         <input type="text" class="title" placeholder="标题" v-model="title" />
         <van-cell class="date-info" v-model:title="createTime">
@@ -26,7 +26,7 @@
 import { useRect, useWindowSize } from '@vant/use';
 import { Toast } from '@vant/compat';
 import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
 import { closeToast, showLoadingToast } from 'vant';
@@ -41,6 +41,7 @@ export default {
     setup() {
         const store = useStore()
         const route = useRoute();
+        const router = useRouter();
 
         //keep-alive 缓存的组件激活时调用
         onMounted(() => {
@@ -70,7 +71,15 @@ export default {
             history.back();
         };
 
-        const State = ref(!route.query.State?1:Number(route.query.State));
+        const openOtherNoteDetail = (cId) => {
+            router.push({
+                path: '/ViewNote',
+                query: { Id: cId },
+                replace: true
+            });
+        }
+
+        const State = ref(!route.query.State ? 1 : Number(route.query.State));
         const onClickRight = () => {
             tmepContent.type = '1';
             if (title.value.trim().length == 0) {
@@ -88,12 +97,12 @@ export default {
                     Category: categoryName.value,
                     Content: content.value,
 
-                    ParentId:ParentId.value,
-                    note_category_Id:note_category_Id.value,
+                    ParentId: ParentId.value,
+                    note_category_Id: note_category_Id.value,
                 }).then((resolve) => {
                     if (resolve.rowsAffected > 0) {
                         Toast('保存成功');
-                        //history.back();
+                        saveAfter(Id.value);
                     }
                 }).catch((reject) => {
                     Toast.fail('保存失败：' + reject);
@@ -114,22 +123,34 @@ export default {
                     Month: m,
                     Day: d,
                     timestamp: Date.now(),
-                    State:State.value,
+                    State: State.value,
 
-                    ParentId:ParentId.value,
-                    note_category_Id:note_category_Id.value,
+                    ParentId: ParentId.value,
+                    note_category_Id: note_category_Id.value,
                 }).then((resolve) => {
                     console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
                         Toast('添加成功');
                         Id.value = resolve.insertId;
                         store.commit('setRefreshListState', true);
-                        //history.back();
+
+                        saveAfter(Id.value);
                     }
                 }).catch((reject) => {
                     Toast.fail('添加失败：' + reject);
                 });
             }
+        };
+
+        const saveAfter = (IdVal) => {
+            setTimeout(() => {
+                if (aId.value && aId.value > 0 || cpId.value && cpId.value > 0) {
+                    //跳转详情页
+                    openOtherNoteDetail(IdVal);
+                } else {
+                    onClickLeft();
+                }
+            }, 500);
         };
 
         const { height } = useWindowSize();
@@ -172,8 +193,28 @@ export default {
                 Toast.fail('查询笔记失败：' + reject);
             });
         }
+        //复制笔记
+        const cpId = ref(route.query.cpId ?? 0);
+        if (cpId.value && cpId.value > 0) {
+            PageTitle.value = '添加笔记';
+            showLoadingToast('加载中...');
+            store.dispatch('getNoteById', cpId.value).then((resolve) => {
+                const data = resolve;
+                title.value = "[复制] "+data.Title;
+                categoryName.value = data.Category;
+                content.value = data.Content;
+                tmepContent.val = data.Content;
+                createTime.value = data.CreateTime;
+                ParentId.value = data.ParentId;
+                note_category_Id.value = data.note_category_Id;
+                closeToast();
+            }).catch((reject) => {
+                console.log('查询笔记失败：' + reject);
+                Toast.fail('查询笔记失败：' + reject);
+            });
+        }
         //其他笔记的Id
-        if(aId.value && aId.value>0){
+        if (aId.value && aId.value > 0) {
             store.dispatch('getNoteById', aId.value).then((resolve) => {
                 const data = resolve;
                 categoryName.value = data.Category;
@@ -185,10 +226,10 @@ export default {
             });
         }
         //知识库的Id
-        if(CyId.value && CyId.value>0){
+        if (CyId.value && CyId.value > 0) {
             store.dispatch('getNoteById', CyId.value).then((resolve) => {
                 const data = resolve;
-                categoryName.value = data.Title+'/未分类';
+                categoryName.value = data.Title + '/未分类';
                 ParentId.value = data.Id;
                 note_category_Id.value = 0;
             }).catch((reject) => {
@@ -197,10 +238,10 @@ export default {
             });
         }
         //分类的Id
-        if(NCId.value && NCId.value>0){
+        if (NCId.value && NCId.value > 0) {
             store.dispatch('getCategoryById', NCId.value).then((resolve) => {
                 const data = resolve;
-                categoryName.value = data.Title+'/'+data.CName;
+                categoryName.value = data.Title + '/' + data.CName;
                 ParentId.value = data.note_Id;
                 note_category_Id.value = data.Id;
             }).catch((reject) => {
@@ -232,7 +273,7 @@ export default {
         getCyNoteList();
         const showPopup = ref(false);
         const cascaderValue = ref('');
-        const options = ref([{ text: '未分类', value: 0, children: [{ text: '未分类', value: 0}] }]);
+        const options = ref([{ text: '未分类', value: 0, children: [{ text: '未分类', value: 0 }] }]);
 
         const onChange = ({ value }) => {
             // 模拟数据请求
@@ -243,11 +284,11 @@ export default {
                 let selectData = [];
                 for (let i = 0; i < options.value.length; i++) {
                     const item = options.value[i];
-                    if(item.value == value){
+                    if (item.value == value) {
                         selectData = item.children;
-                        if(value>0){
+                        if (value > 0) {
                             selectData.length = 0;
-                            selectData.push({ value: 0, text: '未分类' });        
+                            selectData.push({ value: 0, text: '未分类' });
                         }
                         break;
                     }
@@ -261,13 +302,13 @@ export default {
 
         const onFinish = ({ selectedOptions }) => {
             showPopup.value = false;
-            console.log('selectedOptions',JSON.stringify(selectedOptions));
+            console.log('selectedOptions', JSON.stringify(selectedOptions));
             categoryName.value = selectedOptions.map((option) => option.text).join('/');
             var selectIdstr = selectedOptions.map((option) => option.value).join(' ');
             var selectIdArr = selectIdstr.split(' ');
             ParentId.value = Number(selectIdArr[0]);
             note_category_Id.value = Number(selectIdArr[1]);
-            if(ParentId.value == 0){
+            if (ParentId.value == 0) {
                 categoryName.value = categoryName.value.split('/')[0];
             }
         };
@@ -298,11 +339,12 @@ export default {
 }
 </script>
 <style lang="less">
-.nav-bar-addnote{
+.nav-bar-addnote {
     position: fixed;
     width: 100%;
     top: 0px;
 }
+
 .addcontent {
     margin-top: 46px;
     padding: 16px 20px;

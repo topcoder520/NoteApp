@@ -177,6 +177,7 @@ export default {
         const showSheet = ref(false);
         const actionsSheet = [
             { name: '编辑', },
+            { name: '复制', },
             { name: '笔记截图', },
             { name: '删除', color: 'red', },
         ];
@@ -189,7 +190,14 @@ export default {
                     path: '/AddNote',
                     query: { Id: Id.value }
                 });
-            } else if (index == 1) {
+            } else if (index == 1){
+                //复制笔记
+                router.push({
+                    path: '/AddNote',
+                    query: { cpId: Id.value },
+                    replace:true,
+                });
+            }else if (index == 2) {
                 console.log('笔记截图');
                 const el = document.getElementById('richTextID')
                 console.log('el.scrollHeight',el.scrollHeight);
@@ -206,7 +214,7 @@ export default {
                     Toast.fail('截图失败：' + JSON.stringify(reject));
                 });
             }
-            else if (index == 2) {
+            else if (index == 3) {
                 showConfirmDialog({
                     title: '确认删除该笔记？',
                 }).then(() => {
