@@ -19,3 +19,6 @@ export function setRefreshListState(state,isRefresh){
 export function setLocalItem(state,keyval){
     localStorage.setItem(keyval.key,keyval.val);
 }
+export function removeLocalItem(state,key){
+    localStorage.removeItem(key);
+}

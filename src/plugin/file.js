@@ -1,5 +1,6 @@
 import { rootPath, cachePath, picFolderName } from '@/util/config'
 //import {fetchImage} from '@/plugin/request'
+import html2canvas from 'html2canvas';
 
 var permissions = "";
 
@@ -154,9 +155,6 @@ export function saveNetImage(url) {
     })
 }
 
-
-
-
 function hashCode(str) {
     var hash = 0, i, chr;
     if (str.length === 0) return hash;
@@ -167,3 +165,81 @@ function hashCode(str) {
     }
     return hash;
 };
+
+//图片截图
+
+let getCanvas = (el, y, height) => {
+    return new Promise((resolve, reject) => {
+        console.log('2 y,height',y,height);
+        let canvas = document.createElement('canvas');
+        canvas.width = el.clientWidth*4+100;
+        canvas.height = height;
+        html2canvas(el, {
+            canvas: canvas,
+            allowTaint: true,
+            backgroundColor: '#fff',
+            useCORS: true,
+            imageTimeout: 15000,
+            scale: 4,  //数值越大图片越清晰
+            y: y/4,
+        }).then((rescanvas) => {
+            resolve(rescanvas);
+        }).catch((err) => {
+            reject(err);
+        })
+    });
+}
+
+
+export function cutImage(el) {
+    return new Promise((resolve, reject) => {
+        //对高度分段
+        try {
+            let cutHeight = 30000;
+            let scrollHeight = el.scrollHeight*4;
+            let heightArr = [];
+            if (cutHeight > scrollHeight) {
+                heightArr.push(scrollHeight);
+            } else {
+                let ys = scrollHeight % cutHeight;
+                let addNum = Math.floor(scrollHeight / cutHeight);
+                for (let i = 0; i < addNum; i++) {
+                    heightArr.push(cutHeight);
+                }
+                heightArr.push(ys);
+            }
+            console.log('heightArr', JSON.stringify(heightArr));
+            let funcArr = [];
+            for (let i = 0; i < heightArr.length; i++) {
+                let func = getCanvas(el, i * cutHeight, heightArr[i]);
+                funcArr.push(func);
+                //break;
+            }
+            console.log('funcArr num ', funcArr.length);
+            Promise.all(funcArr).then(res => {
+                if (res.length > 0) {
+                    var canvas = document.createElement('canvas');
+                    canvas.width = res[0].width;
+                    canvas.height = scrollHeight;
+                    var ctx = canvas.getContext('2d');
+                    for (let i = 0; i < res.length; i++) {
+                        ctx.drawImage(res[i], 0, i * cutHeight, res[i].width, res[i].height);
+                    }
+                    canvas.toBlob((blob) => {
+                        saveImage(blob).then((cres) => {
+                            resolve(cres);
+                        }).catch((err) => {
+                            reject(err);
+                        });
+                    }, "image/jpeg", 1)
+                }
+            }).catch(err => {
+                console.log('err', err);
+                reject(err);
+            })
+        } catch (error) {
+            reject(error);
+        }
+    });
+
+}

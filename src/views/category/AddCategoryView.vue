@@ -240,7 +240,7 @@ export default {
                             console.log(JSON.stringify(resolve));
                             if (resolve.rowsAffected > 0) {
                                 categoryId.value = resolve.insertId;
-                                list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: resolve.insertId });
+                                list.value.push({ name: categoryName.value + '(0)', tname: categoryName.value, Id: resolve.insertId,TotalNoteNum:0 });
                             }
                         }).catch((reject) => {
                             Toast.fail('添加失败：' + reject);

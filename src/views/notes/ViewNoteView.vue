@@ -53,7 +53,7 @@ import html2canvas from 'html2canvas';
 
 import RichText from '../common/RichTextView.vue';
 
-import { saveImage } from '@/plugin/file'
+import { saveImage,cutImage } from '@/plugin/file'
 
 export default {
     name: 'ViewNoteView',
@@ -191,37 +191,20 @@ export default {
                 });
             } else if (index == 1) {
                 console.log('笔记截图');
-                const el = noteContent.value;
-                console.log(el.clientHeight);
-                console.log(el.clientWidth);
+                const el = document.getElementById('richTextID')
+                console.log('el.scrollHeight',el.scrollHeight);
+                console.log('el.clientWidth',el.clientWidth);
+                
+                
                 showLoadingToast('截图中...');
-                html2canvas(el, {
-                    allowTaint:true,
-                    backgroundColor:'#fff',
-                    useCORS: true,
-                    imageTimeout:15000,
-                    scale:4,  //数值越大图片越清晰
-                    //height:el.clientHeight,
-                    //width:el.clientWidth,
-
-                }).then((canvas) => {
-                    //console.log(canvas.toDataURL('image/jpeg',1));
-
-                    canvas.toBlob((blob) => {
-                        saveImage(blob).then((resole) => {
-                            closeToast();
-                            Toast.success('截图已保存');
-                        }).catch((err) => 
-                        {
-                            closeToast();
-                            Toast.fail('截图保存失败：' + JSON.stringify(err));
-                        });
-                    }, "image/jpeg", 2)
-
-                }).catch((err)=>{
+                cutImage(el).then(resole=>{
                     closeToast();
-                    Toast.fail('截图失败：' + JSON.stringify(err));
-                })
+                    Toast.success('截图已保存');
+                }).catch(reject=>{
+                    closeToast();
+                    console.log('截图失败：' + JSON.stringify(reject));
+                    Toast.fail('截图失败：' + JSON.stringify(reject));
+                });
             }
             else if (index == 2) {
                 showConfirmDialog({

@@ -25,6 +25,10 @@
         <button @click="changeFont('PH2')">
             <van-icon name="photo" />
         </button>
+        <!--拍照-->
+        <button @click="changeFont('Camera')">
+            <van-icon name="photograph" />
+        </button>
         <!--本地图片 base64编码方式存到app-->
         <!-- <button @click="changeFont('PH3')">
             <van-icon name="photo" color="red" />
@@ -62,7 +66,7 @@ import { watch } from 'vue';
 
 import { showImagePreview } from 'vant';
 
-import { Takefromgalery, Takefromgalery2DataURL } from '@/plugin/camera';
+import { Takefromgalery, TakefromCamera,Takefromgalery2DataURL } from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
 import { replaceNativeURL } from '@/util/path';
@@ -287,7 +291,25 @@ export default {
                     console.log(e);
                     Toast(e);
                 });
-            } else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
+            } else if(typ == 'Camera'){//拍照
+                getSelectionRange();
+                //调用相册接口
+                TakefromCamera().then((resole) => {
+                    console.log(resole);
+                    if (resole.type == 'base64') {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
+                        document.execCommand("insertHTML", false, htmlStr);
+                    } else {
+                        var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
+                        //document.execCommand("insertText", false, htmlStr);
+                        document.execCommand("insertHTML", false, htmlStr);
+                    }
+                }).catch((e) => {
+                    console.log(e);
+                    Toast(e);
+                });
+
+            }else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
                 getSelectionRange();
                 //调用相册接口
                 Takefromgalery2DataURL().then((resole) => {

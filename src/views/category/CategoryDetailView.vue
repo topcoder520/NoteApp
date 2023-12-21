@@ -41,6 +41,10 @@ export default {
     const route = useRoute();
     const store = useStore();
 
+    const getLocalItemFn = async (key) => {
+      return await store.getters.getLocalItem(key);
+    }
+
     const CyId = ref(!route.query.CyId ? 0 : Number(route.query.CyId));
     console.log(CyId.value)
     const expandedKeys = ref([]);
@@ -58,8 +62,13 @@ export default {
             timestamp: listData[i].Timestamp,
             children: []
           });
-          expandedKeys.value.push('cy_' + listData[i].Id);
+          getLocalItemFn('cy_' + listData[i].Id).then((val) => {
+            if (val) {
+              expandedKeys.value.push(val);
+            }
+          });
         }
+
         store.dispatch('getNoteListByParentId', { ParentId: PId }).then((resolve) => {
           var listData = resolve;
           console.log('getNoteListByParentId=>' + JSON.stringify(listData));
@@ -98,7 +107,7 @@ export default {
       if (!item || !arr) {
         return;
       }
-      if(arr.length == 0){
+      if (arr.length == 0) {
         arr.push(item);
         return;
       }
@@ -165,6 +174,11 @@ export default {
     const expandNode = (key, e) => {
       console.log(key, e);
       //NCId.value = -1;
+      if (e.expanded) {//展开
+        store.commit('setLocalItem', { key: e.node.key, val: e.node.key });
+      } else {
+        store.commit('removeLocalItem', e.node.key);
+      }
     };
 
     const onSearch = () => {
@@ -176,7 +190,7 @@ export default {
     const onAddNote = () => {
       router.push({
         path: '/AddNote',
-        query: { Id: 0, CyId: CyId.value, NCId: NCId.value,State:0 },
+        query: { Id: 0, CyId: CyId.value, NCId: NCId.value, State: 0 },
       });
     };
 
