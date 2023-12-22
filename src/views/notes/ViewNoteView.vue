@@ -194,7 +194,7 @@ export default {
                 //复制笔记
                 router.push({
                     path: '/AddNote',
-                    query: { cpId: Id.value },
+                    query: { cpId: Id.value, State: 0},
                     replace:true,
                 });
             }else if (index == 2) {
