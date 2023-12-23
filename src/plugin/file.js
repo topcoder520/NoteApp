@@ -170,9 +170,9 @@ function hashCode(str) {
 
 let getCanvas = (el, y, height) => {
     return new Promise((resolve, reject) => {
-        console.log('2 y,height',y,height);
+        console.log('2 y,height', y, height);
         let canvas = document.createElement('canvas');
-        canvas.width = el.clientWidth*4+100;
+        canvas.width = el.clientWidth * 4 + 100;
         canvas.height = height;
         html2canvas(el, {
             canvas: canvas,
@@ -181,7 +181,7 @@ let getCanvas = (el, y, height) => {
             useCORS: true,
             imageTimeout: 15000,
             scale: 4,  //数值越大图片越清晰
-            y: y/4,
+            y: y / 4,
         }).then((rescanvas) => {
             resolve(rescanvas);
         }).catch((err) => {
@@ -196,7 +196,7 @@ export function cutImage(el) {
         //对高度分段
         try {
             let cutHeight = 30000;
-            let scrollHeight = el.scrollHeight*4;
+            let scrollHeight = el.scrollHeight * 4;
             let heightArr = [];
             if (cutHeight > scrollHeight) {
                 heightArr.push(scrollHeight);
@@ -242,4 +242,42 @@ export function cutImage(el) {
         }
     });
 
+}
+
+
+//下载图片
+export function downloadImage(url) {
+    return new Promise((resolve, reject) => {
+        if (url.startsWith('file://')) {
+            window.resolveLocalFileSystemURL(url, function success(fileEntry) {
+                var newPicName = 'Download' + new Date().getTime() + '.jpg';
+                copyFile(fileEntry.toURL(), rootPath, "Pictures", newPicName).then((data) => {
+                    //nativeURL
+                    console.log('camera copy file address success:', data.toURL());
+                    resolve(data.toURL());
+                }).catch(e => {
+                    console.log('camera copy file address error:', JSON.stringify(e));
+                    reject(e);
+                });
+            });
+
+        } else {
+            window.resolveLocalFileSystemURL(rootPath, (root) => {
+                root.getDirectory("Pictures", { create: true }, (dirEntry) => {
+                    var newPicName = 'Download' + new Date().getTime() + '.jpg';
+                    dirEntry.getFile(newPicName, { create: true }, (fileEntry) => {
+                        console.log('axios url ', url);
+                        console.log('local path ', fileEntry.toURL());
+                        Downresource.fetchFromURL(url, fileEntry.toURL(), 0, (res) => {
+                            console.log('res', res);
+                            resolve(fileEntry.toURL());
+                        }, (err) => {
+                            console.log('err', err);
+                            reject(err);
+                        });
+                    })
+                });
+            });
+        }
+    });
 }

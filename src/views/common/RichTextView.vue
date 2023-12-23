@@ -57,6 +57,15 @@
         @confirm="showLinkUrlconfirm">
         <textarea v-model="linkUrl" rows="6" style="width:96%;border: 1px solid #e1dcdc;"></textarea>
     </van-dialog>
+
+    <!--图片预览-->
+    <van-image-preview v-model:show="showPreview" :start-position="startPosition" :images="previewImages" @long-press="onLongPressEvent"
+        @change="onPreviewChange">
+        <template v-slot:previewIndex>第{{ previewIndex + 1 }}页</template>
+    </van-image-preview>
+    <!--下载图片-->
+    <van-action-sheet v-model:show="showDownPic" @select="selectDownPicSheet" :actions="actionsPic" cancel-text="取消" close-on-click-action
+        @cancel="onCancelDownPic" />
 </template>
 <script>
 import { Toast } from '@vant/compat';
@@ -66,11 +75,11 @@ import { watch } from 'vue';
 
 import { showImagePreview } from 'vant';
 
-import { Takefromgalery, TakefromCamera,Takefromgalery2DataURL } from '@/plugin/camera';
+import { Takefromgalery, TakefromCamera, Takefromgalery2DataURL } from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
 import { replaceNativeURL } from '@/util/path';
-import { saveNetImage } from '@/plugin/file';
+import { saveNetImage,downloadImage} from '@/plugin/file';
 import { fetchImage } from '@/plugin/request';
 
 
@@ -124,12 +133,40 @@ export default {
         }, { deep: true });
 
         //点击图片 长按保存
-        var isViewPictures = false;
-        var currentImg = "";
+        const showPreview = ref(false);
+        const previewImages = ref([]);
+        const previewIndex = ref(0);
+        const startPosition = ref(0);
+
+        const onPreviewChange = (index) => {
+            previewIndex.value = index;
+        };
+
+        const onLongPressEvent = (index) => {
+            showDownPic.value = true;
+        };
+        const showDownPic = ref(false);
+        const actionsPic = [{ name: '下载图片' }];
+        const onCancelDownPic = () => {
+
+        };
+        const selectDownPicSheet = (action, index) =>{
+            console.log('action',action,'index',index);
+            if (index == 0) {
+                let downUrl = previewImages.value[previewIndex.value];
+                console.log("down url:",downUrl);
+                downloadImage(downUrl).then((res) =>{
+                    console.log("download image:",res);
+                    Toast.success('下载成功');
+                }).catch((err) =>{
+                    console.log("download image err:",err);
+                    Toast.fail('下载失败');
+                });
+            }
+        };
 
         //input[checkbox] 状态保存
         const clickRichText = (e) => {
-            console.log('clickRichText', e)
             if (e.target.className == 'checkbox') {
                 console.log('checked');
                 //判断是否有多个checkbox，如果是则不处理
@@ -166,30 +203,24 @@ export default {
             } else if (!editable.value && e.target.localName == 'img') {
                 //img 
                 var imgsrc = e.target.src;
+                console.log('imgsrc',imgsrc);
                 let imgsrcList = [];
                 let imgs = document.getElementById('richTextID').getElementsByTagName('img');
                 let location = 0;
                 for (let i = 0; i < imgs.length; i++) {
                     const img = imgs[i];
+                    console.log('img',img,' compare:',img.src == imgsrc);
                     if (img.src == imgsrc) {
                         location = i;
                     }
                     imgsrcList.push(img.src);
                 }
-                if(imgsrcList.length > 1){
-                    isViewPictures = true;
-                    currentImg = imgsrc;
-                }
-                showImagePreview({
-                    images: imgsrcList,
-                    startPosition: location,
-                    onClose: () => {
-                        isViewPictures = false;
-                    },
-                    onChange: (index) => {
-                        currentImg = imgsrcList[index];
-                    }
-                });
+                previewImages.value = imgsrcList;
+                previewIndex.value = location;
+                startPosition.value = location;
+                console.log('previewIndex',previewIndex.value);
+                //展示预览
+                showPreview.value = true;
             }
         }
 
@@ -221,7 +252,7 @@ export default {
                         if (sourceurl) {
                             saveNetImage(sourceurl).then(res => {
                                 console.log('res', res);
-                                if(simg.src != res){
+                                if (simg.src != res) {
                                     simg.src = res;
                                 }
                             });
@@ -306,7 +337,7 @@ export default {
                     console.log(e);
                     Toast(e);
                 });
-            } else if(typ == 'Camera'){//拍照
+            } else if (typ == 'Camera') {//拍照
                 getSelectionRange();
                 //调用相册接口
                 TakefromCamera().then((resole) => {
@@ -324,7 +355,7 @@ export default {
                     Toast(e);
                 });
 
-            }else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
+            } else if (typ == 'PH3') {//本地图片 base64编码方式存到app里面
                 getSelectionRange();
                 //调用相册接口
                 Takefromgalery2DataURL().then((resole) => {
@@ -464,6 +495,17 @@ export default {
             linkUrl,
             showLinkUrlconfirm,
 
+            showPreview,
+            previewImages,
+            previewIndex,
+            startPosition,
+            onPreviewChange,
+            onLongPressEvent,
+
+            onCancelDownPic,
+            showDownPic,
+            actionsPic,
+            selectDownPicSheet,
         }
     }
 }
