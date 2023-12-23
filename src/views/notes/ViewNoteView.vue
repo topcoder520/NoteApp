@@ -123,6 +123,8 @@ export default {
 
         const tmepContent = reactive({ val: '', type: '0' });//进入页面赋值的时候使用一次
 
+        const State = ref(0);
+
         const getNoteById = (cId) => {
             showLoadingToast('加载中...');
             store.dispatch('getNoteById', cId).then((resolve) => {
@@ -135,6 +137,7 @@ export default {
                 createTime.value = data.CreateTime;
                 ParentId.value = data.ParentId;
                 note_category_Id.value = data.note_category_Id;
+                State.value = data.State;
                 closeToast();
                 showRightMenu.value = false;
             }).catch((reject) => {
@@ -194,7 +197,7 @@ export default {
                 //复制笔记
                 router.push({
                     path: '/AddNote',
-                    query: { cpId: Id.value, State: 0},
+                    query: { cpId: Id.value, State: State.value},
                     replace:true,
                 });
             }else if (index == 2) {

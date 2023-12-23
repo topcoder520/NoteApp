@@ -122,6 +122,11 @@ export default {
                 setRichText(rs);
             }
         }, { deep: true });
+
+        //点击图片 长按保存
+        var isViewPictures = false;
+        var currentImg = "";
+
         //input[checkbox] 状态保存
         const clickRichText = (e) => {
             console.log('clickRichText', e)
@@ -171,9 +176,19 @@ export default {
                     }
                     imgsrcList.push(img.src);
                 }
+                if(imgsrcList.length > 1){
+                    isViewPictures = true;
+                    currentImg = imgsrc;
+                }
                 showImagePreview({
                     images: imgsrcList,
                     startPosition: location,
+                    onClose: () => {
+                        isViewPictures = false;
+                    },
+                    onChange: (index) => {
+                        currentImg = imgsrcList[index];
+                    }
                 });
             }
         }
