@@ -179,10 +179,10 @@ export default {
         //
         const showSheet = ref(false);
         const actionsSheet = [
-            { name: '编辑', },
-            { name: '复制', },
+            { name: '编辑笔记', },
+            { name: '复制笔记', },
             { name: '笔记截图', },
-            { name: '删除', color: 'red', },
+            { name: '删除笔记', color: 'red', },
         ];
         const onCancel = () => console.log('取消');
         const noteContent = ref(null);

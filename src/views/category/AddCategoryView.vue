@@ -127,14 +127,14 @@ export default {
                 }).then((resolve) => {
                     console.log(JSON.stringify(resolve));
                     if (resolve.rowsAffected > 0) {
-                        Id.value = resolve.insertId;
+                        var insertId = resolve.insertId;
                         store.commit('setRefreshListState', true);
                         if (list.value.length > 0) {
                             for (let i = 0; i < list.value.length; i++) {
                                 const item = list.value[i];
                                 store.dispatch('addCategory', {
                                     CName: item.tname,
-                                    note_Id: Id.value,
+                                    note_Id: insertId,
                                     Des: "",
                                 }).then((resolve) => {
                                     console.log(JSON.stringify(resolve));
