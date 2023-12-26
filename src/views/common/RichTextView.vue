@@ -48,6 +48,9 @@
         <button @click="changeFont('Time')">
             <van-icon name="tosend" />
         </button>
+        <button @click="changeFont('SelFile')">
+            <van-icon name="description" />
+        </button>
     </div>
     <van-dialog class="showPicUrlDialog" v-model:show="showPicUrl" title="图片地址" show-cancel-button
         @confirm="showPicUrlconfirm" @closed="reCursorposition">
@@ -59,13 +62,23 @@
     </van-dialog>
 
     <!--图片预览-->
-    <van-image-preview v-model:show="showPreview" :start-position="startPosition" :images="previewImages" @long-press="onLongPressEvent"
-        @change="onPreviewChange">
+    <van-image-preview v-model:show="showPreview" :start-position="startPosition" :images="previewImages"
+        @long-press="onLongPressEvent" @change="onPreviewChange">
         <template v-slot:previewIndex>第{{ previewIndex + 1 }}页</template>
     </van-image-preview>
     <!--下载图片-->
-    <van-action-sheet v-model:show="showDownPic" @select="selectDownPicSheet" :actions="actionsPic" cancel-text="取消" close-on-click-action
-        @cancel="onCancelDownPic" />
+    <van-action-sheet v-model:show="showDownPic" @select="selectDownPicSheet" :actions="actionsPic" cancel-text="取消"
+        close-on-click-action @cancel="onCancelDownPic" />
+    <!--修改文件名-->
+    <van-dialog class="showPicUrlDialog" v-model:show="showEditFileName" title="文件名" show-cancel-button
+        @confirm="onEditFileNameConfirm" @closed="reCursorposition">
+        <p>{{ selectFileName }}</p>
+        <textarea v-model="editFileName" placeholder="输入文件名" rows="4"
+            style="width:96%;border: 1px solid #e1dcdc;"></textarea>
+    </van-dialog>
+    <!--上传文件编辑-->
+    <van-action-sheet v-model:show="showFileActionSheet" @select="selectEditFileSheet" :actions="actionsFileItem"
+        cancel-text="取消" :description="editFileActionDes" close-on-click-action />
 </template>
 <script>
 import { Toast } from '@vant/compat';
@@ -73,14 +86,14 @@ import { ref } from 'vue';
 
 import { watch } from 'vue';
 
-import { showImagePreview } from 'vant';
+import { showConfirmDialog, showToast } from 'vant';
 
 import { Takefromgalery, TakefromCamera, Takefromgalery2DataURL } from '@/plugin/camera';
 
 import { getNowDateString } from '@/util/date';
-import { replaceNativeURL } from '@/util/path';
-import { saveNetImage,downloadImage} from '@/plugin/file';
-import { fetchImage } from '@/plugin/request';
+import { replaceNativeURL, getPathInfo } from '@/util/path';
+import { filesPath } from '@/util/config';
+import { saveNetImage, downloadImage, selectFile, copyFile, fileOpener, removeFile } from '@/plugin/file';
 
 
 export default {
@@ -146,21 +159,89 @@ export default {
             showDownPic.value = true;
         };
         const showDownPic = ref(false);
-        const actionsPic = [{ name: '下载图片' }];
+        const actionsPic = [{ name: '下载图片' }, { name: "其他应用打开" }];
         const onCancelDownPic = () => {
 
         };
-        const selectDownPicSheet = (action, index) =>{
-            console.log('action',action,'index',index);
+        const selectDownPicSheet = (action, index) => {
+            console.log('action', action, 'index', index);
             if (index == 0) {
                 let downUrl = previewImages.value[previewIndex.value];
-                console.log("down url:",downUrl);
-                downloadImage(downUrl).then((res) =>{
-                    console.log("download image:",res);
+                console.log("down url:", downUrl);
+                downloadImage(downUrl).then((res) => {
+                    console.log("download image:", res);
                     Toast.success('下载成功');
-                }).catch((err) =>{
-                    console.log("download image err:",err);
+                }).catch((err) => {
+                    console.log("download image err:", err);
                     Toast.fail('下载失败');
+                });
+            } else if (index == 1) {
+                let downUrl = previewImages.value[previewIndex.value];
+                fileOpener(downUrl).then(() => {
+                    console.log('open file success');
+                }).catch((e) => {
+                    console.log('open file fail', e);
+                    Toast('open file fail' + e);
+                });
+            }
+        };
+
+        //点击文件，编辑文件信息
+        const showFileActionSheet = ref(false);
+        const actionsFileItem = [{ name: "其他应用打开" }, { name: "编辑文件名" }, { name: "下载文件" }, { name: "删除文件" }];
+        const editFileActionDes = ref('文件操作');
+
+        const showEditFileFlag = ref(false); //是否显示编辑文件名
+        const selectTarget = ref(null);//选中的文件对象
+        const selectEditFileSheet = (action, index) => {
+            if (index == 0) {
+                console.log('open file');
+                //其他应用打开
+                fileOpener(selectFilePath.value).then(() => {
+                    console.log('open file success');
+                }).catch((e) => {
+                    console.log('open file fail', e);
+                    Toast('open file fail' + e);
+                });
+            } else if (index == 1) {
+                //重命名
+                showEditFileFlag.value = true;
+                showEditFileName.value = true;
+            } else if (index == 2) {
+                //下载文件
+                console.log('download file');
+                var downFileName = "";
+                var info = getPathInfo(selectFilePath.value);
+                if (editFileName.value.endsWith(info.ext)) {
+                    downFileName = editFileName.value;
+                } else {
+                    downFileName = editFileName.value + info.ext;
+                }
+                downloadImage(selectFilePath.value, "Documents", downFileName).then((res) => {
+                    console.log("download file:", res);
+                    Toast.success('下载成功');
+                }).catch((err) => {
+                    console.log("download file err:", err);
+                    Toast.fail('下载失败');
+                });
+            } else if (index == 3) {
+                //删除文件
+                console.log('delete file');
+                showConfirmDialog({
+                    title: '提示',
+                    message: '确定要删除该文件吗？',
+                }).then(async () => {
+                    //删除文件
+                    removeFile(selectFilePath.value).then(() => {
+                        //删除节点
+                        selectTarget.value.parentNode.removeChild(selectTarget.value);
+                        setRichText({ changeInputCheck: true });
+                        Toast.success('删除成功');
+                    }).catch((err) => {
+                        console.log("delete file err:", err);
+                        Toast.fail('删除失败');
+                    });
+                }).catch(() => {
                 });
             }
         };
@@ -203,13 +284,13 @@ export default {
             } else if (!editable.value && e.target.localName == 'img') {
                 //img 
                 var imgsrc = e.target.src;
-                console.log('imgsrc',imgsrc);
+                console.log('imgsrc', imgsrc);
                 let imgsrcList = [];
                 let imgs = document.getElementById('richTextID').getElementsByTagName('img');
                 let location = 0;
                 for (let i = 0; i < imgs.length; i++) {
                     const img = imgs[i];
-                    console.log('img',img,' compare:',img.src == imgsrc);
+                    console.log('img', img, ' compare:', img.src == imgsrc);
                     if (img.src == imgsrc) {
                         location = i;
                     }
@@ -218,9 +299,20 @@ export default {
                 previewImages.value = imgsrcList;
                 previewIndex.value = location;
                 startPosition.value = location;
-                console.log('previewIndex',previewIndex.value);
+                console.log('previewIndex', previewIndex.value);
                 //展示预览
                 showPreview.value = true;
+            } else if (!editable.value && e.target.className == 'uploadfile') {
+                //是否打开上传的文件
+                selectFilePath.value = e.target.getAttribute('data-path');
+                console.log('data-path', selectFilePath.value);
+                editFileActionDes.value = e.target.innerText;
+                selectFileName.value = e.target.innerText;
+                editFileName.value = e.target.innerText;
+
+                selectTarget.value = e.target;
+
+                showFileActionSheet.value = true;
             }
         }
 
@@ -284,6 +376,53 @@ export default {
 
         const showPicUrl = ref(false); //是否展示图片地址弹框
         const picUrl = ref(''); //图片网络地址
+
+        //上传文件
+        const showEditFileName = ref(false); //是否展示修改文件名弹框
+        const selectFileName = ref(''); //当前选中的文件名
+        const editFileName = ref(''); //修改后的文件名
+        const selectFilePath = ref(''); //当前选中的文件路径
+        const onEditFileNameConfirm = () => {
+            console.log('editFileName', editFileName.value);
+            if (editFileName.value.trim().length > 0) {
+                if (!showEditFileFlag.value) {
+                    //上传文件
+                    var info = getPathInfo(selectFilePath.value);
+                    var timestr = 'upload_file_' + new Date().getTime();
+                    copyFile(selectFilePath.value, filesPath, "document", timestr + info.ext).then((data) => {
+                        console.log('copyFile', data.toURL());
+                        richDiv.value.focus();
+                        //设置光标位置
+                        setSelectionRange();
+                        var htmlstr = `<div class="uploadfile" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-path="${data.toURL()}">${editFileName.value}${info.ext}</div>`;
+                        document.execCommand("insertHTML", false, htmlstr);
+                        document.execCommand('insertHTML', false, "<br/>");
+                        showEditFileName.value = false;
+                        setRichText();
+                    }).catch((err) => {
+                        console.log('err', err);
+                        Toast('上传文件失败');
+                    })
+                } else {
+                    //编辑文件名
+                    showEditFileFlag.value = false;
+                    var info = getPathInfo(selectFilePath.value);
+                    if (!editFileName.value.endsWith(info.ext)) {
+                        selectTarget.value.innerText = editFileName.value + info.ext;
+                    } else {
+                        selectTarget.value.innerText = editFileName.value;
+                    }
+                    showEditFileName.value = false;
+                    var rs = { changeInputCheck: true };
+                    setRichText(rs);
+
+                }
+
+            } else {
+                Toast('请输入文件名')
+            }
+        };
+
         const changeFont = (typ) => {
             if (typ == 'B') {//粗体
                 document.execCommand("Bold", false, null);
@@ -378,6 +517,22 @@ export default {
                 var htmlStr = `[${datestr}]`;
                 document.execCommand("insertHTML", false, htmlStr);
                 setRichText();
+            } else if (typ == 'SelFile') {
+                //选择文件 并上传
+                getSelectionRange();
+                selectFile().then((uri) => {
+                    console.log(uri);
+                    selectFilePath.value = uri;
+                    var info = getPathInfo(uri);
+                    //弹窗口
+                    editFileName.value = info.name;
+                    selectFileName.value = info.name + info.ext;
+                    showEditFileName.value = true;
+                }).catch((e) => {
+                    console.log(e);
+                    Toast(e);
+                });
+
             }
         }
 
@@ -506,6 +661,17 @@ export default {
             showDownPic,
             actionsPic,
             selectDownPicSheet,
+
+            showEditFileName,
+            selectFileName,
+            editFileName,
+            onEditFileNameConfirm,
+
+            showFileActionSheet,
+            actionsFileItem,
+            editFileActionDes,
+            selectEditFileSheet,
+
         }
     }
 }

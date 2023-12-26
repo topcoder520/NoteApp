@@ -1,4 +1,5 @@
-import { rootPath, cachePath, picFolderName } from '@/util/config'
+import { rootPath, cachePath, filesPath, picFolderName } from '@/util/config'
+import { getPathInfo, getMIMEType } from '@/util/path'
 //import {fetchImage} from '@/plugin/request'
 import html2canvas from 'html2canvas';
 
@@ -246,12 +247,18 @@ export function cutImage(el) {
 
 
 //下载图片
-export function downloadImage(url) {
+export function downloadImage(url, folderName, fileName) {
     return new Promise((resolve, reject) => {
         if (url.startsWith('file://')) {
             window.resolveLocalFileSystemURL(url, function success(fileEntry) {
-                var newPicName = 'Download' + new Date().getTime() + '.jpg';
-                copyFile(fileEntry.toURL(), rootPath, "Pictures", newPicName).then((data) => {
+                var newPicName = fileName;
+                if (!newPicName) {
+                    newPicName = 'Download' + new Date().getTime() + '.jpg';
+                }
+                if (!folderName) {
+                    folderName = 'Pictures';
+                }
+                copyFile(fileEntry.toURL(), rootPath, folderName, newPicName).then((data) => {
                     //nativeURL
                     console.log('camera copy file address success:', data.toURL());
                     resolve(data.toURL());
@@ -263,8 +270,14 @@ export function downloadImage(url) {
 
         } else {
             window.resolveLocalFileSystemURL(rootPath, (root) => {
-                root.getDirectory("Pictures", { create: true }, (dirEntry) => {
-                    var newPicName = 'Download' + new Date().getTime() + '.jpg';
+                var newPicName = fileName;
+                if (!newPicName) {
+                    newPicName = 'Download' + new Date().getTime() + '.jpg';
+                }
+                if (!folderName) {
+                    folderName = 'Pictures';
+                }
+                root.getDirectory(folderName, { create: true }, (dirEntry) => {
                     dirEntry.getFile(newPicName, { create: true }, (fileEntry) => {
                         console.log('axios url ', url);
                         console.log('local path ', fileEntry.toURL());
@@ -280,4 +293,57 @@ export function downloadImage(url) {
             });
         }
     });
+}
+
+//选择文件
+export function selectFile() {
+    return new Promise((resolve, reject) => {
+        fileChooser.open((contentPath) => {
+            window.FilePath.resolveNativePath(contentPath, function (finalPath) {
+                resolve(finalPath);
+            }, function (error) {
+                reject(error);
+            });
+        }, (err) => {
+            reject(err);
+        });
+    });
+
+}
+//寻找打开文件的app
+export function fileOpener(filepath) {
+    let info = getPathInfo(filepath);
+    console.log('mimetype:', info.mimeType);
+    return new Promise((resolve, reject) => {
+        cordova.plugins.fileOpener2.showOpenWithDialog(
+            filepath, // You can also use a Cordova-style file uri: cdvfile://localhost/persistent/Downloads/starwars.pdf
+            info.mimeType,
+            {
+                error: (e) => {
+                    reject(e);
+                },
+                success: (e) => {
+                    resolve();
+                }
+            }
+        );
+    });
+}
+//删除文件
+export function removeFile(filepath) {
+    return new Promise((resolve, reject) => {
+        window.resolveLocalFileSystemURL(filepath, function (fileEntry) {
+            fileEntry.remove(function () {
+                console.log('delete success');
+                resolve();
+            }, function (err) {
+                console.error(err);
+                reject(err);
+            }, function (err) {
+                console.log('file not exist');
+                reject(err)
+            });
+        })
+    });
+
 }

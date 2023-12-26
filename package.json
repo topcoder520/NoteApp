@@ -37,6 +37,9 @@
     "cordova-plugin-camera": "^6.0.0",
     "cordova-plugin-downresource": "file:../devplugins/cordova.plugin.downresource",
     "cordova-plugin-file": "^7.0.0",
+    "cordova-plugin-file-opener2": "^4.0.0",
+    "cordova-plugin-filechooser": "^1.2.0",
+    "cordova-plugin-filepath": "^1.6.0",
     "cordova-sqlite-evcore-extbuild-free": "^0.18.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
@@ -58,7 +61,10 @@
         "ANDROIDX_CORE_VERSION": "1.6.+"
       },
       "cordova-plugin-android-permissions": {},
-      "cordova-plugin-downresource": {}
+      "cordova-plugin-downresource": {},
+      "cordova-plugin-filechooser": {},
+      "cordova-plugin-filepath": {},
+      "cordova-plugin-file-opener2": {}
     }
   }
 }
