@@ -389,7 +389,7 @@ export default {
                     //上传文件
                     var info = getPathInfo(selectFilePath.value);
                     var timestr = 'upload_file_' + new Date().getTime();
-                    copyFile(selectFilePath.value, filesPath, "document", timestr + info.ext).then((data) => {
+                    copyFile(selectFilePath.value, filesPath, "document"+info.ext, timestr + info.ext).then((data) => {
                         console.log('copyFile', data.toURL());
                         richDiv.value.focus();
                         //设置光标位置
