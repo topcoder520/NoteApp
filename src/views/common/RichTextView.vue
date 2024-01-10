@@ -324,13 +324,6 @@ export default {
                 var noteId = e.target.getAttribute('data-Id');
                 console.log('click appUrl :',noteId);
                 context.emit('invokeMethod',{typ:'appUrl',param:{noteId:noteId}})
-                // router.push({
-                //     path: '/ViewNote',
-                //     query: { 
-                //         Id: noteId,
-                //         date: new Date().getTime()
-                //     },
-                // });
             }
         }
 
@@ -381,29 +374,35 @@ export default {
                 setSelectionRange();
                 const selection = window.getSelection();
                 if (selection.rangeCount > 0) {
-                    console.log('恢复选择文本了');
+                    console.log('恢复选择文本了:',selection.toString(),selection.toString().length);
                     if(linkUrl.value.startsWith('appnote:Id')){
                         var noteId = linkUrl.value.replace('appnote:Id=','');
-                        var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${selection.toString()}</div>`;
-                        document.execCommand("insertHTML", false, htmlstr);
+                        if(selection.toString().length>0){
+                            var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${selection.toString()}</div>`;
+                            document.execCommand("insertHTML", false, htmlstr);
+                            document.execCommand('insertHTML', false, "<br/>");
+                        }else{
+                            store.dispatch('getNoteById', noteId).then((res)=>{
+                                const data = res;
+                                var title = data.Title;
+                                var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
+                                document.execCommand("insertHTML", false, htmlstr);
+                                document.execCommand('insertHTML', false, "<br/>");
+                            }).catch((err)=>{
+                                //document.execCommand("CreateLink", false, linkUrl.value);   
+                                Toast('err copy url'); 
+                            });
+                        }
                     }else{
-                        document.execCommand("CreateLink", false, linkUrl.value);
+                        if(selection.toString().length > 0){
+                            document.execCommand("CreateLink", false, linkUrl.value);
+                        }else{
+                            var htmlstr = `<a href="${linkUrl.value}">${linkUrl.value}</a>`;
+                                document.execCommand("insertHTML", false, htmlstr);
+                                document.execCommand('insertHTML', false, "<br/>");
+                        }
                     }
                     setRichText();
-                }else{
-                    if(linkUrl.value.startsWith('appnote:Id')){
-                        var noteId = linkUrl.value.replace('appnote:Id=','');
-                        store.dispatch('getNoteById', noteId).then((res)=>{
-                            const data = res;
-                            var title = data.Title;
-                            var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
-                            document.execCommand("insertHTML", false, htmlstr);
-                            setRichText();
-                        }).catch((err)=>{
-                            //document.execCommand("CreateLink", false, linkUrl.value);   
-                            Toast('err copy url'); 
-                        });
-                    }
                 }
             } else {
                 Toast('请输入超链接地址')

@@ -20,11 +20,16 @@
   </div>
   <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
     close-on-click-action @cancel="onCancel" />
+
+  <van-action-sheet v-model:show="showAddSheet" @select="selectAddSheet" :actions="actionsAdd" cancel-text="取消"
+    @cancel="onAddCancel" close-on-click-action />
 </template>
 <script>
 import { onActivated, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useStore } from 'vuex';
+import { Toast } from '@vant/compat';
+import { pasteText, clearText } from '@/plugin/clipboard';
 
 import { DownOutlined } from '@ant-design/icons-vue';
 
@@ -153,15 +158,27 @@ export default {
     };
     const treeData = ref([]);
     const NCId = ref(-1);
+    const selectNoteTitle = ref('');
 
     const selectNode = (keys, e) => {
       console.log(keys, e);
       if (keys.length > 0) {
         let keystr = e.node.key + '';
         if (keystr.indexOf('cy_') != -1) {
+          //点击分类
           NCId.value = Number(keystr.substring(keystr.indexOf('cy_') + 3));
+          selectNoteTitle.value = e.node.title;
+          pasteText().then((res) => {
+            const data = res;
+            //appnote:Id
+            if (data.startsWith('appnote:Id')) {
+              showAddSheet.value = true;
+            }
+          });
         } else {
+          //点击文章
           NCId.value = -1;
+          selectNoteTitle.value = '';
           router.push({
             path: '/ViewNote',
             query: { Id: keystr }
@@ -169,8 +186,44 @@ export default {
         }
       } else {
         NCId.value = -1;
+        selectNoteTitle.value = '';
       }
     };
+
+    const showAddSheet = ref(false);
+    const actionsAdd = [
+      { name: '笔记移动到此分类', },
+    ];
+    const onAddCancel = () => {
+      clearText().catch((err) =>{
+        console.log('clear fails: ',err);
+      });
+    };
+    const selectAddSheet = (action, index) => {
+      if (index == 0) {
+        pasteText().then((res) => {
+          var noteId = res.replace('appnote:Id=', '');
+          store.dispatch('updateNoteCategory', {
+            Id: noteId,
+            Category: menuTitle + '/' + selectNoteTitle.value,
+            ParentId: CyId.value,
+            note_category_Id: NCId.value,
+          }).then((resolve) => {
+            if (resolve.rowsAffected > 0) {
+              getNoteById(CyId.value);
+              getNoteListByParentId(CyId.value);
+              clearText().catch((err) => {
+                console.log('clear fails: ', err);
+              });
+              Toast('笔记已移动到 ' + selectNoteTitle.value);
+            }
+          }).catch((reject) => {
+            // Toast.fail('保存失败：' + reject);
+          });
+        });
+      }
+    };
+
     const expandNode = (key, e) => {
       console.log(key, e);
       //NCId.value = -1;
@@ -213,6 +266,7 @@ export default {
       } else if (index == 1) {
         getNoteById(CyId.value);
         getNoteListByParentId(CyId.value);
+        Toast('已刷新');
       }
     }
 
@@ -235,6 +289,10 @@ export default {
       onCancel,
       onShowActionsheet,
 
+      showAddSheet,
+      actionsAdd,
+      onAddCancel,
+      selectAddSheet,
     };
   },
 }

@@ -370,6 +370,22 @@ export function updateNoteSort(context,{
     });
 }
 
+export function updateNoteCategory(context,{
+    Id,ParentId,Category,note_category_Id
+}){
+    return new Promise((resolve, reject)=>{
+        updateRecord(context.state.database, note, { Id: Id }, {
+            ParentId: ParentId,
+            Category:Category,
+            note_category_Id:note_category_Id,
+        }).then((res) =>{
+            resolve(res);
+        }).catch((reject1) => {
+            reject(reject1);
+        });
+    });
+}
+
 export function delNote(context,{Id,real}){
     return new Promise((resolve, reject) => {
         if(real == 0){

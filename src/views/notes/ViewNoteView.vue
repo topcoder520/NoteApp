@@ -21,8 +21,8 @@
         </div>
     </div>
     <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
-        close-on-click-action @cancel="onCancel" />
-    <van-popup v-model:show="showRightMenu" position="right" :style="{ width: '80%', height: '100%' }">
+        close-on-click-action @cancel="onCancel" @closed="onClosed" />
+    <van-popup v-model:show="showRightMenu" @closed="onRightMenuClosed" position="right" :style="{ width: '80%', height: '100%' }">
         <p class="menutitle">{{ categoryName }}</p>
         <div class="menubox" ref="menuRef">
             <van-swipe-cell v-for="(item, index) in listMenu" :key="index">
@@ -77,11 +77,13 @@ export default {
         onActivated(() => {
             console.log('addNote onActivated');
         });
+        const queryData = ref(true);
         onUpdated(()=>{
             console.log('addNote onUpdated',Id.value,"route.query.Id",route.query.Id);
             var noteId = route.query.Id;
             console.log('addNote onUpdated after',noteId);
-            if (noteId) {
+            if (noteId && queryData.value) {
+                queryData.value = true;
                 document.querySelector('.richText').scrollTop = 0;
                 getNoteById(noteId);
             }
@@ -102,6 +104,7 @@ export default {
             history.back();
         };
         const onClickRight = () => {
+            queryData.value = false;
             showSheet.value = true;
         };
 
@@ -211,7 +214,11 @@ export default {
             { name: '笔记截图', },
             { name: '删除笔记', color: 'red', },
         ];
-        const onCancel = () => console.log('取消');
+        const onCancel = () =>{
+        };
+        const onClosed = () =>{
+            queryData.value = true;
+        };
         const noteContent = ref(null);
         const selectSheet = (action, index) => {
             console.log(action, index);
@@ -279,10 +286,14 @@ export default {
         //目录
         const showRightMenu = ref(false);
         const openMenu = () => {
+            queryData.value = false;
             showRightMenu.value = true;
             if (note_category_Id.value > 0) {
                 onLoadMenuData(note_category_Id.value);
             }
+        };
+        const onRightMenuClosed = (e)=>{
+            queryData.value = true;
         };
         const listMenu = ref([]);
         const menuRef = ref(null);
@@ -391,6 +402,7 @@ export default {
             showSheet,
             actionsSheet,
             onCancel,
+            onClosed,
             selectSheet,
             noteContent,
 
@@ -403,6 +415,7 @@ export default {
             menuRef,
 
             goDetail,
+            onRightMenuClosed,
         };
     }
 }
