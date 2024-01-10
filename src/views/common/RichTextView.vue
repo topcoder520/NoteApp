@@ -88,8 +88,10 @@ import { watch } from 'vue';
 
 import { showConfirmDialog, showToast } from 'vant';
 
-import { Takefromgalery, TakefromCamera, Takefromgalery2DataURL } from '@/plugin/camera';
+import { useStore } from 'vuex';
+import { useRoute, useRouter } from 'vue-router';
 
+import { Takefromgalery, TakefromCamera, Takefromgalery2DataURL } from '@/plugin/camera';
 import { getNowDateString } from '@/util/date';
 import { replaceNativeURL, getPathInfo } from '@/util/path';
 import { filesPath } from '@/util/config';
@@ -112,9 +114,13 @@ export default {
     },
     emits: {
         'getValue': null,
+        'invokeMethod':null,
     },
     setup(props, context) {
 
+        const store = useStore();
+        const router = useRouter();
+        
         const richDiv = ref(null);
         watch(() => props.value, (newVal, oldVal) => {
             var rs = {};
@@ -313,6 +319,18 @@ export default {
                 selectTarget.value = e.target;
 
                 showFileActionSheet.value = true;
+            }else if(!editable.value && e.target.className == 'appUrl'){
+                //appUrl
+                var noteId = e.target.getAttribute('data-Id');
+                console.log('click appUrl :',noteId);
+                context.emit('invokeMethod',{typ:'appUrl',param:{noteId:noteId}})
+                // router.push({
+                //     path: '/ViewNote',
+                //     query: { 
+                //         Id: noteId,
+                //         date: new Date().getTime()
+                //     },
+                // });
             }
         }
 
@@ -364,8 +382,28 @@ export default {
                 const selection = window.getSelection();
                 if (selection.rangeCount > 0) {
                     console.log('恢复选择文本了');
-                    document.execCommand("CreateLink", false, linkUrl.value);
+                    if(linkUrl.value.startsWith('appnote:Id')){
+                        var noteId = linkUrl.value.replace('appnote:Id=','');
+                        var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${selection.toString()}</div>`;
+                        document.execCommand("insertHTML", false, htmlstr);
+                    }else{
+                        document.execCommand("CreateLink", false, linkUrl.value);
+                    }
                     setRichText();
+                }else{
+                    if(linkUrl.value.startsWith('appnote:Id')){
+                        var noteId = linkUrl.value.replace('appnote:Id=','');
+                        store.dispatch('getNoteById', noteId).then((res)=>{
+                            const data = res;
+                            var title = data.Title;
+                            var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
+                            document.execCommand("insertHTML", false, htmlstr);
+                            setRichText();
+                        }).catch((err)=>{
+                            //document.execCommand("CreateLink", false, linkUrl.value);   
+                            Toast('err copy url'); 
+                        });
+                    }
                 }
             } else {
                 Toast('请输入超链接地址')
@@ -467,10 +505,12 @@ export default {
                     if (resole.type == 'base64') {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     } else {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
                         //document.execCommand("insertText", false, htmlStr);
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     }
                 }).catch((e) => {
                     console.log(e);
@@ -484,10 +524,12 @@ export default {
                     if (resole.type == 'base64') {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     } else {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
                         //document.execCommand("insertText", false, htmlStr);
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     }
                 }).catch((e) => {
                     console.log(e);
@@ -502,10 +544,12 @@ export default {
                     if (resole.type == 'base64') {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="data:image/jpeg;base64,${resole.data}" style="width: 100%;"></div>`;
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     } else {
                         var htmlStr = `<div class="photobox" style="width: 100%;"><img class="insertphoto" src="${resole.data}" style="width: 100%;"></div>`;
                         //document.execCommand("insertText", false, htmlStr);
                         document.execCommand("insertHTML", false, htmlStr);
+                        document.execCommand('insertHTML', false, "<br/>");
                     }
                 }).catch((e) => {
                     console.log(e);
@@ -566,6 +610,7 @@ export default {
                 //document.execCommand("insertImage", false, picUrl.value);
                 var htmlStr = `<img src="${picUrl.value}" style="width: 100%;">`;
                 document.execCommand("insertHTML", false, htmlStr);
+                document.execCommand('insertHTML', false, "<br/>");
                 setRichText();
             } else {
                 Toast('请输入图片地址')

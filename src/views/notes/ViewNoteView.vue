@@ -17,7 +17,7 @@
             <van-icon name="arrow-left" />
         </div>
         <div class="note-content" ref="noteContent">
-            <rich-text @getValue="getValue" :value="tmepContent" :editable="false"></rich-text>
+            <rich-text @getValue="getValue" @invokeMethod="goDetail" :value="tmepContent" :editable="false"></rich-text>
         </div>
     </div>
     <van-action-sheet v-model:show="showSheet" @select="selectSheet" :actions="actionsSheet" cancel-text="取消"
@@ -43,17 +43,17 @@
 <script>
 import { useRect, useWindowSize } from '@vant/use';
 import { Toast } from '@vant/compat';
-import { onUnmounted, ref, onMounted, onActivated, reactive } from 'vue';
+import { onUnmounted, ref, onMounted, onActivated, reactive, onUpdated } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getNowDateString } from '@/util/date';
 import { showConfirmDialog, closeToast, showLoadingToast } from 'vant';
 
-import html2canvas from 'html2canvas';
+import { copyText } from '@/plugin/clipboard';
 
 import RichText from '../common/RichTextView.vue';
 
-import { saveImage,cutImage } from '@/plugin/file'
+import { saveImage, cutImage } from '@/plugin/file'
 
 export default {
     name: 'ViewNoteView',
@@ -61,7 +61,7 @@ export default {
         RichText,
     },
     setup() {
-        const store = useStore()
+        const store = useStore();
         const route = useRoute();
         const router = useRouter();
 
@@ -76,6 +76,15 @@ export default {
         });
         onActivated(() => {
             console.log('addNote onActivated');
+        });
+        onUpdated(()=>{
+            console.log('addNote onUpdated',Id.value,"route.query.Id",route.query.Id);
+            var noteId = route.query.Id;
+            console.log('addNote onUpdated after',noteId);
+            if (noteId) {
+                document.querySelector('.richText').scrollTop = 0;
+                getNoteById(noteId);
+            }
         });
 
         //
@@ -176,11 +185,29 @@ export default {
             }
         }
 
+        const goDetail = (obj)=>{
+            if(obj.typ == 'appUrl'){
+                var noteId = obj.param.noteId;
+                console.log('goDetail ',noteId);
+                router.push({
+                    path: '/ViewNote',
+                    query: { 
+                        Id: noteId,
+                        date: new Date().getTime()
+                    },
+                });
+                Id.value = noteId;
+                document.querySelector('.richText').scrollTop = 0;
+                getNoteById(noteId);
+            }
+        };
+
         //
         const showSheet = ref(false);
         const actionsSheet = [
             { name: '编辑笔记', },
-            { name: '复制笔记', },
+            { name: '复制编辑', },
+            { name: '复制链接', },
             { name: '笔记截图', },
             { name: '删除笔记', color: 'red', },
         ];
@@ -193,31 +220,40 @@ export default {
                     path: '/AddNote',
                     query: { Id: Id.value }
                 });
-            } else if (index == 1){
+            } else if (index == 1) {
                 //复制笔记
                 router.push({
                     path: '/AddNote',
-                    query: { cpId: Id.value, State: State.value},
-                    replace:true,
+                    query: { cpId: Id.value, State: State.value },
+                    replace: true,
                 });
-            }else if (index == 2) {
+            } else if (index == 2) {
+                //链接
+                var linkUrl = 'appnote:Id='+Id.value;
+                //复制到剪贴板
+                copyText(linkUrl).then(() => {
+                    Toast.success('复制成功');
+                }).catch((err) => {
+                    Toast.fail('复制失败!'+err);
+                });
+            } else if (index == 3) {
                 console.log('笔记截图');
                 const el = document.getElementById('richTextID')
-                console.log('el.scrollHeight',el.scrollHeight);
-                console.log('el.clientWidth',el.clientWidth);
-                
-                
+                console.log('el.scrollHeight', el.scrollHeight);
+                console.log('el.clientWidth', el.clientWidth);
+
+
                 showLoadingToast('截图中...');
-                cutImage(el).then(resole=>{
+                cutImage(el).then(resole => {
                     closeToast();
                     Toast.success('截图已保存');
-                }).catch(reject=>{
+                }).catch(reject => {
                     closeToast();
                     console.log('截图失败：' + JSON.stringify(reject));
                     Toast.fail('截图失败：' + JSON.stringify(reject));
                 });
             }
-            else if (index == 3) {
+            else if (index == 4) {
                 showConfirmDialog({
                     title: '确认删除该笔记？',
                 }).then(() => {
@@ -366,6 +402,7 @@ export default {
             addNote,
             menuRef,
 
+            goDetail,
         };
     }
 }

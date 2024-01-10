@@ -23,6 +23,7 @@
   `cordova plugin add cordova-plugin-filechooser`
   `cordova plugin add cordova-plugin-filepath`
   `cordova plugin add cordova-plugin-file-opener2`
+  `cordova plugin add cordova-clipboard`
   ** cordova-sqlite-evcore-extbuild-free插件替代cordova-sqlite-storage插件 **
 
 # 构建
