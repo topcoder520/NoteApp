@@ -30,7 +30,7 @@
         </config-file>
         <!--hooks -->
         <hook type="after_build" src="scripts/android/hook_after_build.js" />
-        <!-- splash -->
+        <!-- 启动屏 -->
         <splash src="res/screen/android/launch.png" density="land-hdpi"/>    
         <splash src="res/screen/android/launch.png" density="land-ldpi"/>    
         <splash src="res/screen/android/launch.png" density="land-mdpi"/>    
@@ -39,11 +39,17 @@
         <splash src="res/screen/android/launch.png" density="port-ldpi"/>  
         <splash src="res/screen/android/launch.png" density="port-mdpi"/>  
         <splash src="res/screen/android/launch.png" density="port-xhdpi"/>
-        <!--splash 配置-->
+        <!--启动屏 配置-->
         <preference name="AutoHideSplashScreen" value="false" />
         <preference name="SplashScreenDelay" value="10000" /> <!-- defaults to "3000" -->
         <preference name="SplashScreenBackgroundColor" value="green" /> <!-- defaults to "#464646" -->
-        <preference name="SplashScreenWidth" value="432" /> <!-- defaults to "170" -->   
-        <preference name="SplashScreenHeight" value="756" /> <!-- defaults to "200" -->     
+
+        <!--app logo icon-->  
+        <icon density="ldpi" src="res/icon/android/icon-36-ldpi.png" />
+        <icon density="mdpi" src="res/icon/android/icon-48-mdpi.png" />
+        <icon density="hdpi" src="res/icon/android/icon-72-hdpi.png" />
+        <icon density="xhdpi" src="res/icon/android/icon-96-xhdpi.png" />
+        <icon density="xxhdpi" src="res/icon/android/icon-144-xxhdpi.png" />
+        <icon density="xxxhdpi" src="res/icon/android/icon-192-xxxhdpi.png" />
     </platform>
 </widget>

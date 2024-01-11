@@ -46,7 +46,8 @@ export default {
               console.log('FingerprintVerification' + JSON.stringify(resolve));
               //Toast('FingerprintVerification' + JSON.stringify(resolve));
               router.push({
-                path: '/'
+                path: '/',
+                replace:true,
               })
             }).catch(rs => {
               console.log('FingerprintVerification',JSON.stringify(rs));
@@ -59,7 +60,8 @@ export default {
           } else {
             console.log('不不不开启指纹解锁');
             router.push({
-              path: '/'
+              path: '/',
+              replace:true,
             })
           }
         });
@@ -67,7 +69,7 @@ export default {
         navigator.splashscreen.show();
         window.setTimeout(() => {
           navigator.splashscreen.hide();
-        }, 2000);
+        }, 800);
       }).catch((reject) => {
         console.log('startupDatabase-err=>' + reject);
       });
