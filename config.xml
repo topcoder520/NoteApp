@@ -46,9 +46,13 @@
 
         <!--app logo icon-->  
         <icon density="ldpi" src="res/icon/android/icon-36-ldpi.png" />
+        <icon density="ldpi-v26" src="res/icon/android/icon-36-ldpi.png" />
         <icon density="mdpi" src="res/icon/android/icon-48-mdpi.png" />
+        <icon density="mdpi-v26" src="res/icon/android/icon-48-mdpi.png" />
         <icon density="hdpi" src="res/icon/android/icon-72-hdpi.png" />
+        <icon density="hdpi-v26" src="res/icon/android/icon-72-hdpi.png" />
         <icon density="xhdpi" src="res/icon/android/icon-96-xhdpi.png" />
+        <icon density="xhdpi-v26" src="res/icon/android/icon-96-xhdpi.png" />
         <icon density="xxhdpi" src="res/icon/android/icon-144-xxhdpi.png" />
         <icon density="xxxhdpi" src="res/icon/android/icon-192-xxxhdpi.png" />
     </platform>
