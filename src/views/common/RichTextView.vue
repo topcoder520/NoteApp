@@ -90,6 +90,7 @@ import { showConfirmDialog, showToast } from 'vant';
 
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
+import { pasteText, clearText } from '@/plugin/clipboard';
 
 import { Takefromgalery, TakefromCamera, Takefromgalery2DataURL } from '@/plugin/camera';
 import { getNowDateString } from '@/util/date';
@@ -385,14 +386,24 @@ export default {
                             store.dispatch('getNoteById', noteId).then((res)=>{
                                 const data = res;
                                 var title = data.Title;
-                                var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
-                                document.execCommand("insertHTML", false, htmlstr);
-                                document.execCommand('insertHTML', false, "<br/>");
+                                if(title != null && title.length > 0){
+                                    var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
+                                    document.execCommand("insertHTML", false, htmlstr);
+                                    document.execCommand('insertHTML', false, "<br/>");
+                                }
                             }).catch((err)=>{
                                 //document.execCommand("CreateLink", false, linkUrl.value);   
                                 Toast('err copy url'); 
                             });
                         }
+                        pasteText().then((res)=>{
+                            console.log(res);
+                            if(res.length>0 && res.startsWith('appnote:Id')){
+                                clearText();//清除文本
+                            }
+                        }).catch((err)=>{
+                            console.log(err);
+                        });
                     }else{
                         if(selection.toString().length > 0){
                             document.execCommand("CreateLink", false, linkUrl.value);

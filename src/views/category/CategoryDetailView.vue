@@ -205,7 +205,7 @@ export default {
           var noteId = res.replace('appnote:Id=', '');
           store.dispatch('updateNoteCategory', {
             Id: noteId,
-            Category: menuTitle + '/' + selectNoteTitle.value,
+            Category: menuTitle.value + '/' + selectNoteTitle.value,
             ParentId: CyId.value,
             note_category_Id: NCId.value,
           }).then((resolve) => {

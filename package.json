@@ -41,6 +41,7 @@
     "cordova-plugin-file-opener2": "^4.0.0",
     "cordova-plugin-filechooser": "^1.2.0",
     "cordova-plugin-filepath": "^1.6.0",
+    "cordova-plugin-splashscreen": "^6.0.2",
     "cordova-sqlite-evcore-extbuild-free": "^0.18.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
@@ -66,7 +67,8 @@
       "cordova-plugin-file": {
         "ANDROIDX_WEBKIT_VERSION": "1.4.0"
       },
-      "cordova-clipboard": {}
+      "cordova-clipboard": {},
+      "cordova-plugin-splashscreen": {}
     }
   }
 }

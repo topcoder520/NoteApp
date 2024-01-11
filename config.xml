@@ -30,5 +30,20 @@
         </config-file>
         <!--hooks -->
         <hook type="after_build" src="scripts/android/hook_after_build.js" />
+        <!-- splash -->
+        <splash src="res/screen/android/launch.png" density="land-hdpi"/>    
+        <splash src="res/screen/android/launch.png" density="land-ldpi"/>    
+        <splash src="res/screen/android/launch.png" density="land-mdpi"/>    
+        <splash src="res/screen/android/launch.png" density="land-xhdpi"/>   
+        <splash src="res/screen/android/launch.png" density="port-hdpi"/>  
+        <splash src="res/screen/android/launch.png" density="port-ldpi"/>  
+        <splash src="res/screen/android/launch.png" density="port-mdpi"/>  
+        <splash src="res/screen/android/launch.png" density="port-xhdpi"/>
+        <!--splash 配置-->
+        <preference name="AutoHideSplashScreen" value="false" />
+        <preference name="SplashScreenDelay" value="10000" /> <!-- defaults to "3000" -->
+        <preference name="SplashScreenBackgroundColor" value="green" /> <!-- defaults to "#464646" -->
+        <preference name="SplashScreenWidth" value="432" /> <!-- defaults to "170" -->   
+        <preference name="SplashScreenHeight" value="756" /> <!-- defaults to "200" -->     
     </platform>
 </widget>
