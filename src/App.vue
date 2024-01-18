@@ -69,7 +69,7 @@ export default {
         navigator.splashscreen.show();
         window.setTimeout(() => {
           navigator.splashscreen.hide();
-        }, 800);
+        }, 500);
       }).catch((reject) => {
         console.log('startupDatabase-err=>' + reject);
       });

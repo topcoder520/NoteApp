@@ -209,7 +209,7 @@ export default {
         const showSheet = ref(false);
         const actionsSheet = [
             { name: '编辑笔记', },
-            { name: '复制编辑', },
+            { name: '复制笔记', },
             { name: '复制链接', },
             { name: '笔记截图', },
             { name: '删除笔记', color: 'red', },
