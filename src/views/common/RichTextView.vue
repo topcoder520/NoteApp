@@ -738,6 +738,8 @@ export default {
     height: 100%;
     //border: 1px solid;
     overflow: auto;
+
+    line-height: 24px !important;
 }
 
 .richText ul {
