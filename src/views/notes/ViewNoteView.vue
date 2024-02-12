@@ -11,9 +11,9 @@
                 <label class="category-name">{{ categoryName }}</label>
             </template>
         </van-cell> -->
-        <!-- <div class="leftMenu" @click="openMenu">
+        <div class="leftMenu" @click="openMenu">
             <van-icon name="arrow-left" />
-        </div> -->
+        </div>
         <div class="note-content" ref="noteContent">
             <rich-text @getValue="getValue" @invokeMethod="goDetail" :value="tmepContent" :editable="false"></rich-text>
         </div>
@@ -297,7 +297,7 @@ export default {
         const menuRef = ref(null);
         const onLoadMenuData = (CyId) => {
             listMenu.value.length = 0;
-            showLoadingToast('加载中...');
+            //showLoadingToast('加载中...');
             store.dispatch('getNoteList', { note_category_Id: CyId }).then((resolve) => {
                 var listData = resolve;
                 console.log('getNoteList=>' + JSON.stringify(listData));
@@ -319,7 +319,7 @@ export default {
                     console.log('selectheight', selectheight, 'menuClientHeight', menuClientHeight)
                     menuRef.value.scrollTop = (selectheight - menuClientHeight) + menuClientHeight / 2;
                 }, 100);
-                closeToast();
+                //closeToast();
             });
         }
         //flag 0上移 1下移
