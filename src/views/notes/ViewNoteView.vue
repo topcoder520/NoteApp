@@ -6,16 +6,14 @@
     </van-nav-bar>
     <div class="content" ref="root">
         <!-- <input type="text" class="title" readonly placeholder="标题" v-model="title" /> -->
-        <van-cell class="date-info" v-model:title="createTime">
-            <!-- 使用 right-icon 插槽来自定义右侧图标 -->
+        <!-- <van-cell class="date-info" v-model:title="createTime">
             <template #right-icon>
                 <label class="category-name">{{ categoryName }}</label>
             </template>
-        </van-cell>
-        <!-- <textarea class="note-content " v-model="content"></textarea> -->
-        <div class="leftMenu" @click="openMenu">
+        </van-cell> -->
+        <!-- <div class="leftMenu" @click="openMenu">
             <van-icon name="arrow-left" />
-        </div>
+        </div> -->
         <div class="note-content" ref="noteContent">
             <rich-text @getValue="getValue" @invokeMethod="goDetail" :value="tmepContent" :editable="false"></rich-text>
         </div>
@@ -453,6 +451,7 @@ export default {
         border: none;
         height: v-bind("vheight");
         word-wrap: break-word;
+        padding-top: 5px;
     }
 
     .leftMenu {

@@ -2,25 +2,26 @@
     <van-nav-bar class="nav-bar-addnote" :title="PageTitle" left-text="返回" right-text="保存" left-arrow
         @click-left="onClickLeft" @click-right="onClickRight" />
     <div class="addcontent" ref="root">
-        <input type="text" class="title" placeholder="标题" v-model="title" />
-        <van-cell class="date-info" v-model:title="createTime">
-            <!-- 使用 right-icon 插槽来自定义右侧图标 -->
+        <div class="title-box">
+            <input ref="titleRef" type="text" class="title" @input="onTitleInput" @blur="onTitleBlur" @focus="onTitleFocus" placeholder="标题" v-model="title" />
+            <van-icon v-show="isShowClearIcon" name="cross" size="12" @click="onClearTitle"/>
+        </div>
+        <!-- <van-cell class="date-info" v-model:title="createTime">
             <template #right-icon>
                 <div style="display:inline-block;" @click="showPopup = true">
                     <label class="category-name">{{ categoryName }}</label>
                     <van-icon class="arrow-down" size="20px" name="arrow-down" />
                 </div>
             </template>
-        </van-cell>
-        <!-- <textarea class="note-content " v-model="content"></textarea> -->
+        </van-cell> -->
         <div class="note-content">
             <rich-text @getValue="getValue" :value="tmepContent"></rich-text>
         </div>
     </div>
-    <van-popup v-model:show="showPopup" round position="bottom">
+    <!-- <van-popup v-model:show="showPopup" round position="bottom">
         <van-cascader v-model="cascaderValue" title="请选择知识库和分类" :options="options" @close="showPopup = false"
             @change="onChange" @finish="onFinish" />
-    </van-popup>
+    </van-popup> -->
 </template>
 <script>
 import { useRect, useWindowSize } from '@vant/use';
@@ -65,6 +66,32 @@ export default {
                 }
             }
             return content;
+        };
+
+        const onClearTitle = ()=>{
+            title.value = '';
+            titleRef.value.focus();
+        };
+        const isShowClearIcon = ref(false);
+        const titleRef = ref(null);
+        const onTitleFocus = ()=>{
+            if(title.value.length>0){
+                isShowClearIcon.value = true;
+            }else{
+                isShowClearIcon.value = false;
+            }
+        };
+        const onTitleBlur = ()=>{
+            setTimeout(() => {
+              isShowClearIcon.value = false;
+            }, 50);
+        };
+        const onTitleInput = (e)=>{
+            if(e.target.value.length>0){
+                isShowClearIcon.value = true;
+            }else{
+                isShowClearIcon.value = false;
+            }
         };
 
         const onClickLeft = () => {
@@ -334,6 +361,13 @@ export default {
             onFinish,
             cascaderValue,
 
+            onClearTitle,
+            isShowClearIcon,
+            onTitleFocus,
+            onTitleBlur,
+            onTitleInput,
+            titleRef,
+
         };
     }
 }
@@ -377,6 +411,21 @@ export default {
         width: 100%;
         border: none;
         height: v-bind("vheight");
+        margin-top: 10px;
+        border-top: 1px solid #efefef;
+        padding-top: 5px;
+    }
+    .title-box{
+        position: relative;
+
+        .van-icon-cross{
+            font-size: 16px !important;
+            position: absolute;
+            top: 4px;
+            color: red;
+            font-weight: 600;
+
+        }
     }
 }
 </style>

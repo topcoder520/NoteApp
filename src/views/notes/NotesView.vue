@@ -18,7 +18,9 @@
               <p>
                 <span v-show="item.State == 1" class="status"></span>
                 <span v-show="item.State == 0" class="status-over"></span>
-                <span style="margin-right:8px;">{{ item.Category.split('/')[0] }}</span>{{ item.CreateTime }}<span
+                <span style="margin-right:8px;">
+                  <!-- {{ item.Category.split('/')[0] }} -->
+                </span>{{ item.CreateTime }}<span
                   class="top-tag" v-show="item.Sort > 1">置顶</span>
               </p>
             </van-col>
