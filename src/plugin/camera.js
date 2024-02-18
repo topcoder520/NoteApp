@@ -31,7 +31,12 @@ export function Takefromgalery() {
                 // displayFileData(fileEntry.nativeURL, "Native URL");
 
                 //复制图片到 cordova.file.externalDataDirectory 路径下
-                copyFile(fileEntry.toURL(),filesPath, picFolderName, null).then((data) => {
+                var stuffix = ".jpg";
+                if(imgUri.endsWith('.png')){
+                    stuffix = ".png";
+                }
+                var newPicName = 'Upload_' + new Date().getTime() + stuffix;
+                copyFile(fileEntry.toURL(),filesPath, picFolderName,newPicName).then((data) => {
                     //nativeURL
                     console.log('camera copy file address success:', data.toURL());
                     resolve({ type: 'uri', data: data.toURL() });
