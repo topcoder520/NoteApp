@@ -34,9 +34,6 @@
     "cordova-clipboard": {
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
-    "cordova-plugin-splashscreen": {
-      "PACKAGE_NAME": "io.cordova.hellocordova"
-    },
     "cordova-plugin-downresource": {
       "PACKAGE_NAME": "com.github.topcoder520"
     }

@@ -99,7 +99,6 @@ export function copyFile(fromFileURL, toParentDirectURL, newFolder, newName) {
                             console.log('copy success :', entry.nativeURL)
                             resolve(entry);
                         }, (err) => {
-                            console.log('copy err', JSON.stringify(err))
                             reject('copy err', JSON.stringify(err));
                         })
                     } else {
@@ -296,20 +295,63 @@ export function downloadImage(url, folderName, fileName) {
 }
 
 //选择文件
+// export function selectFile() {
+//     return new Promise((resolve, reject) => {
+//         fileChooser.open((contentPath) => {
+//             window.FilePath.resolveNativePath(contentPath, function (finalPath) {
+//                 resolve(finalPath);
+//             }, function (error) {
+//                 reject(error);
+//             });
+//         }, (err) => {
+//             reject(err);
+//         });
+//     });
+
+// }
 export function selectFile() {
     return new Promise((resolve, reject) => {
+        // 1. 打开文件选择器
         fileChooser.open((contentPath) => {
-            window.FilePath.resolveNativePath(contentPath, function (finalPath) {
+            
+            // 2. 预处理：解码路径，防止编码后的冒号导致判断失效
+            var decodedPath = decodeURIComponent(contentPath);
+
+            // 3. 针对 "raw:" 路径的特殊处理 (解决 For Input String 报错)
+            if (decodedPath.includes('raw:/')) {
+                var absolutePath = decodedPath.split('raw:')[1];
+                console.log('> 检测到 raw 路径，手动截取:', absolutePath);
+                if(absolutePath.startsWith('/')) {
+                     absolutePath = 'file://' + absolutePath; // 确保路径以 file:// 开头
+                }
+                return resolve(absolutePath);
+            }
+
+            // 4. 针对已经是以 "file://" 开头的路径，直接返回
+            if (decodedPath.startsWith('file://')) {
+                return resolve(decodedPath);
+            }
+
+            // 5. 正常的 content:// 路径调用插件转换
+            window.FilePath.resolveNativePath(decodedPath, (finalPath) => {
                 resolve(finalPath);
-            }, function (error) {
-                reject(error);
+            }, (error) => {
+                // 如果插件转换失败 (解决 column _data 不存在报错)
+                console.warn('> FilePath 转换失败，尝试直接使用原始 URI:', error);
+                
+                /**
+                 * 核心方案：在 Android 10+，如果无法获取物理路径，
+                 * 很多插件（如 file-opener2 或 file-transfer）其实支持直接接收 contentPath。
+                 */
+                var fixedPath = contentPath.replace(/content:\/\/.*?\/root/, 'file://');
+                resolve(fixedPath); 
             });
         }, (err) => {
             reject(err);
         });
     });
-
 }
+
 //寻找打开文件的app
 export function fileOpener(filepath) {
     let info = getPathInfo(filepath);

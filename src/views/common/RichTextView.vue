@@ -393,7 +393,7 @@ export default {
                                 }
                             }).catch((err)=>{
                                 //document.execCommand("CreateLink", false, linkUrl.value);   
-                                Toast('err copy url'); 
+                                Toast('err copy url', err); 
                             });
                         }
                         pasteText().then((res)=>{
@@ -437,6 +437,7 @@ export default {
                     //上传文件
                     var info = getPathInfo(selectFilePath.value);
                     var timestr = 'upload_file_' + new Date().getTime();
+
                     copyFile(selectFilePath.value, filesPath, "document"+info.ext, timestr + info.ext).then((data) => {
                         console.log('copyFile', data.toURL());
                         richDiv.value.focus();
@@ -449,7 +450,10 @@ export default {
                         setRichText();
                     }).catch((err) => {
                         console.log('err', err);
-                        Toast('上传文件失败');
+                        Toast({
+                            message:'上传文件失败:'+err+' ,fromPath:'+selectFilePath.value+' , toPath:'+filesPath,
+                            duration:3000
+                        });
                     })
                 } else {
                     //编辑文件名
@@ -463,7 +467,6 @@ export default {
                     showEditFileName.value = false;
                     var rs = { changeInputCheck: true };
                     setRichText(rs);
-
                 }
 
             } else {

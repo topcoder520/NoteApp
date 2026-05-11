@@ -1,0 +1,1 @@
+cmd /c "npm run build&&cordova clean android&&cordova build android --release --buildConfig=build-aab.json"
