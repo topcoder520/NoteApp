@@ -23,9 +23,7 @@
 
   `cordova plugin add cordova-plugin-file`
 
-  `cordova plugin add cordova-sqlite-storage`
-
-  `cordova plugin add cordova-plugin-downresource`
+  `cordova plugin add cordova-sqlite-evcore-extbuild-free`
 
   `cordova plugin add cordova-plugin-filechooser`
 
@@ -36,8 +34,10 @@
   `cordova plugin add cordova-clipboard`
 
   `cordova plugin add cordova-plugin-splashscreen`
+
+  `cordova plugin add android_plugins/cordova-plugin-downresource`
   
-  ** cordova-sqlite-evcore-extbuild-free插件替代cordova-sqlite-storage插件 **
+  其中`cordova-plugin-downresource`是本地实现的插件，作用是下载图片等资源文件，解决浏览器安全跨域问题，`android_plugins/cordova-plugin-downresource`是插件在项目中的相对路径
 
 # 构建
 npm run build && cordova build android
