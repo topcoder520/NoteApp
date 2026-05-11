@@ -143,7 +143,7 @@ export function saveNetImage(url) {
                 dirEntry.getFile(filename, { create: true }, (fileEntry) => {
                     console.log('axios url ', url);
                     console.log('local path ', fileEntry.toURL());
-                    Downresource.fetchFromURL(url, fileEntry.toURL(), 0, (res) => {
+                    Downresource.fetchFromURL(url, fileEntry.toURL(), (res) => {
                         console.log('res', res);
                         resolve(fileEntry.toURL());
                     }, (err) => {
@@ -281,7 +281,7 @@ export function downloadImage(url, folderName, fileName) {
                     dirEntry.getFile(newPicName, { create: true }, (fileEntry) => {
                         console.log('axios url ', url);
                         console.log('local path ', fileEntry.toURL());
-                        Downresource.fetchFromURL(url, fileEntry.toURL(), 0, (res) => {
+                        Downresource.fetchFromURL(url, fileEntry.toURL(), (res) => {
                             console.log('res', res);
                             resolve(fileEntry.toURL());
                         }, (err) => {

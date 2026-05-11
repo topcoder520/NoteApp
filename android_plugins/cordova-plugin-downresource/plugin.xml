@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org" id="cordova-plugin-downresource" version="1.0.0">
+    <name>Downresource</name>
+    <js-module src="www/Downresource.js" name="Downresource">
+        <clobbers target="Downresource" />
+    </js-module>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Downresource">
+                <param name="android-package" value="io.github.yourname.downresource.Downresource" />
+            </feature>
+        </config-file>
+        
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <source-file src="src/android/Downresource.java" target-dir="src/io/github/yourname/downresource" />
+    </platform>
+</plugin>
