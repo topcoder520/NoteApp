@@ -1,0 +1,17 @@
+{
+  "name": "cordova-plugin-downresource",
+  "version": "1.0.0",
+  "description": "A Cordova plugin to download resources using native Java to avoid CORS issues.",
+  "cordova": {
+    "id": "cordova-plugin-downresource",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Your Name",
+  "license": "Apache-2.0"
+}

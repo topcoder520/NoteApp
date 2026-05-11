@@ -1,0 +1,44 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-android-fingerprint-auth": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-sqlite-evcore-extbuild-free": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-camera": {
+      "ANDROIDX_CORE_VERSION": "1.6.+",
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-android-permissions": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-downresource": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-filechooser": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-filepath": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-file-opener2": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-plugin-file": {
+      "ANDROIDX_WEBKIT_VERSION": "1.4.0",
+      "PACKAGE_NAME": "com.github.topcoder520"
+    },
+    "cordova-clipboard": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    }
+  },
+  "dependent_plugins": {}
+}

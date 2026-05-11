@@ -41,7 +41,6 @@ build/Release
 node_modules/
 jspm_packages/
 platforms/
-plugins/
 .vscode
 
 # TypeScript v1 declaration files

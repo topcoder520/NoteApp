@@ -1,0 +1,45 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-android-fingerprint-auth": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-sqlite-evcore-extbuild-free": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-android-permissions": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-filechooser": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-filepath": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-file-opener2": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-clipboard": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-splashscreen": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-downresource": {
+      "PACKAGE_NAME": "com.github.topcoder520"
+    }
+  },
+  "dependent_plugins": {}
+}
