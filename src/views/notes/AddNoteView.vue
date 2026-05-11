@@ -382,8 +382,8 @@ export default {
 
 .addcontent {
     margin-top: 46px;
-    padding: 20px 20px 40px;
-    background-color: #fff;
+    padding: 24px 20px 40px;
+    background-color: var(--bg-card);
     min-height: 100vh;
 
     .title-box {
@@ -394,7 +394,7 @@ export default {
             position: absolute;
             top: 8px;
             right: 0;
-            color: #ccc;
+            color: var(--text-muted);
             font-weight: 600;
         }
     }
@@ -402,19 +402,19 @@ export default {
     .title {
         width: 100%;
         font-size: 22px;
-        line-height: 1.3;
+        line-height: 1.4;
         border: none;
         outline: none;
         padding: 8px 0;
         font-weight: 600;
-        color: #1a1a1a;
+        color: var(--text-primary);
         background: transparent;
     }
 
     .title::placeholder {
         font-size: 22px;
         font-weight: 600;
-        color: #c0c0c0;
+        color: var(--text-muted);
     }
 
     .date-info {
@@ -425,7 +425,7 @@ export default {
 
         .category-name,
         .arrow-down {
-            color: #1989fa;
+            color: var(--accent);
         }
     }
 
@@ -434,7 +434,7 @@ export default {
         border: none;
         height: v-bind("vheight");
         margin-top: 16px;
-        border-top: 1px solid #f0f0f0;
+        border-top: 1px solid var(--border);
         padding-top: 12px;
     }
 }

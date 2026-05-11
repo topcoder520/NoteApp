@@ -356,21 +356,23 @@ export default {
 <style lang="less">
 .addcycontent {
     padding: 20px;
-    background-color: #fff;
+    background-color: var(--bg-card);
     min-height: 100vh;
 
     .title {
         width: 100%;
         height: 40px;
-        border: 1px solid #e5e5e5;
-        border-radius: 8px;
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius-input);
         padding: 0 12px;
         font-size: 16px;
         outline: none;
         box-sizing: border-box;
+        background: var(--bg-card);
+        color: var(--text-primary);
 
         &:focus {
-            border-color: #1989fa;
+            border-color: var(--accent);
         }
     }
 
@@ -382,35 +384,37 @@ export default {
 
         .category-name,
         .arrow-down {
-            color: #1989fa;
+            color: var(--accent);
         }
     }
 
     .note-content {
         width: 100%;
-        border: 1px solid #e5e5e5;
-        border-radius: 8px;
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius-input);
         padding: 10px 12px;
         font-size: 14px;
         outline: none;
         margin-top: 12px;
         box-sizing: border-box;
         resize: vertical;
+        background: var(--bg-card);
+        color: var(--text-primary);
 
         &:focus {
-            border-color: #1989fa;
+            border-color: var(--accent);
         }
     }
 
     .categorylist {
         margin-top: 30px;
         padding-top: 18px;
-        border-top: 1px solid #f0f0f0;
+        border-top: 1px solid var(--border);
 
         p {
             text-align: left;
             font-weight: 600;
-            color: #1a1a1a;
+            color: var(--text-primary);
             margin-bottom: 12px;
         }
 
@@ -419,12 +423,12 @@ export default {
             overflow: auto;
 
             .vrow {
-                border-bottom: 1px solid #f5f5f5;
+                border-bottom: 1px solid var(--border-light);
                 padding: 12px 8px;
                 transition: background-color 0.15s ease;
 
                 &:active {
-                    background-color: #f5f7fa;
+                    background-color: var(--bg-page);
                 }
             }
         }

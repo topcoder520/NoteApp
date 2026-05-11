@@ -92,35 +92,134 @@ export default {
 </script>
 
 <style lang="less">
+:root {
+  /* === 色彩体系：极简原木治愈风 === */
+
+  /* 背景色 */
+  --bg-page: #F9F6F0;
+  --bg-card: #FFFDF9;
+  --bg-input: #FFFDF9;
+
+  /* 文字色 */
+  --text-primary: #4A4036;
+  --text-secondary: #9B8E7E;
+  --text-muted: #BFB5A5;
+
+  /* 强调色 — 低饱和豆沙绿 */
+  --accent: #8B9E8B;
+  --accent-dark: #6B7E6B;
+  --accent-light: #F0EDE5;
+  --accent-light2: #F5F2EC;
+
+  /* 状态色 */
+  --success: #7FA98B;
+  --danger: #C4927A;
+  --warning: #D4A08A;
+
+  /* 边框色 */
+  --border: #EBE5DA;
+  --border-light: #F0ECE4;
+  --border-input: #D4CFC6;
+
+  /* 阴影 — 暖色基调 */
+  --shadow-color-base: 74, 64, 54;
+  --shadow-accent: 139, 158, 139;
+
+  /* 圆角 */
+  --radius-card: 16px;
+  --radius-input: 10px;
+  --radius-btn: 8px;
+  --radius-tag: 6px;
+
+  /* Vant 组件变量覆盖 */
+  --van-nav-bar-background: #FFFDF9;
+  --van-nav-bar-title-text-color: #4A4036;
+  --van-tabbar-background: #FFFDF9;
+  --van-tabbar-item-text-color: #9B8E7E;
+  --van-tabbar-item-active-color: #8B9E8B;
+  --van-primary-color: #8B9E8B;
+  --van-danger-color: #C4927A;
+  --van-success-color: #7FA98B;
+  --van-switch-on-background: #8B9E8B;
+  --van-cell-text-color: #4A4036;
+  --van-cell-text-color-secondary: #9B8E7E;
+  --van-text-color: #4A4036;
+  --van-text-color-secondary: #9B8E7E;
+  --van-background: #F9F6F0;
+  --van-background-2: #FFFDF9;
+}
+
 #app {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  background-color: #f5f7fa;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
 }
 
+/* === Tabbar === */
 .van-tabbar {
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
-  border-top: 1px solid #f0f0f0;
+  background-color: var(--bg-card) !important;
+  box-shadow: 0 -2px 16px rgba(var(--shadow-color-base), 0.04);
+  border-top: 1px solid var(--border);
 }
 
 .van-tabbar-item {
-  transition: color 0.2s ease;
+  transition: color 0.25s ease;
 }
 
 .van-tabbar-item--active {
   font-weight: 600;
 }
 
+/* === NavBar === */
 .van-nav-bar {
-  background-color: #fff !important;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  background-color: var(--bg-card) !important;
+  box-shadow: 0 1px 8px rgba(var(--shadow-color-base), 0.03);
 }
 
 .van-nav-bar__title {
   font-weight: 600;
-  color: #1a1a1a;
+  color: var(--text-primary);
+}
+
+/* === Button overrides === */
+.van-button--primary {
+  --van-button-primary-background: var(--accent);
+  --van-button-primary-border-color: var(--accent);
+}
+
+.van-button--success {
+  --van-button-success-background: var(--success);
+  --van-button-success-border-color: var(--success);
+}
+
+.van-button--danger {
+  --van-button-danger-background: var(--danger);
+  --van-button-danger-border-color: var(--danger);
+}
+
+/* === Switch === */
+.van-switch--on {
+  background-color: var(--accent);
+}
+
+/* === Cell === */
+.van-cell {
+  color: var(--text-primary);
+}
+
+.van-cell__value {
+  color: var(--text-secondary);
+}
+
+/* === Dialog / Popup === */
+.van-dialog {
+  border-radius: var(--radius-card);
+}
+
+.van-popup--round {
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 </style>

@@ -14,7 +14,7 @@
           </template>
           <van-row @click="onNoteDetail(item.Id)">
             <van-col span="24">
-              <p class="van-multi-ellipsis--l3"><van-icon name="bookmark" style="margin-right: 5px;" color="blue" />{{
+              <p class="van-multi-ellipsis--l3"><van-icon name="bookmark" style="margin-right: 5px;" color="#8B9E8B" />{{
                 item.Title }}</p>
               <p><span style="color:#999;margin-right:8px;">共{{ item.totalNotes }}篇笔记</span>{{ item.CreateTime }}<span
                   class="top-tag" v-show="item.Sort > 1">常用</span></p>
@@ -285,7 +285,7 @@ export default {
 
 .list-box-cy {
   margin-top: 46px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
 }
 
 .list-box-cy .add-box {
@@ -302,10 +302,10 @@ export default {
   display: inline-block;
   width: 42px;
   height: 42px;
-  background: #fff;
-  border: 1px solid #1989fa;
+  background: var(--bg-card);
+  border: 1px solid var(--accent);
   border-radius: 50%;
-  background-color: #1989fa;
+  background-color: var(--accent);
 }
 
 .list-box-cy .add-box .border .van-icon {
@@ -320,7 +320,7 @@ export default {
 }
 
 .van-pull-refresh-cy {
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
 
   .van-list {
     min-height: v-bind("vheight");
@@ -329,9 +329,9 @@ export default {
 
   .van-row {
     margin: 8px 16px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    background-color: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 2px 16px rgba(var(--shadow-color-base), 0.05);
     transition: transform 0.15s ease;
     overflow: hidden;
 
@@ -350,12 +350,12 @@ export default {
       p:first-child {
         font-size: 16px;
         font-weight: 500;
-        color: #1a1a1a;
+        color: var(--text-primary);
       }
 
       p:last-child {
         font-size: 12px;
-        color: #b0b0b0;
+        color: var(--text-muted);
         display: flex;
         align-items: center;
       }
@@ -366,9 +366,9 @@ export default {
     font-size: 11px;
     display: inline-block;
     padding: 2px 6px;
-    background: linear-gradient(135deg, #1989fa, #0066cc);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #fff;
-    border-radius: 4px;
+    border-radius: var(--radius-tag);
     margin-left: 8px;
     font-weight: 500;
   }

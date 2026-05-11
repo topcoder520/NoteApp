@@ -2,7 +2,7 @@
     <div class="list-header">
         <van-nav-bar title="搜索记录" left-text="返回" left-arrow @click-left="onClickLeft" />
         <van-search v-model="searchKeyword" @search="onSearch" placeholder="请输入搜索关键词" />
-        <van-dropdown-menu active-color="#ee0a24">
+        <van-dropdown-menu active-color="#C4927A">
             <van-dropdown-item v-model="selValue1" :options="option1" @change="changeOption1" />
             <van-dropdown-item v-model="selValue2" :options="option2" @change="changeOption2" />
         </van-dropdown-menu>
@@ -184,29 +184,29 @@ export default {
     width: 100%;
     top: 0px;
     z-index: 1000000;
-    background-color: #fff;
+    background-color: var(--bg-card);
 }
 
 .list-data {
     margin-top: 150px;
-    background-color: #f5f7fa;
+    background-color: var(--bg-page);
     min-height: 100vh;
 }
 
 .van-search {
-    background-color: #f5f7fa;
+    background-color: var(--bg-page);
 
     .van-search__content {
-        border-radius: 8px;
+        border-radius: var(--radius-input);
     }
 }
 
 .van-dropdown-menu {
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 4px rgba(var(--shadow-color-base), 0.03);
 }
 
 .van-dropdown-menu__bar {
-    background-color: #fff;
+    background-color: var(--bg-card);
 }
 
 .task-finish-overlay {

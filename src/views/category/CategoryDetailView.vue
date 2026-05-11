@@ -310,25 +310,25 @@ export default {
   padding: 8px 12px;
   width: 100%;
   overflow: hidden;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 .list-box-detail {
   margin-top: 46px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
   min-height: 100vh;
 
   .cydes {
     padding: 28px 24px 32px;
-    background: linear-gradient(135deg, #e8f4ff 0%, #f0f8ff 50%, #fff 100%);
-    border-bottom: 1px solid #f0f0f0;
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent-light2) 50%, var(--bg-card) 100%);
+    border-bottom: 1px solid var(--border);
 
     h2 {
       word-wrap: break-word;
       word-break: break-all;
       white-space: pre-wrap;
       font-size: 20px;
-      color: #1a1a1a;
+      color: var(--text-primary);
       margin: 0 0 8px;
     }
 
@@ -336,7 +336,7 @@ export default {
       word-wrap: break-word;
       word-break: break-all;
       white-space: pre-wrap;
-      color: #666;
+      color: var(--text-secondary);
       font-size: 14px;
       margin: 0;
     }
@@ -351,23 +351,23 @@ export default {
 .cyLParentNote {
   margin-top: 8px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .cyLParentNote span.ant-tree-node-selected {
-  background-color: #e8f4ff !important;
-  color: #1989fa;
+  background-color: var(--accent-light) !important;
+  color: var(--accent);
 }
 
 .cyLleafNote {
   width: 86%;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--border-light);
   padding: 10px 1px 10px !important;
   margin-left: 24px;
   transition: background-color 0.15s ease;
 
   &:hover {
-    background-color: #fafbfc;
+    background-color: var(--bg-page);
   }
 }
 
@@ -380,11 +380,11 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0px;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .cyLleafNote .ant-tree-node-selected {
-  color: #1989fa;
+  color: var(--accent);
 }
 
 .cyLleafNote .ant-tree-switcher .anticon,
@@ -395,6 +395,6 @@ export default {
 .icon-box {
   display: inline-block;
   padding-left: 18px;
-  color: #333;
+  color: var(--text-primary);
 }
 </style>

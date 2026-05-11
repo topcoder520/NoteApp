@@ -4,10 +4,10 @@
             <router-link to="/Search"> <van-icon name="search" size="18" /></router-link>
         </template> -->
     </van-nav-bar>
-    <van-calendar :show-title="false" :show-subtitle="false" color="#1989fa" :min-date="minDate" :max-date="maxDate" :poppable="false"
+    <van-calendar :show-title="false" :show-subtitle="false" color="#8B9E8B" :min-date="minDate" :max-date="maxDate" :poppable="false"
         :show-confirm="false" :formatter="formatter" @select="SelectDate" @month-show="monthShow">
         <template v-slot:top-info="day">
-            <van-icon v-show="day.topInfo > 0" class="tips" color="red" name="bookmark" />
+            <van-icon v-show="day.topInfo > 0" class="tips" color="#C4927A" name="bookmark" />
         </template>
     </van-calendar>
     <van-popup v-model:show="showPopup" @click-overlay="cancelPop" position="bottom"
@@ -225,19 +225,19 @@ export default {
 </script>
 <style lang="less">
 #app {
-    background-color: #fff;
+    background-color: var(--bg-card);
 
     .van-calendar {
         width: 100%;
         height: v-bind("vheight");
 
         .weekendRed {
-            color: #ee0a24;
+            color: var(--danger);
         }
 
         .today {
             position: relative;
-            color: #1989fa;
+            color: var(--accent);
             font-weight: 700;
 
             &::after {
@@ -248,7 +248,7 @@ export default {
                 transform: translateX(-50%);
                 width: 6px;
                 height: 6px;
-                background-color: #1989fa;
+                background-color: var(--accent);
                 border-radius: 50%;
             }
         }
@@ -259,7 +259,7 @@ export default {
             right: 6px;
             width: 8px;
             height: 8px;
-            background-color: #ee0a24;
+            background-color: var(--danger);
             border-radius: 50%;
         }
     }
@@ -269,8 +269,8 @@ export default {
     }
 
     .van-calendar__day--selected {
-        background-color: #1989fa;
-        border-radius: 8px;
+        background-color: var(--accent);
+        border-radius: var(--radius-input);
     }
 }
 </style>

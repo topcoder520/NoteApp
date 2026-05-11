@@ -421,7 +421,7 @@ export default {
 <style lang="less">
 .content {
     padding: 0 20px;
-    background-color: #fff;
+    background-color: var(--bg-card);
     min-height: 100vh;
 
     .title {
@@ -434,7 +434,7 @@ export default {
     .title::placeholder {
         font-size: x-large;
         font-weight: 600;
-        color: #666;
+        color: var(--text-secondary);
     }
 
     .date-info {
@@ -444,7 +444,7 @@ export default {
 
         .category-name,
         .arrow-down {
-            color: #1989fa;
+            color: var(--accent);
         }
     }
 
@@ -463,12 +463,12 @@ export default {
         height: 44px;
         right: -22px;
         bottom: 200px;
-        background: #fff;
+        background: var(--bg-card);
         line-height: 44px;
         padding-left: 4px;
         text-align: left;
         border-radius: 50%;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 12px rgba(var(--shadow-color-base), 0.08);
         z-index: 2000;
         transition: right 0.2s ease;
 
@@ -482,32 +482,32 @@ export default {
     margin: 0px;
     padding: 16px;
     width: 100%;
-    background: #f5f7fa;
+    background: var(--bg-page);
     font-size: 16px;
     font-weight: 600;
-    color: #1a1a1a;
-    border-bottom: 1px solid #f0f0f0;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
 }
 
 .menubox {
     overflow: auto;
     height: 80%;
-    background-color: #fff;
+    background-color: var(--bg-card);
 }
 
 .vrow {
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid var(--border-light);
     padding: 14px 16px;
     transition: background-color 0.15s ease;
 
     &:active {
-        background-color: #f5f7fa;
+        background-color: var(--bg-page);
     }
 }
 
 .cur {
-    background: #e8f4ff;
-    border-left: 3px solid #1989fa;
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
 }
 
 .vrow p {
@@ -515,6 +515,6 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0px;
-    color: #333;
+    color: var(--text-primary);
 }
 </style>

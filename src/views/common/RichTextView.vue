@@ -379,7 +379,7 @@ export default {
                     if(linkUrl.value.startsWith('appnote:Id')){
                         var noteId = linkUrl.value.replace('appnote:Id=','');
                         if(selection.toString().length>0){
-                            var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${selection.toString()}</div>`;
+                            var htmlstr = `<div class="appUrl" style="color: #8B9E8B;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${selection.toString()}</div>`;
                             document.execCommand("insertHTML", false, htmlstr);
                             document.execCommand('insertHTML', false, "<br/>");
                         }else{
@@ -387,7 +387,7 @@ export default {
                                 const data = res;
                                 var title = data.Title;
                                 if(title != null && title.length > 0){
-                                    var htmlstr = `<div class="appUrl" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
+                                    var htmlstr = `<div class="appUrl" style="color: #8B9E8B;text-decoration: underline;margin: 13px 6px;" data-Id="${noteId}">${title}</div>`;
                                     document.execCommand("insertHTML", false, htmlstr);
                                     document.execCommand('insertHTML', false, "<br/>");
                                 }
@@ -443,7 +443,7 @@ export default {
                         richDiv.value.focus();
                         //设置光标位置
                         setSelectionRange();
-                        var htmlstr = `<div class="uploadfile" style="color: #1989fa;text-decoration: underline;margin: 13px 6px;" data-path="${data.toURL()}">${editFileName.value}${info.ext}</div>`;
+                        var htmlstr = `<div class="uploadfile" style="color: #8B9E8B;text-decoration: underline;margin: 13px 6px;" data-path="${data.toURL()}">${editFileName.value}${info.ext}</div>`;
                         document.execCommand("insertHTML", false, htmlstr);
                         document.execCommand('insertHTML', false, "<br/>");
                         showEditFileName.value = false;
@@ -489,10 +489,10 @@ export default {
                 showLinkUrl.value = true;
                 getSelectionRange();
             } else if (typ == 'A') {//字体颜色
-                document.execCommand("ForeColor", false, '#ff4d4f');
+                document.execCommand("ForeColor", false, '#C4927A');
                 setRichText();
             } else if (typ == 'AB') {//字体背景颜色
-                document.execCommand("BackColor", false, '#40a9ff');
+                document.execCommand("BackColor", false, '#8B9E8B');
                 setRichText();
             } else if (typ == 'BList') {//无序列表
                 document.execCommand("insertUnorderedList", false, null);
@@ -740,9 +740,9 @@ export default {
     width: 100%;
     height: 100%;
     overflow: auto;
-    line-height: 1.7 !important;
+    line-height: 1.8 !important;
     font-size: 15px;
-    color: #333;
+    color: var(--text-primary);
     word-wrap: break-word;
     word-break: break-all;
 }
@@ -777,18 +777,20 @@ export default {
 
 .richText .checkdivChecked {
     text-decoration: line-through;
-    color: #999;
+    color: var(--text-muted);
 }
-
+.van-back-top{
+    background-color: var(--danger) !important;
+}
 .tooltip {
     position: fixed;
     bottom: 0px;
     width: 100%;
     text-align: left;
     left: 0px;
-    background: #fff;
+    background: var(--bg-card);
     padding: 6px 4px;
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -2px 16px rgba(var(--shadow-color-base), 0.05);
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -798,11 +800,11 @@ export default {
     button {
         width: 36px;
         height: 32px;
-        background: #fff;
+        background: var(--bg-card);
         border: 1px solid transparent;
-        border-radius: 6px;
+        border-radius: var(--radius-btn);
         font-size: 13px;
-        color: #555;
+        color: var(--text-secondary);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -811,9 +813,9 @@ export default {
     }
 
     button:active {
-        background-color: #e8f4ff;
-        color: #1989fa;
-        border-color: #d0e7ff;
+        background-color: var(--accent-light);
+        color: var(--accent);
+        border-color: var(--border);
     }
 
     button.under,
@@ -823,8 +825,8 @@ export default {
 
     button.backFontColor span {
         position: relative;
-        background: #000;
-        color: #fff;
+        background: var(--text-primary);
+        color: var(--bg-card);
         padding: 2px 4px;
         border-radius: 2px;
     }
@@ -832,14 +834,14 @@ export default {
 
 .showPicUrlDialog input,
 .showPicUrlDialog textarea {
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-input);
     padding: 8px 12px;
     outline: none;
     font-size: 14px;
 
     &:focus {
-        border-color: #1989fa;
+        border-color: var(--accent);
     }
 }
 </style>

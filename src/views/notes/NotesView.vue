@@ -343,7 +343,7 @@ export default {
 
 .list-box {
   margin-top: 46px;
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
 }
 
 .list-box .add-box {
@@ -361,15 +361,15 @@ export default {
   display: inline-block;
   width: 56px;
   height: 56px;
-  background: #1989fa;
+  background: var(--accent);
   border-radius: 50%;
-  box-shadow: 0 4px 16px rgba(25, 137, 250, 0.4);
+  box-shadow: 0 4px 16px rgba(var(--shadow-accent), 0.35);
   transition: all 0.2s ease;
 }
 
 .list-box .add-box .border:active {
   transform: scale(0.9);
-  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--shadow-accent), 0.25);
 }
 
 .list-box .add-box .border .van-icon {
@@ -379,7 +379,7 @@ export default {
 }
 
 .van-pull-refresh {
-  background-color: #f5f7fa;
+  background-color: var(--bg-page);
 
   .van-list {
     margin-bottom: v-bind("marginbottom");
@@ -389,9 +389,9 @@ export default {
 
   .van-row {
     margin: 8px 16px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    background-color: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 2px 16px rgba(var(--shadow-color-base), 0.05);
     transition: transform 0.15s ease;
     overflow: hidden;
 
@@ -410,13 +410,13 @@ export default {
       p:first-child {
         font-size: 16px;
         font-weight: 500;
-        color: #1a1a1a;
-        line-height: 1.4;
+        color: var(--text-primary);
+        line-height: 1.5;
       }
 
       p:last-child {
         font-size: 12px;
-        color: #b0b0b0;
+        color: var(--text-muted);
         display: flex;
         align-items: center;
       }
@@ -427,9 +427,9 @@ export default {
     font-size: 11px;
     display: inline-block;
     padding: 2px 6px;
-    background: linear-gradient(135deg, #1989fa, #0066cc);
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
     color: #fff;
-    border-radius: 4px;
+    border-radius: var(--radius-tag);
     margin-left: 8px;
     font-weight: 500;
   }
@@ -445,19 +445,19 @@ export default {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: #07c160;
+  background-color: var(--success);
   border-radius: 50%;
   margin-right: 6px;
-  box-shadow: 0 0 4px rgba(7, 193, 96, 0.4);
+  box-shadow: 0 0 4px rgba(var(--success), 0.3);
 }
 
 .status-over {
   display: inline-block;
   width: 8px;
   height: 8px;
-  background-color: #ee0a24;
+  background-color: var(--danger);
   border-radius: 50%;
   margin-right: 6px;
-  box-shadow: 0 0 4px rgba(238, 10, 36, 0.4);
+  box-shadow: 0 0 4px rgba(var(--danger), 0.3);
 }
 </style>

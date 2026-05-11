@@ -57,14 +57,14 @@ export default {
 <style lang="less">
 .setting {
     min-height: 100vh;
-    background-color: #f5f7fa;
+    background-color: var(--bg-page);
     text-align: left;
     padding: 16px 0;
 }
 
 .van-cell-group--inset {
     margin: 0 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-card);
     overflow: hidden;
 }
 
