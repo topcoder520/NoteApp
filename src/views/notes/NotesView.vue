@@ -338,86 +338,107 @@ export default {
   position: fixed;
   width: 100%;
   top: 0px;
+  z-index: 1000;
 }
 
 .list-box {
   margin-top: 46px;
+  background-color: #f5f7fa;
 }
 
 .list-box .add-box {
   display: inline-block;
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   position: fixed;
   border-radius: 50%;
-  bottom: 60px;
-  right: 12px;
+  bottom: 70px;
+  right: 20px;
+  z-index: 1000;
 }
 
 .list-box .add-box .border {
   display: inline-block;
-  width: 42px;
-  height: 42px;
-  background: #fff;
-  border: 1px solid #1989fa;
+  width: 56px;
+  height: 56px;
+  background: #1989fa;
   border-radius: 50%;
-  background-color: #1989fa;
+  box-shadow: 0 4px 16px rgba(25, 137, 250, 0.4);
+  transition: all 0.2s ease;
+}
+
+.list-box .add-box .border:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(25, 137, 250, 0.3);
 }
 
 .list-box .add-box .border .van-icon {
-  line-height: 42px;
-  font-size: 22px;
-  color: #ededed;
-}
-
-.list-box .add-box .border .van-icon:hover {
+  line-height: 56px;
   font-size: 24px;
   color: #fff;
 }
 
 .van-pull-refresh {
-  background-color: #f9f9f9;
-  //margin-bottom: 120px;
+  background-color: #f5f7fa;
 
   .van-list {
     margin-bottom: v-bind("marginbottom");
     min-height: v-bind("vheight");
+    padding-top: 4px;
   }
 
   .van-row {
-    margin: 12px 20px;
+    margin: 8px 16px;
     background-color: #fff;
-    border-radius: 0.8em;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease;
+    overflow: hidden;
+
+    &:active {
+      transform: scale(0.98);
+    }
 
     .van-col {
-
-      padding: 3px 12px;
+      padding: 14px 16px;
 
       p {
-        margin: 6px;
+        margin: 4px 0;
         text-align: left;
       }
 
-      p:first {
-        font-size: 15px;
+      p:first-child {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a1a1a;
+        line-height: 1.4;
       }
 
       p:last-child {
-        font-size: 13px;
-        color: #666;
+        font-size: 12px;
+        color: #b0b0b0;
+        display: flex;
+        align-items: center;
       }
     }
   }
 
   .top-tag {
-    font-size: 12px;
+    font-size: 11px;
     display: inline-block;
-    padding: 2px 3px;
-    background-color: blue;
+    padding: 2px 6px;
+    background: linear-gradient(135deg, #1989fa, #0066cc);
     color: #fff;
-    border-radius: 3px;
-    margin-left: 9px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 500;
   }
+}
+
+// Swipe cell action buttons
+.van-swipe-cell__left .van-button,
+.van-swipe-cell__right .van-button {
+  border-radius: 0;
 }
 
 .status {
@@ -427,6 +448,7 @@ export default {
   background-color: #07c160;
   border-radius: 50%;
   margin-right: 6px;
+  box-shadow: 0 0 4px rgba(7, 193, 96, 0.4);
 }
 
 .status-over {
@@ -436,5 +458,6 @@ export default {
   background-color: #ee0a24;
   border-radius: 50%;
   margin-right: 6px;
+  box-shadow: 0 0 4px rgba(238, 10, 36, 0.4);
 }
 </style>

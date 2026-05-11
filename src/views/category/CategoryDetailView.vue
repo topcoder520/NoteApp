@@ -303,53 +303,72 @@ export default {
   position: fixed;
   width: 100%;
   top: 0px;
+  z-index: 1000;
 }
 
 .cybody {
-  padding: 6px 12px 6px;
+  padding: 8px 12px;
   width: 100%;
   overflow: hidden;
+  background-color: #fff;
 }
 
 .list-box-detail {
   margin-top: 46px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
 
   .cydes {
-    padding: 20px 0px 30px;
-    background-image: url(@/assets/img/bg-cy-detail.jpg);
-    background-size: 100%;
+    padding: 28px 24px 32px;
+    background: linear-gradient(135deg, #e8f4ff 0%, #f0f8ff 50%, #fff 100%);
+    border-bottom: 1px solid #f0f0f0;
 
     h2 {
       word-wrap: break-word;
       word-break: break-all;
       white-space: pre-wrap;
+      font-size: 20px;
+      color: #1a1a1a;
+      margin: 0 0 8px;
     }
 
     p {
       word-wrap: break-word;
       word-break: break-all;
       white-space: pre-wrap;
+      color: #666;
+      font-size: 14px;
+      margin: 0;
     }
   }
 }
 
 .ant-tree {
   margin-bottom: 12px;
+  background: transparent;
 }
 
 .cyLParentNote {
   margin-top: 8px;
+  font-weight: 600;
+  color: #333;
 }
 
 .cyLParentNote span.ant-tree-node-selected {
-  background-color: #b9c1c8 !important;
+  background-color: #e8f4ff !important;
+  color: #1989fa;
 }
 
 .cyLleafNote {
   width: 86%;
-  border-bottom: 1px solid #f3f3f8;
-  padding: 8px 1px 8px !important;
+  border-bottom: 1px solid #f5f5f5;
+  padding: 10px 1px 10px !important;
   margin-left: 24px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background-color: #fafbfc;
+  }
 }
 
 .cyLleafNote .ant-tree-switcher {
@@ -361,6 +380,11 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0px;
+  color: #333;
+}
+
+.cyLleafNote .ant-tree-node-selected {
+  color: #1989fa;
 }
 
 .cyLleafNote .ant-tree-switcher .anticon,
@@ -371,5 +395,6 @@ export default {
 .icon-box {
   display: inline-block;
   padding-left: 18px;
+  color: #333;
 }
 </style>

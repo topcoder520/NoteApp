@@ -280,10 +280,12 @@ export default {
   position: fixed;
   width: 100%;
   top: 0px;
+  z-index: 1000;
 }
 
 .list-box-cy {
   margin-top: 46px;
+  background-color: #f5f7fa;
 }
 
 .list-box-cy .add-box {
@@ -318,46 +320,56 @@ export default {
 }
 
 .van-pull-refresh-cy {
-  background-color: #f9f9f9;
-  //margin-bottom: 120px;
+  background-color: #f5f7fa;
 
   .van-list {
-    //margin-bottom: 80px;
     min-height: v-bind("vheight");
+    padding-top: 4px;
   }
 
   .van-row {
-    margin: 12px 20px;
+    margin: 8px 16px;
     background-color: #fff;
-    border-radius: 0.8em;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease;
+    overflow: hidden;
+
+    &:active {
+      transform: scale(0.98);
+    }
 
     .van-col {
-
-      padding: 3px 12px;
+      padding: 14px 16px;
 
       p {
-        margin: 6px;
+        margin: 4px 0;
         text-align: left;
       }
 
-      p:first {
-        font-size: 15px;
+      p:first-child {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1a1a1a;
       }
 
       p:last-child {
-        font-size: 13px;
-        color: #666;
+        font-size: 12px;
+        color: #b0b0b0;
+        display: flex;
+        align-items: center;
       }
     }
   }
 
   .top-tag {
-    font-size: 12px;
+    font-size: 11px;
     display: inline-block;
-    padding: 2px 3px;
-    background-color: blue;
+    padding: 2px 6px;
+    background: linear-gradient(135deg, #1989fa, #0066cc);
     color: #fff;
-    border-radius: 3px;
-    margin-left: 9px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-weight: 500;
   }
 }</style>

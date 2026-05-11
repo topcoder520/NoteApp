@@ -184,10 +184,29 @@ export default {
     width: 100%;
     top: 0px;
     z-index: 1000000;
+    background-color: #fff;
 }
 
 .list-data {
     margin-top: 150px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+}
+
+.van-search {
+    background-color: #f5f7fa;
+
+    .van-search__content {
+        border-radius: 8px;
+    }
+}
+
+.van-dropdown-menu {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.van-dropdown-menu__bar {
+    background-color: #fff;
 }
 
 .task-finish-overlay {

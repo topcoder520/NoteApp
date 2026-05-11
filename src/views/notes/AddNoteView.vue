@@ -377,33 +377,55 @@ export default {
     position: fixed;
     width: 100%;
     top: 0px;
+    z-index: 1000;
 }
 
 .addcontent {
     margin-top: 46px;
-    padding: 16px 20px;
+    padding: 20px 20px 40px;
+    background-color: #fff;
+    min-height: 100vh;
+
+    .title-box {
+        position: relative;
+
+        .van-icon-cross {
+            font-size: 16px !important;
+            position: absolute;
+            top: 8px;
+            right: 0;
+            color: #ccc;
+            font-weight: 600;
+        }
+    }
 
     .title {
         width: 100%;
-        font-size: 20px;
-        line-height: 20px;
+        font-size: 22px;
+        line-height: 1.3;
         border: none;
+        outline: none;
+        padding: 8px 0;
+        font-weight: 600;
+        color: #1a1a1a;
+        background: transparent;
     }
 
     .title::placeholder {
-        font-size: x-large;
+        font-size: 22px;
         font-weight: 600;
-        color: #666;
+        color: #c0c0c0;
     }
 
     .date-info {
         text-align: left;
         padding-left: 0px !important;
         padding-right: 0px !important;
+        margin-top: 4px;
 
         .category-name,
         .arrow-down {
-            color: deepskyblue;
+            color: #1989fa;
         }
     }
 
@@ -411,21 +433,9 @@ export default {
         width: 100%;
         border: none;
         height: v-bind("vheight");
-        margin-top: 10px;
-        border-top: 1px solid #efefef;
-        padding-top: 5px;
-    }
-    .title-box{
-        position: relative;
-
-        .van-icon-cross{
-            font-size: 16px !important;
-            position: absolute;
-            top: 4px;
-            color: red;
-            font-weight: 600;
-
-        }
+        margin-top: 16px;
+        border-top: 1px solid #f0f0f0;
+        padding-top: 12px;
     }
 }
 </style>

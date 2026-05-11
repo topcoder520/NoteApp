@@ -225,24 +225,52 @@ export default {
 </script>
 <style lang="less">
 #app {
+    background-color: #fff;
 
     .van-calendar {
         width: 100%;
         height: v-bind("vheight");
 
         .weekendRed {
-            color: red;
+            color: #ee0a24;
         }
 
         .today {
-            color: rgb(23, 148, 250);
+            position: relative;
+            color: #1989fa;
+            font-weight: 700;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 2px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 6px;
+                height: 6px;
+                background-color: #1989fa;
+                border-radius: 50%;
+            }
         }
 
         .tips {
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background-color: #ee0a24;
+            border-radius: 50%;
         }
+    }
+
+    .van-calendar__day {
+        transition: background-color 0.15s ease;
+    }
+
+    .van-calendar__day--selected {
+        background-color: #1989fa;
+        border-radius: 8px;
     }
 }
 </style>

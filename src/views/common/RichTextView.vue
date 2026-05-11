@@ -739,10 +739,12 @@ export default {
     text-align: left;
     width: 100%;
     height: 100%;
-    //border: 1px solid;
     overflow: auto;
-
-    line-height: 24px !important;
+    line-height: 1.7 !important;
+    font-size: 15px;
+    color: #333;
+    word-wrap: break-word;
+    word-break: break-all;
 }
 
 .richText ul {
@@ -785,17 +787,33 @@ export default {
     text-align: left;
     left: 0px;
     background: #fff;
+    padding: 6px 4px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    z-index: 1000;
 
     button {
-        width: 42px;
-        height: 28px;
+        width: 36px;
+        height: 32px;
         background: #fff;
-        border: 1px #111;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #555;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
     }
 
     button:active {
-        background-color: #d5ddd5;
-        color: #fff;
+        background-color: #e8f4ff;
+        color: #1989fa;
+        border-color: #d0e7ff;
     }
 
     button.under,
@@ -808,13 +826,20 @@ export default {
         background: #000;
         color: #fff;
         padding: 2px 4px;
+        border-radius: 2px;
     }
 }
 
-.showPicUrlDialog input {
-    border: 1px solid #eee;
-    width: 94%;
-    height: 30px;
-    border-radius: 2px;
+.showPicUrlDialog input,
+.showPicUrlDialog textarea {
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    font-size: 14px;
+
+    &:focus {
+        border-color: #1989fa;
+    }
 }
 </style>

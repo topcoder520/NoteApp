@@ -93,11 +93,34 @@ export default {
 
 <style lang="less">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #f5f7fa;
+}
 
+.van-tabbar {
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid #f0f0f0;
+}
+
+.van-tabbar-item {
+  transition: color 0.2s ease;
+}
+
+.van-tabbar-item--active {
+  font-weight: 600;
+}
+
+.van-nav-bar {
+  background-color: #fff !important;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+}
+
+.van-nav-bar__title {
+  font-weight: 600;
+  color: #1a1a1a;
 }
 </style>

@@ -420,7 +420,9 @@ export default {
 </script>
 <style lang="less">
 .content {
-    padding: 1px 20px;
+    padding: 0 20px;
+    background-color: #fff;
+    min-height: 100vh;
 
     .title {
         width: 100%;
@@ -442,7 +444,7 @@ export default {
 
         .category-name,
         .arrow-down {
-            color: deepskyblue;
+            color: #1989fa;
         }
     }
 
@@ -451,45 +453,61 @@ export default {
         border: none;
         height: v-bind("vheight");
         word-wrap: break-word;
-        padding-top: 5px;
+        padding-top: 12px;
     }
 
     .leftMenu {
         display: inline-block;
         position: fixed;
-        width: 48px;
-        height: 48px;
-        right: -28px;
+        width: 44px;
+        height: 44px;
+        right: -22px;
         bottom: 200px;
-        background: #fdfdfd;
-        line-height: 48px;
-        padding-left: 3px;
+        background: #fff;
+        line-height: 44px;
+        padding-left: 4px;
         text-align: left;
         border-radius: 50%;
-        box-shadow: 0 0 3px #bfb8b8;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
         z-index: 2000;
+        transition: right 0.2s ease;
+
+        &:active {
+            right: -18px;
+        }
     }
 }
 
 .menutitle {
     margin: 0px;
-    padding: 12px 3px;
+    padding: 16px;
     width: 100%;
-    border-bottom: 1px solid #e3dddd;
+    background: #f5f7fa;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .menubox {
     overflow: auto;
     height: 80%;
+    background-color: #fff;
 }
 
 .vrow {
-    border-bottom: 1px solid #eee;
-    padding: 15px 10px;
+    border-bottom: 1px solid #f5f5f5;
+    padding: 14px 16px;
+    transition: background-color 0.15s ease;
+
+    &:active {
+        background-color: #f5f7fa;
+    }
 }
 
 .cur {
-    background: #d6d6d6;
+    background: #e8f4ff;
+    border-left: 3px solid #1989fa;
 }
 
 .vrow p {
@@ -497,5 +515,6 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
     margin: 0px;
+    color: #333;
 }
 </style>

@@ -355,37 +355,63 @@ export default {
 </script>
 <style lang="less">
 .addcycontent {
-    padding: 16px 20px;
+    padding: 20px;
+    background-color: #fff;
+    min-height: 100vh;
 
     .title {
-        width: 97%;
-        height: 32px;
-        border: 1px solid #cdc8c8;
+        width: 100%;
+        height: 40px;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 0 12px;
+        font-size: 16px;
+        outline: none;
+        box-sizing: border-box;
+
+        &:focus {
+            border-color: #1989fa;
+        }
     }
 
     .date-info {
         text-align: left;
         padding-left: 0px !important;
         padding-right: 0px !important;
+        margin-top: 12px;
 
         .category-name,
         .arrow-down {
-            color: deepskyblue;
+            color: #1989fa;
         }
     }
 
     .note-content {
-        width: 98%;
-        border: 1px solid #cdc8c8;
+        width: 100%;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        outline: none;
+        margin-top: 12px;
+        box-sizing: border-box;
+        resize: vertical;
+
+        &:focus {
+            border-color: #1989fa;
+        }
     }
 
     .categorylist {
         margin-top: 30px;
         padding-top: 18px;
-        border-top: 1px solid #eee;
+        border-top: 1px solid #f0f0f0;
 
         p {
             text-align: left;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
         }
 
         .listdata {
@@ -393,7 +419,13 @@ export default {
             overflow: auto;
 
             .vrow {
-                border-bottom: 1px solid #f0ecec;
+                border-bottom: 1px solid #f5f5f5;
+                padding: 12px 8px;
+                transition: background-color 0.15s ease;
+
+                &:active {
+                    background-color: #f5f7fa;
+                }
             }
         }
     }

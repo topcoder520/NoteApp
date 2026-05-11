@@ -44,12 +44,12 @@ module.exports = function (context) {
     const isApk = filePath.endsWith('.apk');
     //const isAab = filePath.endsWith('.aab');
     if (isApk) {
-        // childProcess.execFile('cmd', ['/c', filePath], (error, stdout, stderr) => {
-        //     if (error) {
-        //         console.error(`exec error: ${error}`);
-        //         return;
-        //     }
-        // });
+        childProcess.execFile('cmd', ['/c', filePath], (error, stdout, stderr) => {
+            if (error) {
+                console.error(`exec error: ${error}`);
+                return;
+            }
+        });
     }
     
 }

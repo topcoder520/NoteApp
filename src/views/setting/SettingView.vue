@@ -56,9 +56,23 @@ export default {
 </script>
 <style lang="less">
 .setting {
-    height: 100%;
-    background-color: #fff;
+    min-height: 100vh;
+    background-color: #f5f7fa;
     text-align: left;
-    padding: 10px 1px;
+    padding: 16px 0;
+}
+
+.van-cell-group--inset {
+    margin: 0 16px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.van-cell--large {
+    padding: 16px;
+}
+
+.van-switch {
+    transition: all 0.2s ease;
 }
 </style>
