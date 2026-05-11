@@ -1,0 +1,1 @@
+cmd /c "npm run build&&cordova clean android&&cordova prepare android&&cordova build android --release --buildConfig=build-apk.json"
